@@ -1,4 +1,4 @@
-package com.poptato.app
+package com.poptato.feature
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
