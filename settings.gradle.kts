@@ -1,4 +1,6 @@
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google {
             content {
@@ -24,5 +26,4 @@ include(":app")
 include(":data")
 include(":domain")
 include(":feature")
-include(":build-logic")
 include(":core")
