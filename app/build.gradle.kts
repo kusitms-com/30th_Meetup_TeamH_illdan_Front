@@ -1,6 +1,7 @@
 plugins {
     id("poptato.android.application")
     id("poptato.android.hilt")
+    id("poptato.android.kotlin")
 }
 
 android {

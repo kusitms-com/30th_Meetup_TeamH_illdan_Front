@@ -22,35 +22,35 @@ gradlePlugin {
     plugins {
         register("android-application") {
             id = "poptato.android.application"
-            implementationClass = "com.poptato.build_logic.plugin.AndroidApplicationPlugin"
+            implementationClass = "com.poptato.plugin.AndroidApplicationPlugin"
         }
         register("android-compose") {
             id = "poptato.android.compose"
-            implementationClass = "com.poptato.build_logic.plugin.AndroidComposePlugin"
+            implementationClass = "com.poptato.plugin.AndroidComposePlugin"
         }
         register("android-feature") {
             id = "poptato.android.feature"
-            implementationClass = "com.poptato.build_logic.plugin.AndroidFeaturePlugin"
+            implementationClass = "com.poptato.plugin.AndroidFeaturePlugin"
         }
         register("android-hilt") {
             id = "poptato.android.hilt"
-            implementationClass = "com.poptato.build_logic.plugin.AndroidHiltPlugin"
+            implementationClass = "com.poptato.plugin.AndroidHiltPlugin"
         }
         register("android-kotlin") {
             id = "poptato.android.kotlin"
-            implementationClass = "com.poptato.build_logic.plugin.AndroidKotlinPlugin"
+            implementationClass = "com.poptato.plugin.AndroidKotlinPlugin"
         }
         register("kotlin-jvm") {
             id = "poptato.kotlin.jvm"
-            implementationClass = "com.poptato.build_logic.plugin.KotlinJvmPlugin"
+            implementationClass = "com.poptato.plugin.KotlinJvmPlugin"
         }
         register("kotlin-serialization") {
             id = "poptato.kotlin.serialization"
-            implementationClass = "com.poptato.build_logic.plugin.KotlinSerializationPlugin"
+            implementationClass = "com.poptato.plugin.KotlinSerializationPlugin"
         }
         register("retrofit") {
             id = "poptato.retrofit"
-            implementationClass = "com.poptato.build_logic.plugin.RetrofitPlugin"
+            implementationClass = "com.poptato.plugin.RetrofitPlugin"
         }
     }
 }
