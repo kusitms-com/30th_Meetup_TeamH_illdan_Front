@@ -14,4 +14,10 @@ dependencies {
     implementation(projects.core)
 
     implementation(libs.androidx.datastore)
+
+    implementation(libs.gson)
+    implementation(libs.retrofit.gson)
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging.interceptor)
+    implementation(libs.okhttp.urlconnection)
 }
