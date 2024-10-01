@@ -1,7 +1,7 @@
 plugins {
-    id("poptato.kotlin.jvm")
-    id("poptato.kotlin.serialization")
+    id("poptato.android.feature")
     id("poptato.retrofit")
+    id("poptato.android.hilt")
 }
 
 java {
@@ -12,4 +12,12 @@ java {
 dependencies {
     implementation(projects.domain)
     implementation(projects.core)
+
+    implementation(libs.androidx.datastore)
+
+    implementation(libs.gson)
+    implementation(libs.retrofit.gson)
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging.interceptor)
+    implementation(libs.okhttp.urlconnection)
 }
