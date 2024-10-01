@@ -12,4 +12,5 @@ dependencies {
     implementation(projects.feature)
     implementation(projects.domain)
     implementation(projects.core)
+    implementation(projects.data)
 }
