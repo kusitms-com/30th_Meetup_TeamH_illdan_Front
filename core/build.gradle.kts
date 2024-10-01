@@ -8,4 +8,6 @@ java {
 }
 
 dependencies {
+    implementation(libs.kotlin.stdlib)
+    implementation(libs.coroutines.core)
 }
