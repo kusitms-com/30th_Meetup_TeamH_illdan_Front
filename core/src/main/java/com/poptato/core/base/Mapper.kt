@@ -1,4 +1,5 @@
 package com.poptato.core.base
 
-class Mapper {
+interface Mapper<RESPONSE, MODEL> {
+    fun responseToModel(response: RESPONSE): MODEL
 }
