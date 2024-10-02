@@ -12,4 +12,7 @@ android {
 dependencies {
     implementation(projects.domain)
     implementation(projects.core)
+    implementation(projects.core.ui)
+    implementation(projects.designSystem)
+    implementation(projects.core.navigation)
 }
