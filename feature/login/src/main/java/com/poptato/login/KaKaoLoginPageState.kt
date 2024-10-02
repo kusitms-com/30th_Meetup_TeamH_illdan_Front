@@ -1,4 +1,7 @@
 package com.poptato.login
 
-class KaKaoLoginPageState {
-}
+import com.poptato.ui.base.PageState
+
+data class KaKaoLoginPageState(
+    val temp: String = ""
+): PageState

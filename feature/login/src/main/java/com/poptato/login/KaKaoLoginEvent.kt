@@ -1,4 +1,6 @@
 package com.poptato.login
 
-class KaKaoLoginEvent {
+import com.poptato.ui.base.Event
+
+sealed class KaKaoLoginEvent: Event {
 }
