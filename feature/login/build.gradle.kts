@@ -12,4 +12,7 @@ dependencies {
     implementation(projects.domain)
     implementation(projects.core.ui)
     implementation(projects.designSystem)
+
+    // 카카오 로그인
+    implementation(libs.kakao.auth)
 }
