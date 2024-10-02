@@ -42,6 +42,7 @@ lottie = "6.5.2"
 androidx-paging = "3.3.2"
 coil = "2.7.0"
 kotlin-serialization-converter = "0.8.0"
+kakao-auth = "2.20.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -131,6 +132,9 @@ compose-paging = { module = "androidx.paging:paging-compose", version.ref = "and
 
 # Coil
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
+
+# KaKao
+kakao-auth = { module = "com.kakao.sdk:v2-user", version.ref = "kakao-auth" }
 
 [bundles]
 compose = [
