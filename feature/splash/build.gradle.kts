@@ -1,18 +1,15 @@
 plugins {
     id("poptato.android.feature")
     id("poptato.android.compose")
-    id("poptato.android.hilt")
-    id("poptato.android.kotlin")
 }
 
 android {
-    namespace = "com.poptato.feature"
+    namespace = "com.poptato.splash"
 }
 
 dependencies {
-    implementation(projects.domain)
     implementation(projects.core)
+    implementation(projects.domain)
     implementation(projects.core.ui)
     implementation(projects.designSystem)
-    implementation(projects.core.navigation)
 }
