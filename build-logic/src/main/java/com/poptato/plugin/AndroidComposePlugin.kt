@@ -30,6 +30,7 @@ class AndroidComposePlugin: Plugin<Project> {
             "implementation"(platform(libs.findLibrary("androidx.compose.bom").get()))
             "implementation"(libs.findBundle("compose").get())
             "implementation"(libs.findLibrary("coil-compose").get())
+            "implementation"(libs.findLibrary("androidx.navigation.compose").get())
         }
     }
 }

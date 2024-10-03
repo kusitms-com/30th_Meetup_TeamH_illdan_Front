@@ -9,11 +9,11 @@ espressoCore = "3.6.1"
 lifecycle = "2.4.1"
 lifecycleRuntimeKtx = "2.8.4"
 activityCompose = "1.9.1"
-composeBom = "2024.06.00"
+composeBom = "2024.09.02"
 composeCompiler = "1.5.14"
 hilt = "2.51.1"
 androidxHilt = "1.2.0"
-navigationCompose = "2.7.7"
+navigationCompose = "2.8.1"
 retrofit = "2.11.0"
 retrofit-bom = "2.11.0"
 gson = "2.10.1"
@@ -42,6 +42,7 @@ lottie = "6.5.2"
 androidx-paging = "3.3.2"
 coil = "2.7.0"
 kotlin-serialization-converter = "0.8.0"
+kakao-auth = "2.20.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -132,6 +133,9 @@ compose-paging = { module = "androidx.paging:paging-compose", version.ref = "and
 # Coil
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 
+# KaKao
+kakao-auth = { module = "com.kakao.sdk:v2-user", version.ref = "kakao-auth" }
+
 [bundles]
 compose = [
     "compose-ui",
@@ -148,6 +152,7 @@ compose = [
     "compose-ui-tooling-preview",
     "hilt-navigation",
     "compose-lottie",
+
 ]
 
 [plugins]

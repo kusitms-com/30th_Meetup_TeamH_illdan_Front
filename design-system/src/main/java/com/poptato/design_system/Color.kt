@@ -16,3 +16,5 @@ val Gray80 = Color(0xFF515157)
 val Gray90 = Color(0xFF3B3B40)
 val Gray100 = Color(0xFF252528)
 
+// KaKao
+val KaKaoMain = Color(0xFFFEE500)

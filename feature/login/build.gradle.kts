@@ -4,12 +4,15 @@ plugins {
 }
 
 android {
-    namespace = "com.poptato.navigation"
+    namespace = "com.poptato.login"
 }
 
 dependencies {
     implementation(projects.core)
     implementation(projects.domain)
-    implementation(projects.feature.splash)
-    implementation(projects.feature.login)
+    implementation(projects.core.ui)
+    implementation(projects.designSystem)
+
+    // 카카오 로그인
+    implementation(libs.kakao.auth)
 }
