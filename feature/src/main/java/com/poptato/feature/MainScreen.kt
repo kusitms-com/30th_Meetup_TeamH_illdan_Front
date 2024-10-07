@@ -46,6 +46,7 @@ import com.poptato.navigation.NavRoutes
 import com.poptato.navigation.loginNavGraph
 import com.poptato.navigation.mainNavGraph
 import com.poptato.navigation.splashNavGraph
+import com.poptato.ui.util.DismissKeyboardOnClick
 import kotlinx.coroutines.flow.distinctUntilChanged
 
 @Composable
@@ -63,49 +64,51 @@ fun MainScreen() {
             }
     }
 
-    Scaffold(
-        bottomBar = {
-            if (uiState.bottomNavType != BottomNavType.DEFAULT) {
-                BottomNavBar(
-                    type = uiState.bottomNavType,
-                    onClick = { route: String ->
-                        navController.navigate(route)
-                    },
-                    modifier = Modifier.navigationBarsPadding()
-                )
-            }
-        }
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .padding(innerPadding)
-        ) {
-            NavHost(
-                navController = navController,
-                startDestination = NavRoutes.SplashGraph.route,
-                exitTransition = { ExitTransition.None },
-                enterTransition = {
-                    slideIntoContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Start,
-                        tween(slideDuration)
-                    )
-                },
-                popEnterTransition = {
-                    slideIntoContainer(
-                        AnimatedContentTransitionScope.SlideDirection.End,
-                        tween(slideDuration)
-                    )
-                },
-                popExitTransition = {
-                    slideOutOfContainer(
-                        AnimatedContentTransitionScope.SlideDirection.End,
-                        tween(slideDuration)
+    DismissKeyboardOnClick {
+        Scaffold(
+            bottomBar = {
+                if (uiState.bottomNavType != BottomNavType.DEFAULT) {
+                    BottomNavBar(
+                        type = uiState.bottomNavType,
+                        onClick = { route: String ->
+                            navController.navigate(route)
+                        },
+                        modifier = Modifier.navigationBarsPadding()
                     )
                 }
+            }
+        ) { innerPadding ->
+            Box(
+                modifier = Modifier
+                    .padding(innerPadding)
             ) {
-                splashNavGraph(navController = navController)
-                loginNavGraph(navController = navController)
-                mainNavGraph(navController = navController)
+                NavHost(
+                    navController = navController,
+                    startDestination = NavRoutes.SplashGraph.route,
+                    exitTransition = { ExitTransition.None },
+                    enterTransition = {
+                        slideIntoContainer(
+                            AnimatedContentTransitionScope.SlideDirection.Start,
+                            tween(slideDuration)
+                        )
+                    },
+                    popEnterTransition = {
+                        slideIntoContainer(
+                            AnimatedContentTransitionScope.SlideDirection.End,
+                            tween(slideDuration)
+                        )
+                    },
+                    popExitTransition = {
+                        slideOutOfContainer(
+                            AnimatedContentTransitionScope.SlideDirection.End,
+                            tween(slideDuration)
+                        )
+                    }
+                ) {
+                    splashNavGraph(navController = navController)
+                    loginNavGraph(navController = navController)
+                    mainNavGraph(navController = navController)
+                }
             }
         }
     }
@@ -163,9 +166,12 @@ fun BottomNavItem(
         modifier = Modifier
             .size(width = 42.dp, height = 46.dp)
             .clickable {
-                when(type) {
+                when (type) {
                     BottomNavType.TODAY -> TODO()
-                    BottomNavType.BACK_LOG -> { onClick(NavRoutes.BacklogScreen.route) }
+                    BottomNavType.BACK_LOG -> {
+                        onClick(NavRoutes.BacklogScreen.route)
+                    }
+
                     BottomNavType.HISTORY -> TODO()
                     BottomNavType.SETTINGS -> TODO()
                     BottomNavType.DEFAULT -> TODO()
@@ -187,10 +193,4 @@ fun BottomNavItem(
             color = if (isSelected) Primary60 else Gray80
         )
     }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun PreviewBottomNav() {
-    BottomNavBar()
 }
