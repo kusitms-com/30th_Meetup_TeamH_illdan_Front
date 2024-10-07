@@ -79,7 +79,6 @@ fun MainScreen() {
         Box(
             modifier = Modifier
                 .padding(innerPadding)
-                .systemBarsPadding()
         ) {
             NavHost(
                 navController = navController,

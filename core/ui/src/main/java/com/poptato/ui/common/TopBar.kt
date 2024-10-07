@@ -1,5 +1,6 @@
 package com.poptato.ui.common
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,6 +23,7 @@ import com.poptato.design_system.Gray100
 import com.poptato.design_system.Gray40
 import com.poptato.design_system.PoptatoTypo
 
+@SuppressLint("ModifierParameter")
 @Composable
 fun TopBar(
     titleText: String = "",
@@ -29,10 +31,11 @@ fun TopBar(
     titleTextStyle: TextStyle = PoptatoTypo.xxxLSemiBold,
     subTextStyle: TextStyle = PoptatoTypo.mdMedium,
     titleTextColor: Color = Gray00,
-    subTextColor: Color = Gray40
+    subTextColor: Color = Gray40,
+    modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(56.dp)
             .background(Gray100)
