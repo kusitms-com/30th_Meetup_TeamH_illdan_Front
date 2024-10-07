@@ -1,5 +1,6 @@
 plugins {
     id("poptato.android.feature")
+    id("poptato.android.compose")
 }
 
 android {
@@ -7,5 +8,5 @@ android {
 }
 
 dependencies {
-
+    implementation(projects.designSystem)
 }
