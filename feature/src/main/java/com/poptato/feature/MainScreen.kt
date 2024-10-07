@@ -1,5 +1,6 @@
 package com.poptato.feature
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -42,6 +44,7 @@ import com.poptato.design_system.Settings
 import com.poptato.design_system.Today
 import com.poptato.navigation.NavRoutes
 import com.poptato.navigation.loginNavGraph
+import com.poptato.navigation.mainNavGraph
 import com.poptato.navigation.splashNavGraph
 import kotlinx.coroutines.flow.distinctUntilChanged
 
@@ -52,7 +55,7 @@ fun MainScreen() {
     val navController = rememberNavController()
     val slideDuration = 300
 
-    LaunchedEffect(navController.currentBackStackEntryFlow) {
+    LaunchedEffect(navController) {
         navController.currentBackStackEntryFlow
             .distinctUntilChanged()
             .collect { backStackEntry ->
@@ -67,7 +70,8 @@ fun MainScreen() {
                     type = uiState.bottomNavType,
                     onClick = { route: String ->
                         navController.navigate(route)
-                    }
+                    },
+                    modifier = Modifier.navigationBarsPadding()
                 )
             }
         }
@@ -102,6 +106,7 @@ fun MainScreen() {
             ) {
                 splashNavGraph(navController = navController)
                 loginNavGraph(navController = navController)
+                mainNavGraph(navController = navController)
             }
         }
     }
@@ -110,10 +115,11 @@ fun MainScreen() {
 @Composable
 fun BottomNavBar(
     type: BottomNavType = BottomNavType.TODAY,
-    onClick: (String) -> Unit = {}
+    onClick: (String) -> Unit = {},
+    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(72.dp)
             .background(Gray100),
@@ -160,7 +166,7 @@ fun BottomNavItem(
             .clickable {
                 when(type) {
                     BottomNavType.TODAY -> TODO()
-                    BottomNavType.BACK_LOG -> TODO()
+                    BottomNavType.BACK_LOG -> { onClick(NavRoutes.BacklogScreen.route) }
                     BottomNavType.HISTORY -> TODO()
                     BottomNavType.SETTINGS -> TODO()
                     BottomNavType.DEFAULT -> TODO()
