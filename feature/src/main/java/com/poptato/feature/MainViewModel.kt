@@ -1,5 +1,7 @@
 package com.poptato.feature
 
+import com.poptato.core.enums.BottomNavType
+import com.poptato.navigation.NavRoutes
 import com.poptato.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -8,4 +10,20 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
 
 ) : BaseViewModel<MainPageState>(MainPageState()) {
+
+    fun setBottomNavType(route: String?) {
+        val type = when (route) {
+            else -> {
+                BottomNavType.DEFAULT
+            }
+        }
+    }
+
+    private fun updateBottomNav(type: BottomNavType) {
+        updateState(
+            uiState.value.copy(
+                bottomNavType = type
+            )
+        )
+    }
 }
