@@ -43,6 +43,7 @@ import com.poptato.design_system.R
 import com.poptato.design_system.Settings
 import com.poptato.design_system.Today
 import com.poptato.navigation.NavRoutes
+import com.poptato.navigation.historyNavGraph
 import com.poptato.navigation.loginNavGraph
 import com.poptato.navigation.mainNavGraph
 import com.poptato.navigation.splashNavGraph
@@ -110,6 +111,7 @@ fun MainScreen() {
                     splashNavGraph(navController = navController)
                     loginNavGraph(navController = navController)
                     mainNavGraph(navController = navController)
+                    historyNavGraph(navController = navController)
                 }
             }
         }

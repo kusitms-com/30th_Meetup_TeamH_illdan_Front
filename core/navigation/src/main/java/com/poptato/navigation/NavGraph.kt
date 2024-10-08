@@ -35,3 +35,11 @@ fun NavGraphBuilder.mainNavGraph(navController: NavHostController) {
         }
     }
 }
+
+fun NavGraphBuilder.historyNavGraph(navController: NavHostController) {
+    navigation(startDestination = NavRoutes.HistoryScreen.route, route = NavRoutes.HistoryGraph.route) {
+        composable(NavRoutes.HistoryScreen.route) {
+        //    HistoryScreen()
+        }
+    }
+}

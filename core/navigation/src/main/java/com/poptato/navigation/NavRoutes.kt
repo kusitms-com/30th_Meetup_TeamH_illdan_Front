@@ -12,4 +12,8 @@ sealed class NavRoutes(val route: String) {
     // MainGraph
     data object MainGraph: NavRoutes("main_graph")
     data object BacklogScreen: NavRoutes("backlog")
+
+    // HistoryGraph
+    data object HistoryGraph: NavRoutes("history_graph")
+    data object HistoryScreen: NavRoutes("history")
 }
