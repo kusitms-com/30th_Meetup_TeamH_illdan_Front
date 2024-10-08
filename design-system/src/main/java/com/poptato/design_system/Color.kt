@@ -15,7 +15,7 @@ val Gray70 = Color(0xFF67676F)
 val Gray80 = Color(0xFF515157)
 val Gray90 = Color(0xFF3B3B40)
 val Gray95 = Color(0xFF2C2C30)
-val Gray100 = Color(0xFF252528)
+val Gray100 = Color(0xFF1E1E20)
 
 // Primary
 val Primary10 = Color(0xFFEDFCFA)

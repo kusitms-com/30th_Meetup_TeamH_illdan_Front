@@ -19,6 +19,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -36,15 +37,29 @@ import timber.log.Timber
 
 @Composable
 fun KaKaoLoginScreen(
-
+    goToBacklog: () -> Unit = {}
 ) {
     val viewModel: KaKaoLoginViewModel = hiltViewModel()
 
-    KaKaoLoginContent()
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collect { event ->
+            when(event) {
+                is KaKaoLoginEvent.GoToBacklog -> {
+                    goToBacklog()
+                }
+            }
+        }
+    }
+
+    KaKaoLoginContent(
+        onSuccessKaKaoLogin = { viewModel.kakaoLogin() }
+    )
 }
 
 @Composable
-fun KaKaoLoginContent() {
+fun KaKaoLoginContent(
+    onSuccessKaKaoLogin: () -> Unit = {}
+) {
     val context = LocalContext.current
 
     Box(
@@ -68,7 +83,7 @@ fun KaKaoLoginContent() {
                     .height(56.dp)
                     .padding(horizontal = 16.dp)
                     .background(KaKaoMain, shape = RoundedCornerShape(8.dp))
-                    .clickable { signInKakao(context) },
+                    .clickable { signInKakao(context, onSuccessKaKaoLogin) },
                 contentAlignment = Alignment.Center
             ) {
                 Row {
@@ -89,26 +104,26 @@ fun KaKaoLoginContent() {
     }
 }
 
-private fun signInKakao(context: Context) {
+private fun signInKakao(context: Context, onSuccessKaKaoLogin: () -> Unit) {
     if (UserApiClient.instance.isKakaoTalkLoginAvailable(context)) {
-        signInKakaoApp(context)
+        signInKakaoApp(context, onSuccessKaKaoLogin)
     } else {
-        signInKakaoEmail(context)
+        signInKakaoEmail(context, onSuccessKaKaoLogin)
     }
 }
 
-private fun signInKakaoApp(context: Context) {
+private fun signInKakaoApp(context: Context, onSuccessKaKaoLogin: () -> Unit) {
     UserApiClient.instance.loginWithKakaoTalk(context) { token, error ->
         if (error != null) {
             Timber.tag("KaKao Login Error").e(error.stackTraceToString())
             return@loginWithKakaoTalk
         }
         Toast.makeText(context, "로그인 성공하였습니다.", Toast.LENGTH_SHORT).show()
-//        login(token)
+        onSuccessKaKaoLogin()
     }
 }
 
-private fun signInKakaoEmail(context: Context) {
+private fun signInKakaoEmail(context: Context, onSuccessKaKaoLogin: () -> Unit) {
     UserApiClient.instance.loginWithKakaoAccount(context) { token, error ->
         if (error != null) {
             Timber.tag("KaKao Login Error").e(error.stackTraceToString())
@@ -116,7 +131,7 @@ private fun signInKakaoEmail(context: Context) {
         }
 
         Toast.makeText(context, "로그인 성공하였습니다.", Toast.LENGTH_SHORT).show()
-//        login(token)
+        onSuccessKaKaoLogin()
     }
 }
 

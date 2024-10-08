@@ -1,4 +1,4 @@
-package com.poptato.core
+package com.poptato.backlog
 
 import org.junit.Test
 

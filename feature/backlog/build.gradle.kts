@@ -4,9 +4,12 @@ plugins {
 }
 
 android {
-    namespace = "com.poptato.ui"
+    namespace = "com.poptato.backlog"
 }
 
 dependencies {
+    implementation(projects.core)
+    implementation(projects.domain)
+    implementation(projects.core.ui)
     implementation(projects.designSystem)
 }
