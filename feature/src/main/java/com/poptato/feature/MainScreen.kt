@@ -71,7 +71,9 @@ fun MainScreen() {
                     BottomNavBar(
                         type = uiState.bottomNavType,
                         onClick = { route: String ->
-                            navController.navigate(route)
+                            if (navController.currentDestination?.route != route) {
+                                navController.navigate(route)
+                            }
                         },
                         modifier = Modifier.navigationBarsPadding()
                     )
@@ -171,7 +173,6 @@ fun BottomNavItem(
                     BottomNavType.BACK_LOG -> {
                         onClick(NavRoutes.BacklogScreen.route)
                     }
-
                     BottomNavType.HISTORY -> TODO()
                     BottomNavType.SETTINGS -> TODO()
                     BottomNavType.DEFAULT -> TODO()
