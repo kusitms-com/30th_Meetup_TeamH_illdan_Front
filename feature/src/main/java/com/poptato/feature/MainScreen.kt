@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -27,7 +26,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -36,12 +34,9 @@ import androidx.navigation.compose.rememberNavController
 import com.poptato.core.enums.BottomNavType
 import com.poptato.design_system.Gray100
 import com.poptato.design_system.Gray80
-import com.poptato.design_system.History
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.Primary60
 import com.poptato.design_system.R
-import com.poptato.design_system.Settings
-import com.poptato.design_system.Today
 import com.poptato.navigation.NavRoutes
 import com.poptato.navigation.loginNavGraph
 import com.poptato.navigation.mainNavGraph
@@ -131,7 +126,7 @@ fun BottomNavBar(
         verticalAlignment = Alignment.CenterVertically
     ) {
         BottomNavItem(
-            iconId = if(type == BottomNavType.TODAY) R.drawable.ic_calendar_selected else R.drawable.ic_calendar_unselected,
+            iconId = if(type == BottomNavType.TODAY) R.drawable.ic_today_selected else R.drawable.ic_today_unselected,
             isSelected = type == BottomNavType.TODAY,
             type = BottomNavType.TODAY,
             onClick = onClick
