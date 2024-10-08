@@ -50,6 +50,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -59,9 +60,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.poptato.design_system.Backlog
 import com.poptato.design_system.BacklogHint
 import com.poptato.design_system.BacklogTitle
+import com.poptato.design_system.EmptyBacklogTitle
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
 import com.poptato.design_system.Gray70
+import com.poptato.design_system.Gray80
 import com.poptato.design_system.Gray95
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.Primary10
@@ -122,20 +125,35 @@ fun BacklogContent(
                 .fillMaxSize()
         ) {
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             CreateBacklogTextFiled(
                 onValueChange = onValueChange,
                 taskInput = uiState.taskInput,
                 createBacklog = createBacklog
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            if (uiState.backlogList.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = EmptyBacklogTitle,
+                        style = PoptatoTypo.lgMedium,
+                        textAlign = TextAlign.Center,
+                        color = Gray80
+                    )
+                }
+            } else {
+                Spacer(modifier = Modifier.height(16.dp))
 
-            BacklogTaskList(
-                taskList = uiState.backlogList,
-                onItemSwiped = onItemSwiped,
-                dragDropListState = dragDropListState!!
-            )
+                BacklogTaskList(
+                    taskList = uiState.backlogList,
+                    onItemSwiped = onItemSwiped,
+                    dragDropListState = dragDropListState!!
+                )
+            }
         }
     }
 }
@@ -259,7 +277,8 @@ fun BacklogTaskList(
                 detectDragGesturesAfterLongPress(
                     onDragStart = { offset ->
                         dragDropListState.onDragStart(offset)
-                        draggedItemId = taskList[dragDropListState.currentIndexOfDraggedItem ?: return@detectDragGesturesAfterLongPress]
+                        draggedItemId = taskList[dragDropListState.currentIndexOfDraggedItem
+                            ?: return@detectDragGesturesAfterLongPress]
                     },
                     onDragEnd = {
                         dragDropListState.onDragInterrupted()
@@ -277,7 +296,8 @@ fun BacklogTaskList(
                             .checkForOverScroll()
                             .takeIf { it != 0f }
                             ?.let {
-                                dragDropListState.overscrollJob = scope.launch { dragDropListState.lazyListState.scrollBy(it) }
+                                dragDropListState.overscrollJob =
+                                    scope.launch { dragDropListState.lazyListState.scrollBy(it) }
                             } ?: run { dragDropListState.overscrollJob?.cancel() }
                     }
                 )
@@ -292,7 +312,9 @@ fun BacklogTaskList(
                 modifier = Modifier
                     .zIndex(if (index == dragDropListState.currentIndexOfDraggedItem) 1f else 0f)
                     .graphicsLayer {
-                        translationY = dragDropListState.elementDisplacement.takeIf { index == dragDropListState.currentIndexOfDraggedItem } ?: 0f
+                        translationY =
+                            dragDropListState.elementDisplacement.takeIf { index == dragDropListState.currentIndexOfDraggedItem }
+                                ?: 0f
                         scaleX = if (isDragged) 1.05f else 1f
                         scaleY = if (isDragged) 1.05f else 1f
                     }
@@ -319,7 +341,10 @@ fun BacklogTaskList(
                         fadeOutSpec = null
                     )
                     .border(
-                        if (isDragged) BorderStroke(2.dp, Color.White) else BorderStroke(0.dp, Color.Transparent),
+                        if (isDragged) BorderStroke(2.dp, Color.White) else BorderStroke(
+                            0.dp,
+                            Color.Transparent
+                        ),
                         RoundedCornerShape(8.dp)
                     )
             ) {
