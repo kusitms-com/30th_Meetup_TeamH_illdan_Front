@@ -8,4 +8,8 @@ import javax.inject.Inject
 class KaKaoLoginViewModel @Inject constructor(
 
 ) : BaseViewModel<KaKaoLoginPageState>(KaKaoLoginPageState()) {
+
+    fun kakaoLogin() {
+        emitEventFlow(KaKaoLoginEvent.GoToBacklog)
+    }
 }

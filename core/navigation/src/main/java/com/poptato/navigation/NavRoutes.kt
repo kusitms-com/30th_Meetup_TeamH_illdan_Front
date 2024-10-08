@@ -8,4 +8,8 @@ sealed class NavRoutes(val route: String) {
     // KaKaoLogin Graph
     data object KaKaoLoginGraph: NavRoutes("kakao_login_graph")
     data object KaKaoLoginScreen: NavRoutes("kakao_login")
+
+    // MainGraph
+    data object MainGraph: NavRoutes("main_graph")
+    data object BacklogScreen: NavRoutes("backlog")
 }

@@ -126,7 +126,8 @@ object PoptatoTypo {
         fontSize = 16.sp,
         fontFamily = fontFamily,
         fontWeight = FontWeight.Normal,
-        lineHeight = 24.sp
+        lineHeight = 24.sp,
+        color = Gray00
     )
 
     val smSemiBold: TextStyle = TextStyle(

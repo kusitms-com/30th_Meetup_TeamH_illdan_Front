@@ -13,10 +13,14 @@ class MainViewModel @Inject constructor(
 
     fun setBottomNavType(route: String?) {
         val type = when (route) {
+            NavRoutes.BacklogScreen.route -> {
+                BottomNavType.BACK_LOG
+            }
             else -> {
                 BottomNavType.DEFAULT
             }
         }
+        updateBottomNav(type)
     }
 
     private fun updateBottomNav(type: BottomNavType) {

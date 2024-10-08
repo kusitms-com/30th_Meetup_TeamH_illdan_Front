@@ -1,5 +1,6 @@
 package com.poptato.feature
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -42,7 +44,9 @@ import com.poptato.design_system.Settings
 import com.poptato.design_system.Today
 import com.poptato.navigation.NavRoutes
 import com.poptato.navigation.loginNavGraph
+import com.poptato.navigation.mainNavGraph
 import com.poptato.navigation.splashNavGraph
+import com.poptato.ui.util.DismissKeyboardOnClick
 import kotlinx.coroutines.flow.distinctUntilChanged
 
 @Composable
@@ -52,7 +56,7 @@ fun MainScreen() {
     val navController = rememberNavController()
     val slideDuration = 300
 
-    LaunchedEffect(navController.currentBackStackEntryFlow) {
+    LaunchedEffect(navController) {
         navController.currentBackStackEntryFlow
             .distinctUntilChanged()
             .collect { backStackEntry ->
@@ -60,48 +64,53 @@ fun MainScreen() {
             }
     }
 
-    Scaffold(
-        bottomBar = {
-            if (uiState.bottomNavType != BottomNavType.DEFAULT) {
-                BottomNavBar(
-                    type = uiState.bottomNavType,
-                    onClick = { route: String ->
-                        navController.navigate(route)
-                    }
-                )
-            }
-        }
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .padding(innerPadding)
-                .systemBarsPadding()
-        ) {
-            NavHost(
-                navController = navController,
-                startDestination = NavRoutes.SplashGraph.route,
-                exitTransition = { ExitTransition.None },
-                enterTransition = {
-                    slideIntoContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Start,
-                        tween(slideDuration)
-                    )
-                },
-                popEnterTransition = {
-                    slideIntoContainer(
-                        AnimatedContentTransitionScope.SlideDirection.End,
-                        tween(slideDuration)
-                    )
-                },
-                popExitTransition = {
-                    slideOutOfContainer(
-                        AnimatedContentTransitionScope.SlideDirection.End,
-                        tween(slideDuration)
+    DismissKeyboardOnClick {
+        Scaffold(
+            bottomBar = {
+                if (uiState.bottomNavType != BottomNavType.DEFAULT) {
+                    BottomNavBar(
+                        type = uiState.bottomNavType,
+                        onClick = { route: String ->
+                            if (navController.currentDestination?.route != route) {
+                                navController.navigate(route)
+                            }
+                        },
+                        modifier = Modifier.navigationBarsPadding()
                     )
                 }
+            }
+        ) { innerPadding ->
+            Box(
+                modifier = Modifier
+                    .padding(innerPadding)
             ) {
-                splashNavGraph(navController = navController)
-                loginNavGraph(navController = navController)
+                NavHost(
+                    navController = navController,
+                    startDestination = NavRoutes.SplashGraph.route,
+                    exitTransition = { ExitTransition.None },
+                    enterTransition = {
+                        slideIntoContainer(
+                            AnimatedContentTransitionScope.SlideDirection.Start,
+                            tween(slideDuration)
+                        )
+                    },
+                    popEnterTransition = {
+                        slideIntoContainer(
+                            AnimatedContentTransitionScope.SlideDirection.End,
+                            tween(slideDuration)
+                        )
+                    },
+                    popExitTransition = {
+                        slideOutOfContainer(
+                            AnimatedContentTransitionScope.SlideDirection.End,
+                            tween(slideDuration)
+                        )
+                    }
+                ) {
+                    splashNavGraph(navController = navController)
+                    loginNavGraph(navController = navController)
+                    mainNavGraph(navController = navController)
+                }
             }
         }
     }
@@ -110,10 +119,11 @@ fun MainScreen() {
 @Composable
 fun BottomNavBar(
     type: BottomNavType = BottomNavType.TODAY,
-    onClick: (String) -> Unit = {}
+    onClick: (String) -> Unit = {},
+    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(72.dp)
             .background(Gray100),
@@ -158,9 +168,11 @@ fun BottomNavItem(
         modifier = Modifier
             .size(width = 42.dp, height = 46.dp)
             .clickable {
-                when(type) {
+                when (type) {
                     BottomNavType.TODAY -> TODO()
-                    BottomNavType.BACK_LOG -> TODO()
+                    BottomNavType.BACK_LOG -> {
+                        onClick(NavRoutes.BacklogScreen.route)
+                    }
                     BottomNavType.HISTORY -> TODO()
                     BottomNavType.SETTINGS -> TODO()
                     BottomNavType.DEFAULT -> TODO()
@@ -182,10 +194,4 @@ fun BottomNavItem(
             color = if (isSelected) Primary60 else Gray80
         )
     }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun PreviewBottomNav() {
-    BottomNavBar()
 }

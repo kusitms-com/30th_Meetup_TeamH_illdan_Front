@@ -12,4 +12,5 @@ dependencies {
     implementation(projects.domain)
     implementation(projects.feature.splash)
     implementation(projects.feature.login)
+    implementation(projects.feature.backlog)
 }
