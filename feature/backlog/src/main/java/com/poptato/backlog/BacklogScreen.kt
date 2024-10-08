@@ -290,14 +290,13 @@ fun BacklogTaskList(
     ) {
         itemsIndexed(taskList, key = { _, item -> item }) { index, item ->
             var offsetX by remember { mutableFloatStateOf(0f) }
-            val isDragged = draggedItemId == item
+            val isDragged = index == dragDropListState.currentIndexOfDraggedItem
 
             Box(
                 modifier = Modifier
                     .zIndex(if (index == dragDropListState.currentIndexOfDraggedItem) 1f else 0f)
                     .graphicsLayer {
                         translationY = dragDropListState.elementDisplacement.takeIf { index == dragDropListState.currentIndexOfDraggedItem } ?: 0f
-                        shadowElevation = 4.dp.toPx().takeIf { index == dragDropListState.currentIndexOfDraggedItem } ?: 0f
                         scaleX = if (isDragged) 1.05f else 1f
                         scaleY = if (isDragged) 1.05f else 1f
                     }
