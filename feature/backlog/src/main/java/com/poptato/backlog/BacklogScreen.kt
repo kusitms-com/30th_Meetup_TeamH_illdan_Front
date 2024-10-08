@@ -122,11 +122,7 @@ fun BacklogContent(
                 .fillMaxSize()
         ) {
             Spacer(modifier = Modifier.height(8.dp))
-
-            BacklogGuideItem()
-
-            Spacer(modifier = Modifier.height(16.dp))
-
+            
             CreateBacklogTextFiled(
                 onValueChange = onValueChange,
                 taskInput = uiState.taskInput,
