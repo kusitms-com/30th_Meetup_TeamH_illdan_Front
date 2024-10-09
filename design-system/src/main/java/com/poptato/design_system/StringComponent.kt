@@ -13,6 +13,7 @@ const val BtnKaKaoLoginText = "카카오 로그인"
 // Backlog
 const val BacklogTitle = "오늘 할 일은 무엇인가요?\n일단 추가해 보세요!"
 const val BacklogHint = "새로 추가하기..."
+const val EmptyBacklogTitle = "할 일을 생각나는 대로\n추가해보세요."
 
 // Today
 const val TodayTopBarSub = "오늘도 하나씩 해보는 거야!"
