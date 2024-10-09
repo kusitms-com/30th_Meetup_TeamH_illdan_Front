@@ -7,6 +7,7 @@ import androidx.navigation.navigation
 import com.poptato.backlog.BacklogScreen
 import com.poptato.login.KaKaoLoginScreen
 import com.poptato.splash.SplashScreen
+import com.poptato.yesterdaylist.YesterdayListScreen
 
 fun NavGraphBuilder.splashNavGraph(navController: NavHostController) {
     navigation(startDestination = NavRoutes.SplashScreen.route, route = NavRoutes.SplashGraph.route) {
@@ -32,6 +33,14 @@ fun NavGraphBuilder.mainNavGraph(navController: NavHostController) {
     navigation(startDestination = NavRoutes.BacklogScreen.route, route = NavRoutes.MainGraph.route) {
         composable(NavRoutes.BacklogScreen.route) {
             BacklogScreen()
+        }
+    }
+}
+
+fun NavGraphBuilder.yesterdayListNavGraph(navController: NavHostController) {
+    navigation(startDestination = NavRoutes.YesterdayListScreen.route, route = NavRoutes.YesterdayListGraph.route) {
+        composable(NavRoutes.YesterdayListScreen.route) {
+            YesterdayListScreen()
         }
     }
 }

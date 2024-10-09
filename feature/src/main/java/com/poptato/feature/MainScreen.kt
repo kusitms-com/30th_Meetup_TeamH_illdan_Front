@@ -46,6 +46,7 @@ import com.poptato.navigation.NavRoutes
 import com.poptato.navigation.loginNavGraph
 import com.poptato.navigation.mainNavGraph
 import com.poptato.navigation.splashNavGraph
+import com.poptato.navigation.yesterdayListNavGraph
 import com.poptato.ui.util.DismissKeyboardOnClick
 import kotlinx.coroutines.flow.distinctUntilChanged
 
@@ -110,6 +111,7 @@ fun MainScreen() {
                     splashNavGraph(navController = navController)
                     loginNavGraph(navController = navController)
                     mainNavGraph(navController = navController)
+                    yesterdayListNavGraph(navController = navController)
                 }
             }
         }
