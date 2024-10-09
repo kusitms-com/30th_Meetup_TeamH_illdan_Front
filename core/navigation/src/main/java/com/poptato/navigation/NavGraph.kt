@@ -32,7 +32,9 @@ fun NavGraphBuilder.loginNavGraph(navController: NavHostController) {
 fun NavGraphBuilder.mainNavGraph(navController: NavHostController) {
     navigation(startDestination = NavRoutes.BacklogScreen.route, route = NavRoutes.MainGraph.route) {
         composable(NavRoutes.BacklogScreen.route) {
-            BacklogScreen()
+            BacklogScreen(
+                goToYesterdayList = { navController.navigate(NavRoutes.YesterdayListScreen.route) }
+            )
         }
     }
 }

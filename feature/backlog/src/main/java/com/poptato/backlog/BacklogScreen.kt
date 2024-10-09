@@ -7,6 +7,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.scrollBy
@@ -77,7 +78,7 @@ import kotlin.math.absoluteValue
 
 @Composable
 fun BacklogScreen(
-
+    goToYesterdayList: () -> Unit = {}
 ) {
     val viewModel: BacklogViewModel = hiltViewModel()
     val uiState: BacklogPageState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -93,7 +94,8 @@ fun BacklogScreen(
         onValueChange = { newValue -> viewModel.onValueChange(newValue) },
         createBacklog = { newItem -> viewModel.createBacklog(newItem) },
         onItemSwiped = { itemToRemove -> viewModel.removeBacklogItem(itemToRemove) },
-        dragDropListState = dragDropListState
+        dragDropListState = dragDropListState,
+        onClickYesterdayList = { goToYesterdayList() }      // TODO 테스트용: "어제 리스트 체크하기" 스낵바 생성 후 변경 예정
     )
 }
 
@@ -103,7 +105,8 @@ fun BacklogContent(
     onValueChange: (String) -> Unit = {},
     createBacklog: (String) -> Unit = {},
     onItemSwiped: (String) -> Unit = {},
-    dragDropListState: DragDropListState? = null
+    dragDropListState: DragDropListState? = null,
+    onClickYesterdayList: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -123,7 +126,9 @@ fun BacklogContent(
         ) {
             Spacer(modifier = Modifier.height(8.dp))
 
-            BacklogGuideItem()
+            BacklogGuideItem(
+                onClickYesterdayList = onClickYesterdayList
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -145,13 +150,16 @@ fun BacklogContent(
 }
 
 @Composable
-fun BacklogGuideItem() {
+fun BacklogGuideItem(
+    onClickYesterdayList: () -> Unit = {}
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
             .clip(RoundedCornerShape(8.dp))
             .background(Primary70)
+            .clickable { onClickYesterdayList() }
     ) {
         Text(
             text = BacklogTitle,
