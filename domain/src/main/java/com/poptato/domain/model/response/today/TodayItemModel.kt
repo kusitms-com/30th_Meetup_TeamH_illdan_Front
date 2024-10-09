@@ -6,5 +6,5 @@ data class TodayItemModel(
     val todoId: Long = -1,
     val content: String = "",
     val todoStatus: TodoStatus = TodoStatus.INCOMPLETE,
-    val isComplete: Boolean = false
+    val isBookmark: Boolean = false
 )

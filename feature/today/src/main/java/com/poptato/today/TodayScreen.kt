@@ -58,6 +58,7 @@ import com.poptato.design_system.Primary100
 import com.poptato.design_system.Primary60
 import com.poptato.design_system.R
 import com.poptato.design_system.TodayTopBarSub
+import com.poptato.domain.model.enums.TodoStatus
 import com.poptato.domain.model.response.today.TodayItemModel
 import com.poptato.ui.common.PoptatoCheckBox
 import com.poptato.ui.common.TopBar
@@ -75,8 +76,8 @@ fun TodayScreen(
     TodayContent(
         date = date,
         uiState = uiState,
-        onCheckedChange = { isChecked, id ->
-            viewModel.onCheckedTodo(value = isChecked, id = id)
+        onCheckedChange = { status, id ->
+            viewModel.onCheckedTodo(status = status, id = id)
         },
         onClickBtnGetTodo = { goToBacklog() }
     )
@@ -86,7 +87,7 @@ fun TodayScreen(
 fun TodayContent(
     date: String = "09.28",
     uiState: TodayPageState = TodayPageState(),
-    onCheckedChange: (Boolean, Long) -> Unit = {_, _ ->},
+    onCheckedChange: (TodoStatus, Long) -> Unit = {_, _ ->},
     onClickBtnGetTodo: () -> Unit = {}
 ) {
     Column(
@@ -124,7 +125,7 @@ fun TodayContent(
 @Composable
 fun TodayTodoList(
     list: List<TodayItemModel> = emptyList(),
-    onCheckedChange: (Boolean, Long) -> Unit = { _, _ -> }
+    onCheckedChange: (TodoStatus, Long) -> Unit = { _, _ -> }
 ) {
     LazyColumn(
         modifier = Modifier
@@ -152,10 +153,10 @@ fun TodayTodoList(
 @Composable
 fun TodayTodoItem(
     item: TodayItemModel = TodayItemModel(),
-    onCheckedChange: (Boolean, Long) -> Unit = { _, _ -> },
+    onCheckedChange: (TodoStatus, Long) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier
 ) {
-    var showAnimation by remember { mutableStateOf(item.isComplete) }
+    var showAnimation by remember { mutableStateOf(item.todoStatus == TodoStatus.COMPLETED) }
     val transition = updateTransition(targetState = showAnimation, label = "")
 
     LaunchedEffect(transition) {
@@ -206,9 +207,9 @@ fun TodayTodoItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             PoptatoCheckBox(
-                isChecked = item.isComplete,
+                isChecked = item.todoStatus == TodoStatus.COMPLETED,
                 onCheckedChange = {
-                    onCheckedChange(!item.isComplete, item.todoId)
+                    onCheckedChange(item.todoStatus, item.todoId)
                 }
             )
 
