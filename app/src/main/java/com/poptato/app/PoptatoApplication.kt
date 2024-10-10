@@ -1,6 +1,7 @@
 package com.poptato.app
 
 import android.app.Application
+import com.jakewharton.threetenabp.AndroidThreeTen
 import com.kakao.sdk.common.KakaoSdk
 import dagger.hilt.android.HiltAndroidApp
 
@@ -10,5 +11,6 @@ class PoptatoApplication: Application() {
         super.onCreate()
 
         KakaoSdk.init(this, BuildConfig.KAKAO_APP_KEY)
+        AndroidThreeTen.init(this)
     }
 }

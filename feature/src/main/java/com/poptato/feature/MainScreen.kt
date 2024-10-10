@@ -41,6 +41,7 @@ import com.poptato.navigation.NavRoutes
 import com.poptato.navigation.loginNavGraph
 import com.poptato.navigation.mainNavGraph
 import com.poptato.navigation.splashNavGraph
+import com.poptato.navigation.todayNavGraph
 import com.poptato.ui.util.DismissKeyboardOnClick
 import kotlinx.coroutines.flow.distinctUntilChanged
 
@@ -105,6 +106,7 @@ fun MainScreen() {
                     splashNavGraph(navController = navController)
                     loginNavGraph(navController = navController)
                     mainNavGraph(navController = navController)
+                    todayNavGraph(navController = navController)
                 }
             }
         }
@@ -164,10 +166,8 @@ fun BottomNavItem(
             .size(width = 42.dp, height = 46.dp)
             .clickable {
                 when (type) {
-                    BottomNavType.TODAY -> TODO()
-                    BottomNavType.BACK_LOG -> {
-                        onClick(NavRoutes.BacklogScreen.route)
-                    }
+                    BottomNavType.TODAY -> { onClick(NavRoutes.TodayScreen.route) }
+                    BottomNavType.BACK_LOG -> { onClick(NavRoutes.BacklogScreen.route) }
                     BottomNavType.HISTORY -> TODO()
                     BottomNavType.SETTINGS -> TODO()
                     BottomNavType.DEFAULT -> TODO()

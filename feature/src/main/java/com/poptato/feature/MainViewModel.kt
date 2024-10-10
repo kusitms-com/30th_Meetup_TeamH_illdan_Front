@@ -16,6 +16,9 @@ class MainViewModel @Inject constructor(
             NavRoutes.BacklogScreen.route -> {
                 BottomNavType.BACK_LOG
             }
+            NavRoutes.TodayScreen.route -> {
+                BottomNavType.TODAY
+            }
             else -> {
                 BottomNavType.DEFAULT
             }
