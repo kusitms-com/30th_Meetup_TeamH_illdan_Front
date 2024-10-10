@@ -9,6 +9,11 @@ const val Backlog = "백로그"
 const val modify = "수정하기"
 const val delete = "삭제하기"
 const val dueDate = "마감기한"
+const val Confirm = "확인"
+const val Complete = "완료"
+const val Year = "년"
+const val Month = "월"
+const val Day = "일"
 
 // KaKaoLogin
 const val BtnKaKaoLoginText = "카카오 로그인"
