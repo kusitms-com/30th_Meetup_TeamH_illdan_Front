@@ -9,4 +9,5 @@ android {
 
 dependencies {
     implementation(projects.designSystem)
+    implementation(projects.domain)
 }

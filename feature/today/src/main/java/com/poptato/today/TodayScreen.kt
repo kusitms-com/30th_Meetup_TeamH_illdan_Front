@@ -7,7 +7,6 @@ import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.updateTransition
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -25,7 +24,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -59,7 +57,7 @@ import com.poptato.design_system.Primary60
 import com.poptato.design_system.R
 import com.poptato.design_system.TodayTopBarSub
 import com.poptato.domain.model.enums.TodoStatus
-import com.poptato.domain.model.response.today.TodayItemModel
+import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.ui.common.PoptatoCheckBox
 import com.poptato.ui.common.TopBar
 import com.poptato.ui.util.toPx
@@ -124,7 +122,7 @@ fun TodayContent(
 
 @Composable
 fun TodayTodoList(
-    list: List<TodayItemModel> = emptyList(),
+    list: List<TodoItemModel> = emptyList(),
     onCheckedChange: (TodoStatus, Long) -> Unit = { _, _ -> }
 ) {
     LazyColumn(
@@ -152,7 +150,7 @@ fun TodayTodoList(
 @SuppressLint("ModifierParameter")
 @Composable
 fun TodayTodoItem(
-    item: TodayItemModel = TodayItemModel(),
+    item: TodoItemModel = TodoItemModel(),
     onCheckedChange: (TodoStatus, Long) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier
 ) {

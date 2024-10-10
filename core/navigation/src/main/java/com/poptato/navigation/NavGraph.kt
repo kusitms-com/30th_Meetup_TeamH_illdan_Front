@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.poptato.backlog.BacklogScreen
+import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.login.KaKaoLoginScreen
 import com.poptato.splash.SplashScreen
 import com.poptato.today.TodayScreen
@@ -29,10 +30,12 @@ fun NavGraphBuilder.loginNavGraph(navController: NavHostController) {
     }
 }
 
-fun NavGraphBuilder.mainNavGraph(navController: NavHostController) {
+fun NavGraphBuilder.mainNavGraph(navController: NavHostController, showBottomSheet: (TodoItemModel) -> Unit) {
     navigation(startDestination = NavRoutes.BacklogScreen.route, route = NavRoutes.BacklogGraph.route) {
         composable(NavRoutes.BacklogScreen.route) {
-            BacklogScreen()
+            BacklogScreen(
+                showBottomSheet = showBottomSheet
+            )
         }
     }
 }

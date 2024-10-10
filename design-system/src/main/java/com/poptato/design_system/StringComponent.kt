@@ -6,6 +6,9 @@ const val List = "목록"
 const val History = "히스토리"
 const val Settings = "설정"
 const val Backlog = "백로그"
+const val modify = "수정하기"
+const val delete = "삭제하기"
+const val dueDate = "마감기한"
 
 // KaKaoLogin
 const val BtnKaKaoLoginText = "카카오 로그인"
