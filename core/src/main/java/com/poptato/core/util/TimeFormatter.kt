@@ -1,6 +1,7 @@
 package com.poptato.core.util
 
 import org.threeten.bp.LocalDate
+import org.threeten.bp.Year
 import org.threeten.bp.format.DateTimeFormatter
 
 object TimeFormatter {
@@ -15,5 +16,20 @@ object TimeFormatter {
         val currentDate = LocalDate.now()
         val formatter = DateTimeFormatter.ofPattern("MM.dd")
         return currentDate.format(formatter)
+    }
+
+    fun getTodayYearMonthDay(): List<String> {
+        val currentDate = LocalDate.now().toString()
+        return currentDate.split('-')
+    }
+
+    fun getDaysInMonth(year: Int, month: Int): List<Int> {
+        val daysInMonth = when (month) {
+            1, 3, 5, 7, 8, 10, 12 -> 31
+            4, 6, 9, 11 -> 30
+            2 -> if (Year.isLeap(year.toLong())) 29 else 28
+            else -> 30
+        }
+        return (1..daysInMonth).toList()
     }
 }
