@@ -64,11 +64,12 @@ fun KaKaoLoginContent(
 
     Box(
         modifier = Modifier
-            .fillMaxSize(),
+            .fillMaxSize()
+            .background(Gray100),
         contentAlignment = Alignment.Center
     ) {
         Image(
-            painter = painterResource(id = R.drawable.ic_temp_splash),
+            painter = painterResource(id = R.drawable.ic_app),
             contentDescription = "ic_temp"
         )
 
