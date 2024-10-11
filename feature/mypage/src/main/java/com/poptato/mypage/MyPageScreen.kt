@@ -55,22 +55,9 @@ fun MyPageContent(
             .background(Gray100)
     ) {
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 16.dp)
-                .padding(end = 16.dp)
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_setting),
-                contentDescription = "",
-                tint = Color.Unspecified,
-                modifier = Modifier
-                    .size(24.dp)
-                    .align(Alignment.TopEnd)
-                    .clickable { onClickSettingBtn() }
-            )
-        }
+        SettingBtn(
+            onClickSettingBtn = onClickSettingBtn
+        )
 
         MyData()
 
@@ -81,6 +68,28 @@ fun MyPageContent(
             contentScale = ContentScale.Crop
         )
 
+    }
+}
+
+@Composable
+fun SettingBtn(
+    onClickSettingBtn: () -> Unit = {}
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 16.dp)
+            .padding(end = 16.dp)
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_setting),
+            contentDescription = "",
+            tint = Color.Unspecified,
+            modifier = Modifier
+                .size(24.dp)
+                .align(Alignment.TopEnd)
+                .clickable { onClickSettingBtn() }
+        )
     }
 }
 
