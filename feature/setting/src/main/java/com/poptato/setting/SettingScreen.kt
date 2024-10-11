@@ -42,20 +42,23 @@ import com.poptato.design_system.VersionSetting
 
 @Composable
 fun SettingScreen(
-    goBackToMyPage: () -> Unit = {}
+    goBackToMyPage: () -> Unit = {},
+    goToServiceDelete: () -> Unit = {}
 ) {
 
     val viewModel: SettingViewModel = hiltViewModel()
     val uiState: SettingPageState by viewModel.uiState.collectAsStateWithLifecycle()
 
     SettingContent(
-        onClickCloseBtn = { goBackToMyPage() }
+        onClickCloseBtn = { goBackToMyPage() },
+        onClickServiceDeleteBtn = { goToServiceDelete() }
     )
 }
 
 @Composable
 fun SettingContent(
-    onClickCloseBtn: () -> Unit = {}
+    onClickCloseBtn: () -> Unit = {},
+    onClickServiceDeleteBtn: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -99,7 +102,8 @@ fun SettingContent(
         )
         SettingServiceItem(
             title = UserDelete,
-            color = Gray60
+            color = Gray60,
+            onClickAction = { onClickServiceDeleteBtn() }
         )
     }
 }
@@ -152,13 +156,15 @@ fun SettingSubTitle(
 fun SettingServiceItem(
     title: String,
     color: Color = Gray20,
-    isVersion: Boolean = false
+    isVersion: Boolean = false,
+    onClickAction: () -> Unit = {}
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 16.dp)
             .padding(start = 24.dp)
+            .clickable { onClickAction() }
     ) {
         Text(
             text = title,

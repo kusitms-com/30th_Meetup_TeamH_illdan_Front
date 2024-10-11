@@ -76,7 +76,8 @@ fun NavGraphBuilder.myPageNavGraph(navController: NavHostController) {
 
         composable(NavRoutes.SettingScreen.route) {
             SettingScreen(
-                goBackToMyPage = { navController.popBackStack() }
+                goBackToMyPage = { navController.popBackStack() },
+                goToServiceDelete = { navController.navigate(NavRoutes.ServiceDeleteScreen.route) }
             )
         }
 
