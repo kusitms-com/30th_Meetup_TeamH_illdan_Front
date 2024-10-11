@@ -22,6 +22,7 @@ sealed class NavRoutes(val route: String) {
     data object MyPageGraph: NavRoutes("my_page_graph")
     data object MyPageScreen: NavRoutes("my_page")
     data object SettingScreen: NavRoutes("setting")
+    data object ServiceDeleteScreen: NavRoutes("service_delete")
 
     // Today Graph
     data object TodayGraph: NavRoutes("today_graph")
