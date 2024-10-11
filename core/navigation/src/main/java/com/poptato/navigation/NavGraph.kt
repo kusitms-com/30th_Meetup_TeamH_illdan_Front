@@ -74,7 +74,9 @@ fun NavGraphBuilder.myPageNavGraph(navController: NavHostController) {
         }
 
         composable(NavRoutes.SettingScreen.route) {
-            SettingScreen()
+            SettingScreen(
+                goBackToMyPage = { navController.popBackStack() }
+            )
         }
     }
 }

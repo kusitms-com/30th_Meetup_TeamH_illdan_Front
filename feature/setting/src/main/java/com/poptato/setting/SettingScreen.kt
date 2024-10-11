@@ -1,6 +1,7 @@
 package com.poptato.setting
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,23 +39,31 @@ import com.poptato.design_system.UserDelete
 import com.poptato.design_system.Version
 
 @Composable
-fun SettingScreen() {
+fun SettingScreen(
+    goBackToMyPage: () -> Unit = {}
+) {
 
     val viewModel: SettingViewModel = hiltViewModel()
     val uiState: SettingPageState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    SettingContent()
+    SettingContent(
+        onClickCloseBtn = { goBackToMyPage() }
+    )
 }
 
 @Composable
-fun SettingContent() {
+fun SettingContent(
+    onClickCloseBtn: () -> Unit = {}
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Gray100)
     ) {
 
-        SettingTitle()
+        SettingTitle(
+            onClickCloseBtn = onClickCloseBtn
+        )
 
         SettingSubTitle(
             title = ProfileTitle
@@ -93,7 +102,9 @@ fun SettingContent() {
 }
 
 @Composable
-fun SettingTitle() {
+fun SettingTitle(
+    onClickCloseBtn: () -> Unit = {}
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -115,6 +126,7 @@ fun SettingTitle() {
             modifier = Modifier
                 .align(Alignment.CenterEnd)
                 .size(width = 24.dp, height = 24.dp)
+                .clickable { onClickCloseBtn() }
         )
     }
 }
