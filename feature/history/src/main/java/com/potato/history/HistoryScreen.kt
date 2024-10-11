@@ -193,10 +193,52 @@ fun TopSearchBar(
 
 @Composable
 fun DateHeader(date: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, end = 16.dp, top = 32.dp, bottom = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
 
+        Text(
+            text = date,
+            color = Gray70,
+            style = PoptatoTypo.xsRegular,
+            modifier = Modifier
+                .padding(end = 8.dp)
+        )
+
+        HorizontalDivider(
+            modifier = Modifier
+                .height(1.dp)
+                .fillMaxWidth(),
+            thickness = 1.dp,
+            color = Gray95
+        )
+    }
 }
 
 @Composable
 fun HistoryListItem(item: HistoryItemModel) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 8.dp)
+            .background(Color.Unspecified, shape = MaterialTheme.shapes.small),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_history_checked),
+            contentDescription = "Check",
+            tint =  Color.Unspecified,
+            modifier = Modifier.padding(end = 8.dp)
+        )
 
+        Text(
+            text = item.title,
+            color = Gray00,
+            style = PoptatoTypo.smMedium,
+            modifier = Modifier.weight(1f)
+        )
+    }
 }
