@@ -10,6 +10,7 @@ import com.poptato.login.KaKaoLoginScreen
 import com.poptato.splash.SplashScreen
 import com.poptato.yesterdaylist.YesterdayListScreen
 import com.poptato.today.TodayScreen
+import com.poptato.yesterdaylist.allcheck.AllCheckScreen
 
 fun NavGraphBuilder.splashNavGraph(navController: NavHostController) {
     navigation(startDestination = NavRoutes.SplashScreen.route, route = NavRoutes.SplashGraph.route) {
@@ -47,8 +48,13 @@ fun NavGraphBuilder.yesterdayListNavGraph(navController: NavHostController) {
     navigation(startDestination = NavRoutes.YesterdayListScreen.route, route = NavRoutes.YesterdayListGraph.route) {
         composable(NavRoutes.YesterdayListScreen.route) {
             YesterdayListScreen(
-                goBackToBacklog = { navController.popBackStack() }
+                goBackToBacklog = { navController.popBackStack() },
+                showAllCheckPage = { navController.navigate(NavRoutes.YesterdayAllCheckScreen.route) }
             )
+        }
+
+        composable(NavRoutes.YesterdayAllCheckScreen.route) {
+            AllCheckScreen()
         }
     }
 }
