@@ -1,6 +1,7 @@
 package com.poptato.setting.servicedelete
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,20 +39,28 @@ import com.poptato.design_system.UserDeleteBtn
 import com.poptato.design_system.UserDeleteTitle
 
 @Composable
-fun ServiceDeleteScreen() {
+fun ServiceDeleteScreen(
+    goBackToSetting: () -> Unit = {}
+) {
 
-    ServiceDeleteContent()
+    ServiceDeleteContent(
+        onClickCloseBtn = { goBackToSetting() }
+    )
 }
 
 @Composable
-fun ServiceDeleteContent() {
+fun ServiceDeleteContent(
+    onClickCloseBtn: () -> Unit = {}
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Gray100)
     ) {
 
-        CloseBtn()
+        CloseBtn(
+            onClickCloseBtn = onClickCloseBtn
+        )
 
         Text(
             text = UserDeleteTitle,
@@ -75,7 +84,9 @@ fun ServiceDeleteContent() {
 }
 
 @Composable
-fun CloseBtn() {
+fun CloseBtn(
+    onClickCloseBtn: () -> Unit = {}
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -89,6 +100,7 @@ fun CloseBtn() {
             modifier = Modifier
                 .size(24.dp)
                 .align(Alignment.TopEnd)
+                .clickable { onClickCloseBtn() }
         )
     }
 }

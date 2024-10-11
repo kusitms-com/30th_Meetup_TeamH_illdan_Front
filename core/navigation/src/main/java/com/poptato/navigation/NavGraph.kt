@@ -82,7 +82,9 @@ fun NavGraphBuilder.myPageNavGraph(navController: NavHostController) {
         }
 
         composable(NavRoutes.ServiceDeleteScreen.route) {
-            ServiceDeleteScreen()
+            ServiceDeleteScreen(
+                goBackToSetting = { navController.popBackStack() }
+            )
         }
     }
 }
