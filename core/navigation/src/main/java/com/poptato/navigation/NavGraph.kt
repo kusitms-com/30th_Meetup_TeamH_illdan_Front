@@ -72,12 +72,7 @@ fun NavGraphBuilder.myPageNavGraph(navController: NavHostController) {
                 goToSettingPage = { navController.navigate(NavRoutes.SettingScreen.route) }
             )
         }
-    }
-}
 
-
-fun NavGraphBuilder.settingNavGraph(navController: NavHostController) {
-    navigation(startDestination = NavRoutes.SettingScreen.route, route = NavRoutes.SettingGraph.route) {
         composable(NavRoutes.SettingScreen.route) {
             SettingScreen()
         }

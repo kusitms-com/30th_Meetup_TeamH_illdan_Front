@@ -23,6 +23,9 @@ class MainViewModel @Inject constructor(
             NavRoutes.MyPageScreen.route -> {
                 BottomNavType.SETTINGS
             }
+            NavRoutes.SettingScreen.route -> {
+                BottomNavType.SETTINGS
+            }
             else -> {
                 BottomNavType.DEFAULT
             }
