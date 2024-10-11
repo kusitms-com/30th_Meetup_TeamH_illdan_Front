@@ -27,11 +27,13 @@ import com.poptato.design_system.Gray100
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.Primary60
 import com.poptato.design_system.R
+import com.poptato.design_system.YesterdayAllCheckBtn
 import com.poptato.design_system.YesterdayListTitle
 
 @Composable
 fun YesterdayListScreen(
-    goBackToBacklog: () -> Unit = {}
+    goBackToBacklog: () -> Unit = {},
+    showAllCheckPage: () -> Unit = {}
 ) {
 
     val viewModel: YesterdayListViewModel = hiltViewModel()
@@ -39,14 +41,16 @@ fun YesterdayListScreen(
 
     YesterdayContent(
         uiState = uiState,
-        onClickCloseBtn = { goBackToBacklog() }
+        onClickCloseBtn = { goBackToBacklog() },
+        onClickAllCheckBtn = { showAllCheckPage() }
     )
 }
 
 @Composable
 fun YesterdayContent(
     uiState: YesterdayListPageState = YesterdayListPageState(),
-    onClickCloseBtn: () -> Unit = {}
+    onClickCloseBtn: () -> Unit = {},
+    onClickAllCheckBtn: () -> Unit = {}
 ) {
     Box(
         modifier = Modifier
@@ -67,7 +71,9 @@ fun YesterdayContent(
                     .fillMaxWidth()
             )
 
-            AllCheckBtn()
+            AllCheckBtn(
+                onClickAllCheckBtn = onClickAllCheckBtn
+            )
         }
 
     }
@@ -104,7 +110,9 @@ fun TitleTopBar(
 }
 
 @Composable
-fun AllCheckBtn() {
+fun AllCheckBtn(
+    onClickAllCheckBtn: () -> Unit = {}
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -112,9 +120,10 @@ fun AllCheckBtn() {
             .padding(horizontal = 16.dp)
             .padding(bottom = 8.dp)
             .background(Primary60, shape = RoundedCornerShape(12.dp))
+            .clickable { onClickAllCheckBtn() }
     ) {
         Text(
-            text = "완료",
+            text = YesterdayAllCheckBtn,
             style = PoptatoTypo.lgSemiBold,
             color = Gray100,
             modifier = Modifier
