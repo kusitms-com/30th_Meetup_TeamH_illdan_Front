@@ -68,7 +68,9 @@ fun NavGraphBuilder.yesterdayListNavGraph(navController: NavHostController) {
 fun NavGraphBuilder.myPageNavGraph(navController: NavHostController) {
     navigation(startDestination = NavRoutes.MyPageScreen.route, route = NavRoutes.MyPageGraph.route) {
         composable(NavRoutes.MyPageScreen.route) {
-            MyPageScreen()
+            MyPageScreen(
+                goToSettingPage = { navController.navigate(NavRoutes.SettingScreen.route) }
+            )
         }
     }
 }
