@@ -4,6 +4,7 @@ import com.poptato.domain.model.enums.TodoStatus
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -13,7 +14,7 @@ class YesterdayListViewModel @Inject constructor(
     YesterdayListPageState()
 ) {
 
-    private val _yesterdayList: MutableList<TodoItemModel> = mutableListOf(
+    private val _yesterdayList: List<TodoItemModel> = listOf(
         TodoItemModel(1, "test1", TodoStatus.INCOMPLETE, false),
         TodoItemModel(2, "test2", TodoStatus.INCOMPLETE, false),
         TodoItemModel(3, "test3", TodoStatus.INCOMPLETE, false),
@@ -38,6 +39,24 @@ class YesterdayListViewModel @Inject constructor(
     private fun getYesterdayList(updatedList: List<TodoItemModel>) {
         updateState(
             uiState.value.copy(yesterdayList =  updatedList)
+        )
+    }
+
+    fun onCheckedTodo(id: Long, status: TodoStatus) {
+        Timber.d("[어제 한 일] check -> id: $id & status: $status")
+
+        val newStatus = if (status == TodoStatus.COMPLETED) TodoStatus.INCOMPLETE else TodoStatus.COMPLETED
+
+        val updatedList = uiState.value.yesterdayList.map { item ->
+            if (item.todoId == id) {
+                item.copy(todoStatus = newStatus)
+            } else {
+                item
+            }
+        }
+
+        updateState(
+            uiState.value.copy(yesterdayList = updatedList)
         )
     }
 }

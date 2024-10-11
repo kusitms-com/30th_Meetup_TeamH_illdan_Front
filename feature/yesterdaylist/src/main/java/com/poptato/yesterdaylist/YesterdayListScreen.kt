@@ -55,6 +55,9 @@ fun YesterdayListScreen(
     YesterdayContent(
         uiState = uiState,
         onClickCloseBtn = { goBackToBacklog() },
+        onCheckedChange = { id, status ->
+            viewModel.onCheckedTodo(id, status)
+        },
         onClickAllCheckBtn = { showAllCheckPage() }
     )
 }
@@ -63,7 +66,7 @@ fun YesterdayListScreen(
 fun YesterdayContent(
     uiState: YesterdayListPageState = YesterdayListPageState(),
     onClickCloseBtn: () -> Unit = {},
-    onCheckedChange: (TodoStatus, Long) -> Unit = {_, _ ->},
+    onCheckedChange: (Long, TodoStatus) -> Unit = {_, _ ->},
     onClickAllCheckBtn: () -> Unit = {}
 ) {
     Box(
@@ -85,7 +88,8 @@ fun YesterdayContent(
                     .fillMaxWidth()
             ) {
                 YesterdayTodoList(
-                    list = uiState.yesterdayList
+                    list = uiState.yesterdayList,
+                    onCheckedChange = onCheckedChange
                 )
             }
 
@@ -129,7 +133,8 @@ fun TitleTopBar(
 
 @Composable
 fun YesterdayTodoList(
-    list: List<TodoItemModel> = emptyList()
+    list: List<TodoItemModel> = emptyList(),
+    onCheckedChange: (Long, TodoStatus) -> Unit = {_, _ ->},
 ) {
     Timber.d("[어제 한 일] list -> $list")
 
@@ -143,7 +148,8 @@ fun YesterdayTodoList(
             Spacer(modifier = Modifier.height(8.dp))
 
             YesterdayTodoItem(
-                item = item
+                item = item,
+                onCheckedChange = onCheckedChange
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -153,7 +159,8 @@ fun YesterdayTodoList(
 
 @Composable
 fun YesterdayTodoItem(
-    item: TodoItemModel = TodoItemModel()
+    item: TodoItemModel = TodoItemModel(),
+    onCheckedChange: (Long, TodoStatus) -> Unit = {_, _ ->},
 ) {
     Row(
         modifier = Modifier
@@ -165,6 +172,7 @@ fun YesterdayTodoItem(
     ) {
         PoptatoCheckBox(
             isChecked = item.todoStatus == TodoStatus.COMPLETED,
+            onCheckedChange = { onCheckedChange(item.todoId, item.todoStatus) }
         )
 
         Spacer(modifier = Modifier.width(10.dp))
