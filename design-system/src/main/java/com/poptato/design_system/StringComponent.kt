@@ -22,3 +22,7 @@ const val EmptyBacklogTitle = "할 일을 생각나는 대로\n추가해보세�
 const val TodayTopBarSub = "오늘도 하나씩 해보는 거야!"
 const val EmptyTodoTitle = "오늘 할 일은 무엇인가요?"
 const val BtnGetTodoText = "할 일 가져오기"
+
+//history
+const val HistorySearchHint = "검색.."
+const val HistoryListEmpty = "아직 완료한 일이 없어요"
