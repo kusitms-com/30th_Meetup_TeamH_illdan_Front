@@ -46,7 +46,9 @@ fun NavGraphBuilder.mainNavGraph(navController: NavHostController, showBottomShe
 fun NavGraphBuilder.yesterdayListNavGraph(navController: NavHostController) {
     navigation(startDestination = NavRoutes.YesterdayListScreen.route, route = NavRoutes.YesterdayListGraph.route) {
         composable(NavRoutes.YesterdayListScreen.route) {
-            YesterdayListScreen()
+            YesterdayListScreen(
+                goBackToBacklog = { navController.popBackStack() }
+            )
         }
     }
 }

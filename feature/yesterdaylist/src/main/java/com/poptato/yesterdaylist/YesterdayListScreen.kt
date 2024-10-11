@@ -1,6 +1,7 @@
 package com.poptato.yesterdaylist
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,19 +31,23 @@ import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.YesterdayListTitle
 
 @Composable
-fun YesterdayListScreen() {
+fun YesterdayListScreen(
+    goBackToBacklog: () -> Unit = {}
+) {
 
     val viewModel: YesterdayListViewModel = hiltViewModel()
     val uiState: YesterdayListPageState by viewModel.uiState.collectAsStateWithLifecycle()
 
     YesterdayContent(
-        uiState = uiState
+        uiState = uiState,
+        onClickCloseBtn = { goBackToBacklog() }
     )
 }
 
 @Composable
 fun YesterdayContent(
     uiState: YesterdayListPageState = YesterdayListPageState(),
+    onClickCloseBtn: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -50,13 +55,17 @@ fun YesterdayContent(
             .background(Gray100)
     ) {
 
-        TitleTopBar()
+        TitleTopBar(
+            onClickCloseBtn = onClickCloseBtn
+        )
 
     }
 }
 
 @Composable
-fun TitleTopBar() {
+fun TitleTopBar(
+    onClickCloseBtn: () -> Unit = {}
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -78,6 +87,7 @@ fun TitleTopBar() {
             modifier = Modifier
                 .align(Alignment.CenterEnd)
                 .size(width = 24.dp, height = 24.dp)
+                .clickable { onClickCloseBtn() }
         )
     }
 }
