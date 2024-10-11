@@ -54,7 +54,11 @@ fun NavGraphBuilder.yesterdayListNavGraph(navController: NavHostController) {
         }
 
         composable(NavRoutes.YesterdayAllCheckScreen.route) {
-            AllCheckScreen()
+            AllCheckScreen(
+                goBackToBacklog = { navController.navigate(NavRoutes.BacklogScreen.route) {
+                    popUpTo(NavRoutes.BacklogScreen.route) { inclusive = true }
+                } }
+            )
         }
     }
 }
