@@ -40,6 +40,10 @@ const val VersionSetting = "v 1.0.0"
 const val UserDelete = "서비스 탈퇴하기"
 const val UserDeleteTitle = "정말 서비스를\n탈퇴하시겠어요?"
 const val UserDeleteBtn = "탈퇴하기"
+const val FirstNoticeTitle = "회원님의 계정이 즉시 삭제돼요"
+const val FirstNoticeContent = "탈퇴한 회원의 정보는 즉시 삭제되며, 재가입은 14일이 지나야 가능해요."
+const val SecondNoticeTitle = "회원님의 데이터가 모두 삭제돼요"
+const val SecondNoticeContent = "오늘, 할 일, 기록에 저장된 모든 데이터가 삭제돼요."
 
 // Today
 const val TodayTopBarSub = "오늘도 하나씩 해보는 거야!"
