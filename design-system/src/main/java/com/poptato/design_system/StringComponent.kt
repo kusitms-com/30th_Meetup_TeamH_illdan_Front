@@ -23,6 +23,10 @@ const val YesterdayListTitle = "어제 완료한 일 왼쪽으로 스와이프!"
 const val YesterdayAllCheckBtn = "완료"
 const val YesterdayAllCheckContent = "좋아요! 오늘 하루도\n힘차게 시작해볼까요?"
 
+// Setting
+const val SettingExampleName = "구름"
+const val SettingExampleMail = "example@gmail.com"
+
 // Today
 const val TodayTopBarSub = "오늘도 하나씩 해보는 거야!"
 const val EmptyTodoTitle = "오늘 할 일은 무엇인가요?"
