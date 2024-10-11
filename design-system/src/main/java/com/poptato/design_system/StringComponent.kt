@@ -24,8 +24,19 @@ const val YesterdayAllCheckBtn = "완료"
 const val YesterdayAllCheckContent = "좋아요! 오늘 하루도\n힘차게 시작해볼까요?"
 
 // Setting
-const val SettingExampleName = "구름"
-const val SettingExampleMail = "example@gmail.com"
+const val SettingTitle = "설정"
+const val ProfileTitle = "계정"
+const val EditProfile = "프로필 편집"
+const val ProfileDetail = "계정 정보"
+const val LogOut = "로그아웃"
+const val ServiceTitle = "서비스"
+const val Notice = "공지사항"
+const val FAQ = "문의 & FAQ"
+const val Policy = "개인정보처리 방침 및 서비스 이용약관"
+const val Version = "버전"
+const val UserDelete = "서비스 탈퇴하기"
+const val MyPageExampleName = "구름"
+const val MyPageExampleMail = "example@gmail.com"
 
 // Today
 const val TodayTopBarSub = "오늘도 하나씩 해보는 거야!"

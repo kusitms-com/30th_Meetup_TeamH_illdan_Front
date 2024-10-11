@@ -27,10 +27,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
 import com.poptato.design_system.Gray40
+import com.poptato.design_system.MyPageExampleMail
+import com.poptato.design_system.MyPageExampleName
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.R
-import com.poptato.design_system.SettingExampleMail
-import com.poptato.design_system.SettingExampleName
 
 @Composable
 fun MyPageScreen(
@@ -100,7 +100,7 @@ fun MyData() {
 
             Column {
                 Text(
-                    text = SettingExampleName,
+                    text = MyPageExampleName,
                     color = Gray00,
                     style = PoptatoTypo.lgSemiBold,
                     modifier = Modifier
@@ -108,7 +108,7 @@ fun MyData() {
                 )
 
                 Text(
-                    text = SettingExampleMail,
+                    text = MyPageExampleMail,
                     color = Gray40,
                     style = PoptatoTypo.smRegular,
                     modifier = Modifier
