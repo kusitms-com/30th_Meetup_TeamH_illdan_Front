@@ -18,6 +18,10 @@ sealed class NavRoutes(val route: String) {
     data object YesterdayListScreen: NavRoutes("yesterday_list")
     data object YesterdayAllCheckScreen: NavRoutes("yesterday_all_check")
 
+    // Setting
+    data object SettingGraph: NavRoutes("setting_graph")
+    data object SettingScreen: NavRoutes("setting")
+
     // Today Graph
     data object TodayGraph: NavRoutes("today_graph")
     data object TodayScreen: NavRoutes("today")

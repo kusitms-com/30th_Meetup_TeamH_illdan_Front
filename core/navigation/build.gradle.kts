@@ -14,5 +14,6 @@ dependencies {
     implementation(projects.feature.login)
     implementation(projects.feature.backlog)
     implementation(projects.feature.yesterdaylist)
+    implementation(projects.feature.setting)
     implementation(projects.feature.today)
 }
