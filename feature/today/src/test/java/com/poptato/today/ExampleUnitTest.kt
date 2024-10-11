@@ -1,4 +1,4 @@
-package com.poptato.data
+package com.poptato.today
 
 import org.junit.Test
 

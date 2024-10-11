@@ -7,6 +7,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.scrollBy
@@ -28,6 +29,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -42,7 +45,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
@@ -50,6 +52,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -59,25 +62,27 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.poptato.design_system.Backlog
 import com.poptato.design_system.BacklogHint
 import com.poptato.design_system.BacklogTitle
+import com.poptato.design_system.EmptyBacklogTitle
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
 import com.poptato.design_system.Gray70
+import com.poptato.design_system.Gray80
 import com.poptato.design_system.Gray95
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.Primary10
 import com.poptato.design_system.Primary60
 import com.poptato.design_system.Primary70
 import com.poptato.design_system.R
+import com.poptato.domain.model.response.today.TodoItemModel
+import com.poptato.ui.common.TodoBottomSheetContent
 import com.poptato.ui.common.TopBar
 import com.poptato.ui.util.DragDropListState
 import com.poptato.ui.util.rememberDragDropListState
-import com.poptato.ui.util.toPx
 import kotlinx.coroutines.launch
-import kotlin.math.absoluteValue
 
 @Composable
 fun BacklogScreen(
-
+    showBottomSheet: (TodoItemModel) -> Unit = {}
 ) {
     val viewModel: BacklogViewModel = hiltViewModel()
     val uiState: BacklogPageState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -93,7 +98,10 @@ fun BacklogScreen(
         onValueChange = { newValue -> viewModel.onValueChange(newValue) },
         createBacklog = { newItem -> viewModel.createBacklog(newItem) },
         onItemSwiped = { itemToRemove -> viewModel.removeBacklogItem(itemToRemove) },
-        dragDropListState = dragDropListState
+        dragDropListState = dragDropListState,
+        onClickBtnTodoSettings = {
+            showBottomSheet(uiState.backlogList[it])
+        }
     )
 }
 
@@ -102,8 +110,9 @@ fun BacklogContent(
     uiState: BacklogPageState = BacklogPageState(),
     onValueChange: (String) -> Unit = {},
     createBacklog: (String) -> Unit = {},
-    onItemSwiped: (String) -> Unit = {},
-    dragDropListState: DragDropListState? = null
+    onItemSwiped: (TodoItemModel) -> Unit = {},
+    dragDropListState: DragDropListState? = null,
+    onClickBtnTodoSettings: (Int) -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -123,23 +132,35 @@ fun BacklogContent(
         ) {
             Spacer(modifier = Modifier.height(8.dp))
 
-            BacklogGuideItem()
-
-            Spacer(modifier = Modifier.height(16.dp))
-
             CreateBacklogTextFiled(
                 onValueChange = onValueChange,
                 taskInput = uiState.taskInput,
                 createBacklog = createBacklog
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            if (uiState.backlogList.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = EmptyBacklogTitle,
+                        style = PoptatoTypo.lgMedium,
+                        textAlign = TextAlign.Center,
+                        color = Gray80
+                    )
+                }
+            } else {
+                Spacer(modifier = Modifier.height(16.dp))
 
-            BacklogTaskList(
-                taskList = uiState.backlogList,
-                onItemSwiped = onItemSwiped,
-                dragDropListState = dragDropListState!!
-            )
+                BacklogTaskList(
+                    taskList = uiState.backlogList,
+                    onItemSwiped = onItemSwiped,
+                    dragDropListState = dragDropListState!!,
+                    onClickBtnTodoSettings = onClickBtnTodoSettings
+                )
+            }
         }
     }
 }
@@ -248,11 +269,12 @@ fun CreateBacklogTextFiled(
 
 @Composable
 fun BacklogTaskList(
-    taskList: List<String> = emptyList(),
-    onItemSwiped: (String) -> Unit = {},
-    dragDropListState: DragDropListState
+    taskList: List<TodoItemModel> = emptyList(),
+    onItemSwiped: (TodoItemModel) -> Unit = {},
+    dragDropListState: DragDropListState,
+    onClickBtnTodoSettings: (Int) -> Unit = {}
 ) {
-    var draggedItemId by remember { mutableStateOf<String?>(null) }
+    var draggedItem by remember { mutableStateOf<TodoItemModel?>(null) }
     val scope = rememberCoroutineScope()
 
     LazyColumn(
@@ -263,15 +285,16 @@ fun BacklogTaskList(
                 detectDragGesturesAfterLongPress(
                     onDragStart = { offset ->
                         dragDropListState.onDragStart(offset)
-                        draggedItemId = taskList[dragDropListState.currentIndexOfDraggedItem ?: return@detectDragGesturesAfterLongPress]
+                        draggedItem = taskList[dragDropListState.currentIndexOfDraggedItem
+                            ?: return@detectDragGesturesAfterLongPress]
                     },
                     onDragEnd = {
                         dragDropListState.onDragInterrupted()
-                        draggedItemId = null
+                        draggedItem = null
                     },
                     onDragCancel = {
                         dragDropListState.onDragInterrupted()
-                        draggedItemId = null
+                        draggedItem = null
                     },
                     onDrag = { change, offset ->
                         change.consume()
@@ -281,14 +304,15 @@ fun BacklogTaskList(
                             .checkForOverScroll()
                             .takeIf { it != 0f }
                             ?.let {
-                                dragDropListState.overscrollJob = scope.launch { dragDropListState.lazyListState.scrollBy(it) }
+                                dragDropListState.overscrollJob =
+                                    scope.launch { dragDropListState.lazyListState.scrollBy(it) }
                             } ?: run { dragDropListState.overscrollJob?.cancel() }
                     }
                 )
             },
         state = dragDropListState.lazyListState
     ) {
-        itemsIndexed(taskList, key = { _, item -> item }) { index, item ->
+        itemsIndexed(taskList, key = { _, item -> item.todoId }) { index, item ->
             var offsetX by remember { mutableFloatStateOf(0f) }
             val isDragged = index == dragDropListState.currentIndexOfDraggedItem
 
@@ -296,7 +320,9 @@ fun BacklogTaskList(
                 modifier = Modifier
                     .zIndex(if (index == dragDropListState.currentIndexOfDraggedItem) 1f else 0f)
                     .graphicsLayer {
-                        translationY = dragDropListState.elementDisplacement.takeIf { index == dragDropListState.currentIndexOfDraggedItem } ?: 0f
+                        translationY =
+                            dragDropListState.elementDisplacement.takeIf { index == dragDropListState.currentIndexOfDraggedItem }
+                                ?: 0f
                         scaleX = if (isDragged) 1.05f else 1f
                         scaleY = if (isDragged) 1.05f else 1f
                     }
@@ -323,7 +349,10 @@ fun BacklogTaskList(
                         fadeOutSpec = null
                     )
                     .border(
-                        if (isDragged) BorderStroke(2.dp, Color.White) else BorderStroke(0.dp, Color.Transparent),
+                        if (isDragged) BorderStroke(2.dp, Color.White) else BorderStroke(
+                            0.dp,
+                            Color.Transparent
+                        ),
                         RoundedCornerShape(8.dp)
                     )
             ) {
@@ -332,7 +361,11 @@ fun BacklogTaskList(
                     enter = slideInVertically(initialOffsetY = { -100 }) + fadeIn(),
                     exit = fadeOut()
                 ) {
-                    BacklogItem(item)
+                    BacklogItem(
+                        item = item,
+                        index = index,
+                        onClickBtnTodoSettings = onClickBtnTodoSettings
+                    )
                 }
             }
             Spacer(modifier = Modifier.height(12.dp))
@@ -348,7 +381,9 @@ fun BacklogTaskList(
 
 @Composable
 fun BacklogItem(
-    item: String
+    item: TodoItemModel,
+    index: Int = -1,
+    onClickBtnTodoSettings: (Int) -> Unit = {}
 ) {
     Row(
         modifier = Modifier
@@ -360,7 +395,7 @@ fun BacklogItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = item,
+            text = item.content,
             color = Gray00,
             style = PoptatoTypo.mdRegular,
             modifier = Modifier
@@ -372,7 +407,11 @@ fun BacklogItem(
         Icon(
             painter = painterResource(id = R.drawable.ic_three_dot),
             contentDescription = "",
-            tint = Color.Unspecified
+            tint = Color.Unspecified,
+            modifier = Modifier
+                .clickable {
+                    onClickBtnTodoSettings(index)
+                }
         )
     }
 }
