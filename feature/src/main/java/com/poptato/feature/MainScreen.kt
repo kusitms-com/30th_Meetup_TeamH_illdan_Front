@@ -45,6 +45,7 @@ import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.navigation.NavRoutes
 import com.poptato.navigation.loginNavGraph
 import com.poptato.navigation.mainNavGraph
+import com.poptato.navigation.myPageNavGraph
 import com.poptato.navigation.settingNavGraph
 import com.poptato.navigation.splashNavGraph
 import com.poptato.navigation.yesterdayListNavGraph
@@ -144,6 +145,7 @@ fun MainScreen() {
                         loginNavGraph(navController = navController)
                         mainNavGraph(navController = navController, showBottomSheet = showBottomSheet)
                         yesterdayListNavGraph(navController = navController)
+                        myPageNavGraph(navController = navController)
                         settingNavGraph(navController = navController)
                         todayNavGraph(navController = navController)
                     }
@@ -216,7 +218,7 @@ fun BottomNavItem(
 
                     BottomNavType.HISTORY -> TODO()
                     BottomNavType.SETTINGS -> {
-                        onClick(NavRoutes.SettingScreen.route)
+                        onClick(NavRoutes.MyPageScreen.route)
                     }
                     BottomNavType.DEFAULT -> TODO()
                 }
