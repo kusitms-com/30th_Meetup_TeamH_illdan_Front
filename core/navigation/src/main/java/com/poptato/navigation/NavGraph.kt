@@ -7,6 +7,7 @@ import androidx.navigation.navigation
 import com.poptato.backlog.BacklogScreen
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.login.KaKaoLoginScreen
+import com.poptato.mypage.MyPageScreen
 import com.poptato.setting.SettingScreen
 import com.poptato.splash.SplashScreen
 import com.poptato.yesterdaylist.YesterdayListScreen
@@ -63,6 +64,15 @@ fun NavGraphBuilder.yesterdayListNavGraph(navController: NavHostController) {
         }
     }
 }
+
+fun NavGraphBuilder.myPageNavGraph(navController: NavHostController) {
+    navigation(startDestination = NavRoutes.MyPageScreen.route, route = NavRoutes.MyPageGraph.route) {
+        composable(NavRoutes.MyPageScreen.route) {
+            MyPageScreen()
+        }
+    }
+}
+
 
 fun NavGraphBuilder.settingNavGraph(navController: NavHostController) {
     navigation(startDestination = NavRoutes.SettingScreen.route, route = NavRoutes.SettingGraph.route) {
