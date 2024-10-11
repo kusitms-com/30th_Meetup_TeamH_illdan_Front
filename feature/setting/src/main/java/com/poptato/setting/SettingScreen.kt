@@ -30,6 +30,7 @@ import com.poptato.design_system.Gray60
 import com.poptato.design_system.LogOut
 import com.poptato.design_system.Policy
 import com.poptato.design_system.PoptatoTypo
+import com.poptato.design_system.Primary60
 import com.poptato.design_system.ProfileDetail
 import com.poptato.design_system.ProfileTitle
 import com.poptato.design_system.R
@@ -37,6 +38,7 @@ import com.poptato.design_system.ServiceTitle
 import com.poptato.design_system.SettingTitle
 import com.poptato.design_system.UserDelete
 import com.poptato.design_system.Version
+import com.poptato.design_system.VersionSetting
 
 @Composable
 fun SettingScreen(
@@ -92,7 +94,8 @@ fun SettingContent(
             title = Policy
         )
         SettingServiceItem(
-            title = Version
+            title = Version,
+            isVersion = true
         )
         SettingServiceItem(
             title = UserDelete,
@@ -148,7 +151,8 @@ fun SettingSubTitle(
 @Composable
 fun SettingServiceItem(
     title: String,
-    color: Color = Gray20
+    color: Color = Gray20,
+    isVersion: Boolean = false
 ) {
     Box(
         modifier = Modifier
@@ -161,6 +165,17 @@ fun SettingServiceItem(
             color = color,
             style = PoptatoTypo.mdMedium
         )
+
+        if (isVersion) {
+            Text(
+                text = VersionSetting,
+                color = Primary60,
+                style = PoptatoTypo.mdMedium,
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(end = 24.dp)
+            )
+        }
     }
 }
 
