@@ -16,18 +16,20 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -36,26 +38,33 @@ import androidx.navigation.compose.rememberNavController
 import com.poptato.core.enums.BottomNavType
 import com.poptato.design_system.Gray100
 import com.poptato.design_system.Gray80
-import com.poptato.design_system.History
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.Primary60
 import com.poptato.design_system.R
-import com.poptato.design_system.Settings
-import com.poptato.design_system.Today
+import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.navigation.NavRoutes
 import com.poptato.navigation.loginNavGraph
 import com.poptato.navigation.mainNavGraph
 import com.poptato.navigation.splashNavGraph
 import com.poptato.navigation.yesterdayListNavGraph
+import com.poptato.navigation.todayNavGraph
+import com.poptato.ui.common.TodoBottomSheetContent
 import com.poptato.ui.util.DismissKeyboardOnClick
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
 
 @Composable
 fun MainScreen() {
     val viewModel: MainViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val navController = rememberNavController()
+    val scope = rememberCoroutineScope()
+    val sheetState = androidx.compose.material.rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
     val slideDuration = 300
+    val showBottomSheet: (TodoItemModel) -> Unit = { item: TodoItemModel ->
+        viewModel.onSelectedTodoItem(item)
+    }
 
     LaunchedEffect(navController) {
         navController.currentBackStackEntryFlow
@@ -65,53 +74,77 @@ fun MainScreen() {
             }
     }
 
-    DismissKeyboardOnClick {
-        Scaffold(
-            bottomBar = {
-                if (uiState.bottomNavType != BottomNavType.DEFAULT) {
-                    BottomNavBar(
-                        type = uiState.bottomNavType,
-                        onClick = { route: String ->
-                            if (navController.currentDestination?.route != route) {
-                                navController.navigate(route)
-                            }
-                        },
-                        modifier = Modifier.navigationBarsPadding()
-                    )
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collect { event ->
+            when(event) {
+                is MainEvent.ShowTodoBottomSheet -> {
+                    scope.launch {
+                        sheetState.show()
+                    }
                 }
             }
-        ) { innerPadding ->
-            Box(
-                modifier = Modifier
-                    .padding(innerPadding)
-            ) {
-                NavHost(
-                    navController = navController,
-                    startDestination = NavRoutes.SplashGraph.route,
-                    exitTransition = { ExitTransition.None },
-                    enterTransition = {
-                        slideIntoContainer(
-                            AnimatedContentTransitionScope.SlideDirection.Start,
-                            tween(slideDuration)
-                        )
-                    },
-                    popEnterTransition = {
-                        slideIntoContainer(
-                            AnimatedContentTransitionScope.SlideDirection.End,
-                            tween(slideDuration)
-                        )
-                    },
-                    popExitTransition = {
-                        slideOutOfContainer(
-                            AnimatedContentTransitionScope.SlideDirection.End,
-                            tween(slideDuration)
+        }
+    }
+
+    DismissKeyboardOnClick {
+        ModalBottomSheetLayout(
+            sheetState = sheetState,
+            sheetContent = {
+                TodoBottomSheetContent(
+                    item = uiState.selectedItem
+                )
+            },
+            sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+            scrimColor = Color(0, 0, 0, 128)
+        ) {
+            Scaffold(
+                bottomBar = {
+                    if (uiState.bottomNavType != BottomNavType.DEFAULT) {
+                        BottomNavBar(
+                            type = uiState.bottomNavType,
+                            onClick = { route: String ->
+                                if (navController.currentDestination?.route != route) {
+                                    navController.navigate(route)
+                                }
+                            },
+                            modifier = Modifier.navigationBarsPadding()
                         )
                     }
+                }
+            ) { innerPadding ->
+                Box(
+                    modifier = Modifier
+                        .padding(innerPadding)
                 ) {
-                    splashNavGraph(navController = navController)
-                    loginNavGraph(navController = navController)
-                    mainNavGraph(navController = navController)
-                    yesterdayListNavGraph(navController = navController)
+                    NavHost(
+                        navController = navController,
+                        startDestination = NavRoutes.SplashGraph.route,
+                        exitTransition = { ExitTransition.None },
+                        enterTransition = {
+                            slideIntoContainer(
+                                AnimatedContentTransitionScope.SlideDirection.Start,
+                                tween(slideDuration)
+                            )
+                        },
+                        popEnterTransition = {
+                            slideIntoContainer(
+                                AnimatedContentTransitionScope.SlideDirection.End,
+                                tween(slideDuration)
+                            )
+                        },
+                        popExitTransition = {
+                            slideOutOfContainer(
+                                AnimatedContentTransitionScope.SlideDirection.End,
+                                tween(slideDuration)
+                            )
+                        }
+                    ) {
+                        splashNavGraph(navController = navController)
+                        loginNavGraph(navController = navController)
+                        mainNavGraph(navController = navController, showBottomSheet = showBottomSheet)
+                        yesterdayListNavGraph(navController = navController)
+                        todayNavGraph(navController = navController)
+                    }
                 }
             }
         }
@@ -133,7 +166,7 @@ fun BottomNavBar(
         verticalAlignment = Alignment.CenterVertically
     ) {
         BottomNavItem(
-            iconId = if(type == BottomNavType.TODAY) R.drawable.ic_calendar_selected else R.drawable.ic_calendar_unselected,
+            iconId = if(type == BottomNavType.TODAY) R.drawable.ic_today_selected else R.drawable.ic_today_unselected,
             isSelected = type == BottomNavType.TODAY,
             type = BottomNavType.TODAY,
             onClick = onClick
@@ -171,10 +204,14 @@ fun BottomNavItem(
             .size(width = 42.dp, height = 46.dp)
             .clickable {
                 when (type) {
-                    BottomNavType.TODAY -> TODO()
+                    BottomNavType.TODAY -> {
+                        onClick(NavRoutes.TodayScreen.route)
+                    }
+
                     BottomNavType.BACK_LOG -> {
                         onClick(NavRoutes.BacklogScreen.route)
                     }
+
                     BottomNavType.HISTORY -> TODO()
                     BottomNavType.SETTINGS -> TODO()
                     BottomNavType.DEFAULT -> TODO()

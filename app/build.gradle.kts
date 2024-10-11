@@ -37,4 +37,7 @@ dependencies {
 
     // 카카오 로그인
     implementation(libs.kakao.auth)
+
+    // ThreeTen
+    implementation(libs.threeten)
 }

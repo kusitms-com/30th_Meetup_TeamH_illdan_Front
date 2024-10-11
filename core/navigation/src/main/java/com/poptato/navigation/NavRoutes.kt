@@ -9,11 +9,15 @@ sealed class NavRoutes(val route: String) {
     data object KaKaoLoginGraph: NavRoutes("kakao_login_graph")
     data object KaKaoLoginScreen: NavRoutes("kakao_login")
 
-    // MainGraph
-    data object MainGraph: NavRoutes("main_graph")
+    // Backlog Graph
+    data object BacklogGraph: NavRoutes("backlog_graph")
     data object BacklogScreen: NavRoutes("backlog")
 
     // YesterdayList
     data object YesterdayListGraph: NavRoutes("yesterday_list_graph")
     data object YesterdayListScreen: NavRoutes("yesterday_list")
+
+    // Today Graph
+    data object TodayGraph: NavRoutes("today_graph")
+    data object TodayScreen: NavRoutes("today")
 }

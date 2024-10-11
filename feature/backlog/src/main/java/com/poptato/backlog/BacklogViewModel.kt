@@ -1,10 +1,11 @@
 package com.poptato.backlog
 
 import com.poptato.core.util.move
+import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import okhttp3.internal.filterList
 import javax.inject.Inject
+import kotlin.random.Random
 
 @HiltViewModel
 class BacklogViewModel @Inject constructor(
@@ -20,9 +21,9 @@ class BacklogViewModel @Inject constructor(
         )
     }
 
-    fun createBacklog(item: String) {
+    fun createBacklog(content: String) {
         val newList = uiState.value.backlogList.toMutableList()
-        newList.add(0, item)
+        newList.add(0, TodoItemModel(content = content, todoId = Random.nextLong()))
         updateState(
             uiState.value.copy(
                 backlogList = newList
@@ -30,24 +31,12 @@ class BacklogViewModel @Inject constructor(
         )
     }
 
-    fun removeBacklogItem(item: String) {
+    fun removeBacklogItem(item: TodoItemModel) {
         val newList = uiState.value.backlogList.filter { it != item }
 
         updateState(
             uiState.value.copy(
                 backlogList = newList
-            )
-        )
-    }
-
-    fun moveBacklogItem(fromIndex: Int, toIndex: Int) {
-        val updatedList = uiState.value.backlogList.toMutableList()
-        val item = updatedList.removeAt(fromIndex)
-        updatedList.add(toIndex, item)
-
-        updateState(
-            uiState.value.copy(
-                backlogList = updatedList
             )
         )
     }
@@ -58,7 +47,7 @@ class BacklogViewModel @Inject constructor(
         updateList(currentList)
     }
 
-    private fun updateList(updatedList: List<String>) {
+    private fun updateList(updatedList: List<TodoItemModel>) {
         updateState(
             uiState.value.copy(
                 backlogList = updatedList

@@ -1,6 +1,7 @@
 package com.poptato.feature
 
 import com.poptato.core.enums.BottomNavType
+import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.navigation.NavRoutes
 import com.poptato.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,6 +17,9 @@ class MainViewModel @Inject constructor(
             NavRoutes.BacklogScreen.route -> {
                 BottomNavType.BACK_LOG
             }
+            NavRoutes.TodayScreen.route -> {
+                BottomNavType.TODAY
+            }
             else -> {
                 BottomNavType.DEFAULT
             }
@@ -29,5 +33,14 @@ class MainViewModel @Inject constructor(
                 bottomNavType = type
             )
         )
+    }
+
+    fun onSelectedTodoItem(item: TodoItemModel) {
+        updateState(
+            uiState.value.copy(
+                selectedItem = item
+            )
+        )
+        emitEventFlow(MainEvent.ShowTodoBottomSheet)
     }
 }
