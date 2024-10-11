@@ -20,6 +20,9 @@ class MainViewModel @Inject constructor(
             NavRoutes.TodayScreen.route -> {
                 BottomNavType.TODAY
             }
+            NavRoutes.SettingScreen.route -> {
+                BottomNavType.SETTINGS
+            }
             else -> {
                 BottomNavType.DEFAULT
             }
