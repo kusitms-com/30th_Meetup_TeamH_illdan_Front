@@ -31,7 +31,7 @@ fun AllCheckScreen(
 ) {
 
     LaunchedEffect(Unit) {
-        delay(2500L)
+        delay(2000L)
         goBackToBacklog()
     }
 
