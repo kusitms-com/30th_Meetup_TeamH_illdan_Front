@@ -15,13 +15,19 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.BottomSheetState
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,7 +36,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.poptato.core.enums.DateType
 import com.poptato.design_system.Danger50
 import com.poptato.design_system.Day
 import com.poptato.design_system.Gray00
@@ -45,26 +50,40 @@ import com.poptato.design_system.delete
 import com.poptato.design_system.dueDate
 import com.poptato.design_system.modify
 import com.poptato.domain.model.response.today.TodoItemModel
+import kotlinx.coroutines.launch
+
+@Composable
+fun TodoBottomSheet(
+    item: TodoItemModel = TodoItemModel(),
+    setDeadline: (String) -> Unit = {},
+    onClickShowDatePicker: () -> Unit = {}
+) {
+    var deadline by remember { mutableStateOf(item.deadline) }
+
+    LaunchedEffect(item) {
+        deadline = item.deadline
+    }
+
+    TodoBottomSheetContent(
+        item = item.copy(deadline = deadline),
+        removeDeadline = {
+            deadline = ""
+            setDeadline("")
+        },
+        onClickShowDatePicker = onClickShowDatePicker
+    )
+}
 
 @Composable
 fun TodoBottomSheetContent(
     item: TodoItemModel = TodoItemModel(),
+    removeDeadline: () -> Unit = {},
+    onClickShowDatePicker: () -> Unit = {}
 ) {
-    var showDateBottomSheet by remember { mutableStateOf(false) }
-    val deadline = remember { mutableStateOf("") }
-
-    if (showDateBottomSheet) {
-        DatePickerBottomSheet(
-            onDismissRequest = { showDateBottomSheet = false },
-            onDateSelected = { year, month, day ->
-                deadline.value = "$year$Year $month$Month $day$Day"
-            }
-        )
-    }
-
     Column(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
+            .height(324.dp)
             .background(Gray100)
     ) {
         Row(
@@ -140,15 +159,13 @@ fun TodoBottomSheetContent(
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp, vertical = 16.dp)
             ) {
-                if (deadline.value.isEmpty()) {
+                if (item.deadline.isEmpty()) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_btn_add),
                         contentDescription = "",
                         tint = Color.Unspecified,
                         modifier = Modifier
-                            .clickable {
-                                showDateBottomSheet = true
-                            }
+                            .clickable { onClickShowDatePicker() }
                     )
                 } else {
                     Icon(
@@ -156,9 +173,7 @@ fun TodoBottomSheetContent(
                         contentDescription = "",
                         tint = Color.Unspecified,
                         modifier = Modifier
-                            .clickable {
-                                deadline.value = ""
-                            }
+                            .clickable { removeDeadline() }
                     )
                 }
 
@@ -175,7 +190,7 @@ fun TodoBottomSheetContent(
                 Spacer(modifier = Modifier.width(10.dp))
 
                 Text(
-                    text = deadline.value,
+                    text = item.deadline,
                     color = Gray40,
                     style = PoptatoTypo.mdMedium,
                     modifier = Modifier.weight(1f),
