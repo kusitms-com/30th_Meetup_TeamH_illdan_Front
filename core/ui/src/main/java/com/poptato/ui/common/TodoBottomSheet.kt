@@ -9,16 +9,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.BottomSheetState
-import androidx.compose.material.ModalBottomSheetLayout
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -27,7 +22,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,26 +31,22 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.poptato.design_system.Danger50
-import com.poptato.design_system.Day
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
 import com.poptato.design_system.Gray40
 import com.poptato.design_system.Gray95
-import com.poptato.design_system.Month
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.R
-import com.poptato.design_system.Year
 import com.poptato.design_system.delete
 import com.poptato.design_system.dueDate
 import com.poptato.design_system.modify
 import com.poptato.domain.model.response.today.TodoItemModel
-import kotlinx.coroutines.launch
 
 @Composable
 fun TodoBottomSheet(
     item: TodoItemModel = TodoItemModel(),
     setDeadline: (String) -> Unit = {},
-    onClickShowDatePicker: () -> Unit = {}
+    onClickShowDatePicker: () -> Unit = {},
 ) {
     var deadline by remember { mutableStateOf(item.deadline) }
 
