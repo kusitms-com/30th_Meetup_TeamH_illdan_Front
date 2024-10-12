@@ -13,5 +13,6 @@ dependencies {
     implementation(projects.feature.splash)
     implementation(projects.feature.login)
     implementation(projects.feature.backlog)
+    implementation(projects.feature.yesterdaylist)
     implementation(projects.feature.today)
 }

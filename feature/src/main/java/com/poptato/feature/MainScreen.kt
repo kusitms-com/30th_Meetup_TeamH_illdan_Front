@@ -46,6 +46,7 @@ import com.poptato.navigation.NavRoutes
 import com.poptato.navigation.loginNavGraph
 import com.poptato.navigation.mainNavGraph
 import com.poptato.navigation.splashNavGraph
+import com.poptato.navigation.yesterdayListNavGraph
 import com.poptato.navigation.todayNavGraph
 import com.poptato.ui.common.TodoBottomSheetContent
 import com.poptato.ui.util.DismissKeyboardOnClick
@@ -141,6 +142,7 @@ fun MainScreen() {
                         splashNavGraph(navController = navController)
                         loginNavGraph(navController = navController)
                         mainNavGraph(navController = navController, showBottomSheet = showBottomSheet)
+                        yesterdayListNavGraph(navController = navController)
                         todayNavGraph(navController = navController)
                     }
                 }
