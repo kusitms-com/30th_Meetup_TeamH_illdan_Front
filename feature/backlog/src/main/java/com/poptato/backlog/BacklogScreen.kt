@@ -81,6 +81,7 @@ import timber.log.Timber
 
 @Composable
 fun BacklogScreen(
+    goToYesterdayList: () -> Unit = {},
     showBottomSheet: (TodoItemModel) -> Unit = {},
     todoBottomSheetClosedFlow: SharedFlow<Unit>,
     updateDeadlineFlow: SharedFlow<String>,
@@ -111,6 +112,7 @@ fun BacklogScreen(
         onValueChange = { newValue -> viewModel.onValueChange(newValue) },
         createBacklog = { newItem -> viewModel.createBacklog(newItem) },
         onItemSwiped = { itemToRemove -> viewModel.removeBacklogItem(itemToRemove) },
+        onClickYesterdayList = { goToYesterdayList() },      // TODO 테스트용: "어제 리스트 체크하기" 스낵바 생성 후 변경 예정
         dragDropListState = dragDropListState,
         onClickBtnTodoSettings = {
             showBottomSheet(uiState.backlogList[it])
@@ -124,6 +126,7 @@ fun BacklogContent(
     uiState: BacklogPageState = BacklogPageState(),
     onValueChange: (String) -> Unit = {},
     createBacklog: (String) -> Unit = {},
+    onClickYesterdayList: () -> Unit = {},
     onItemSwiped: (TodoItemModel) -> Unit = {},
     dragDropListState: DragDropListState? = null,
     onClickBtnTodoSettings: (Int) -> Unit = {}
@@ -145,6 +148,12 @@ fun BacklogContent(
                 .fillMaxSize()
         ) {
             Spacer(modifier = Modifier.height(8.dp))
+
+            BacklogGuideItem(
+                onClickYesterdayList = onClickYesterdayList
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             CreateBacklogTextFiled(
                 onValueChange = onValueChange,
@@ -402,13 +411,16 @@ fun BacklogItem(
 }
 
 @Composable
-fun BacklogGuideItem() {
+fun BacklogGuideItem(
+    onClickYesterdayList: () -> Unit = {},
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
             .clip(RoundedCornerShape(8.dp))
             .background(Primary70)
+            .clickable { onClickYesterdayList() }
     ) {
         Text(
             text = BacklogTitle,

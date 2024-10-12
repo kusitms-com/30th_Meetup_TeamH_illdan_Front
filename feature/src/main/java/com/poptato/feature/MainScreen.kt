@@ -60,6 +60,7 @@ import com.poptato.navigation.NavRoutes
 import com.poptato.navigation.loginNavGraph
 import com.poptato.navigation.backlogNavGraph
 import com.poptato.navigation.splashNavGraph
+import com.poptato.navigation.yesterdayListNavGraph
 import com.poptato.navigation.todayNavGraph
 import com.poptato.ui.common.DatePickerBottomSheet
 import com.poptato.ui.common.TodoBottomSheet
@@ -210,6 +211,7 @@ fun MainScreen() {
                     ) {
                         splashNavGraph(navController = navController)
                         loginNavGraph(navController = navController)
+                        yesterdayListNavGraph(navController = navController)
                         backlogNavGraph(
                             navController = navController,
                             showBottomSheet = showBottomSheet,
