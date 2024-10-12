@@ -6,5 +6,6 @@ data class TodoItemModel(
     val todoId: Long = -1,
     val content: String = "",
     val todoStatus: TodoStatus = TodoStatus.INCOMPLETE,
-    val isBookmark: Boolean = false
+    val isBookmark: Boolean = false,
+    val deadline: String = ""
 )
