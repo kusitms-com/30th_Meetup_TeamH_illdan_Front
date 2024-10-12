@@ -5,6 +5,9 @@ import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.navigation.NavRoutes
 import com.poptato.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @HiltViewModel
@@ -38,9 +41,19 @@ class MainViewModel @Inject constructor(
     fun onSelectedTodoItem(item: TodoItemModel) {
         updateState(
             uiState.value.copy(
-                selectedItem = item
+                selectedTodoItem = item
             )
         )
         emitEventFlow(MainEvent.ShowTodoBottomSheet)
+    }
+
+    fun onUpdatedDeadline(date: String) {
+        val updatedItem = uiState.value.selectedTodoItem.copy(deadline = date)
+
+        updateState(
+            uiState.value.copy(
+                selectedTodoItem = updatedItem
+            )
+        )
     }
 }

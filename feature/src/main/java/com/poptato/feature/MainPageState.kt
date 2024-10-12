@@ -6,5 +6,5 @@ import com.poptato.ui.base.PageState
 
 data class MainPageState(
     val bottomNavType: BottomNavType = BottomNavType.DEFAULT,
-    val selectedItem: TodoItemModel = TodoItemModel()
+    val selectedTodoItem: TodoItemModel = TodoItemModel()
 ): PageState
