@@ -1,5 +1,6 @@
 package com.poptato.navigation
 
+import androidx.compose.material.ModalBottomSheetState
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
@@ -9,6 +10,7 @@ import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.login.KaKaoLoginScreen
 import com.poptato.splash.SplashScreen
 import com.poptato.today.TodayScreen
+import kotlinx.coroutines.flow.SharedFlow
 
 fun NavGraphBuilder.splashNavGraph(navController: NavHostController) {
     navigation(startDestination = NavRoutes.SplashScreen.route, route = NavRoutes.SplashGraph.route) {
@@ -30,11 +32,18 @@ fun NavGraphBuilder.loginNavGraph(navController: NavHostController) {
     }
 }
 
-fun NavGraphBuilder.mainNavGraph(navController: NavHostController, showBottomSheet: (TodoItemModel) -> Unit) {
+fun NavGraphBuilder.backlogNavGraph(
+    navController: NavHostController,
+    showBottomSheet: (TodoItemModel) -> Unit,
+    todoBottomSheetClosedFlow: SharedFlow<Unit>,
+    updateDeadlineFlow: SharedFlow<String>,
+) {
     navigation(startDestination = NavRoutes.BacklogScreen.route, route = NavRoutes.BacklogGraph.route) {
         composable(NavRoutes.BacklogScreen.route) {
             BacklogScreen(
-                showBottomSheet = showBottomSheet
+                showBottomSheet = showBottomSheet,
+                todoBottomSheetClosedFlow = todoBottomSheetClosedFlow,
+                updateDeadlineFlow = updateDeadlineFlow,
             )
         }
     }

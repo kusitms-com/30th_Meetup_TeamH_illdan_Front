@@ -29,8 +29,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.ModalBottomSheetLayout
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -74,15 +72,18 @@ import com.poptato.design_system.Primary60
 import com.poptato.design_system.Primary70
 import com.poptato.design_system.R
 import com.poptato.domain.model.response.today.TodoItemModel
-import com.poptato.ui.common.TodoBottomSheetContent
 import com.poptato.ui.common.TopBar
 import com.poptato.ui.util.DragDropListState
 import com.poptato.ui.util.rememberDragDropListState
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @Composable
 fun BacklogScreen(
-    showBottomSheet: (TodoItemModel) -> Unit = {}
+    showBottomSheet: (TodoItemModel) -> Unit = {},
+    todoBottomSheetClosedFlow: SharedFlow<Unit>,
+    updateDeadlineFlow: SharedFlow<String>,
 ) {
     val viewModel: BacklogViewModel = hiltViewModel()
     val uiState: BacklogPageState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -93,6 +94,18 @@ fun BacklogScreen(
         }
     )
 
+    LaunchedEffect(todoBottomSheetClosedFlow) {
+        todoBottomSheetClosedFlow.collect {
+            // TODO: 데이터 갱신 함수 호출
+        }
+    }
+
+    LaunchedEffect(updateDeadlineFlow) {
+        updateDeadlineFlow.collect {
+            viewModel.setDeadline(it)
+        }
+    }
+
     BacklogContent(
         uiState = uiState,
         onValueChange = { newValue -> viewModel.onValueChange(newValue) },
@@ -101,6 +114,7 @@ fun BacklogScreen(
         dragDropListState = dragDropListState,
         onClickBtnTodoSettings = {
             showBottomSheet(uiState.backlogList[it])
+            viewModel.onSelectedItem(uiState.backlogList[it])
         }
     )
 }
@@ -166,35 +180,6 @@ fun BacklogContent(
 }
 
 @Composable
-fun BacklogGuideItem() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .clip(RoundedCornerShape(8.dp))
-            .background(Primary70)
-    ) {
-        Text(
-            text = BacklogTitle,
-            style = PoptatoTypo.smRegular,
-            color = Primary10,
-            modifier = Modifier
-                .padding(start = 16.dp)
-                .padding(vertical = 12.dp)
-        )
-
-        Icon(
-            painter = painterResource(id = R.drawable.ic_backlog_guide),
-            contentDescription = "",
-            tint = Color.Unspecified,
-            modifier = Modifier
-                .size(width = 77.dp, height = 54.dp)
-                .align(Alignment.BottomEnd)
-        )
-    }
-}
-
-@Composable
 fun CreateBacklogTextFiled(
     taskInput: String = "",
     onValueChange: (String) -> Unit = {},
@@ -224,7 +209,7 @@ fun CreateBacklogTextFiled(
             ),
             keyboardActions = KeyboardActions(
                 onDone = {
-                    createBacklog(taskInput)
+                    if(taskInput.isNotEmpty()) createBacklog(taskInput)
                     onValueChange("")
                 }
             ),
@@ -412,6 +397,35 @@ fun BacklogItem(
                 .clickable {
                     onClickBtnTodoSettings(index)
                 }
+        )
+    }
+}
+
+@Composable
+fun BacklogGuideItem() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(Primary70)
+    ) {
+        Text(
+            text = BacklogTitle,
+            style = PoptatoTypo.smRegular,
+            color = Primary10,
+            modifier = Modifier
+                .padding(start = 16.dp)
+                .padding(vertical = 12.dp)
+        )
+
+        Icon(
+            painter = painterResource(id = R.drawable.ic_backlog_guide),
+            contentDescription = "",
+            tint = Color.Unspecified,
+            modifier = Modifier
+                .size(width = 77.dp, height = 54.dp)
+                .align(Alignment.BottomEnd)
         )
     }
 }
