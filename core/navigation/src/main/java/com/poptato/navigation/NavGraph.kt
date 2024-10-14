@@ -8,6 +8,9 @@ import androidx.navigation.navigation
 import com.poptato.backlog.BacklogScreen
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.login.KaKaoLoginScreen
+import com.poptato.mypage.MyPageScreen
+import com.poptato.setting.SettingScreen
+import com.poptato.setting.servicedelete.ServiceDeleteScreen
 import com.poptato.splash.SplashScreen
 import com.poptato.yesterdaylist.YesterdayListScreen
 import com.poptato.today.TodayScreen
@@ -66,6 +69,29 @@ fun NavGraphBuilder.yesterdayListNavGraph(navController: NavHostController) {
                 goBackToBacklog = { navController.navigate(NavRoutes.BacklogScreen.route) {
                     popUpTo(NavRoutes.BacklogScreen.route) { inclusive = true }
                 } }
+            )
+        }
+    }
+}
+
+fun NavGraphBuilder.myPageNavGraph(navController: NavHostController) {
+    navigation(startDestination = NavRoutes.MyPageScreen.route, route = NavRoutes.MyPageGraph.route) {
+        composable(NavRoutes.MyPageScreen.route) {
+            MyPageScreen(
+                goToSettingPage = { navController.navigate(NavRoutes.SettingScreen.route) }
+            )
+        }
+
+        composable(NavRoutes.SettingScreen.route) {
+            SettingScreen(
+                goBackToMyPage = { navController.popBackStack() },
+                goToServiceDelete = { navController.navigate(NavRoutes.ServiceDeleteScreen.route) }
+            )
+        }
+
+        composable(NavRoutes.ServiceDeleteScreen.route) {
+            ServiceDeleteScreen(
+                goBackToSetting = { navController.popBackStack() }
             )
         }
     }
