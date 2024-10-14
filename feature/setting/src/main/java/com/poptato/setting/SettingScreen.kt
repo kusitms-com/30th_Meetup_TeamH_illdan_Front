@@ -39,6 +39,7 @@ import com.poptato.design_system.SettingTitle
 import com.poptato.design_system.UserDelete
 import com.poptato.design_system.Version
 import com.poptato.design_system.VersionSetting
+import com.poptato.setting.BuildConfig.VERSION_NAME
 
 @Composable
 fun SettingScreen(
@@ -174,7 +175,7 @@ fun SettingServiceItem(
 
         if (isVersion) {
             Text(
-                text = VersionSetting,
+                text = String.format(VersionSetting, VERSION_NAME),
                 color = Primary60,
                 style = PoptatoTypo.mdMedium,
                 modifier = Modifier
