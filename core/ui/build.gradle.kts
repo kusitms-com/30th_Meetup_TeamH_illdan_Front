@@ -10,4 +10,5 @@ android {
 dependencies {
     implementation(projects.designSystem)
     implementation(projects.domain)
+    implementation(projects.core)
 }

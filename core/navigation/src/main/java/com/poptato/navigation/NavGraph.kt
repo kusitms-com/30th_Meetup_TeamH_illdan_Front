@@ -1,5 +1,6 @@
 package com.poptato.navigation
 
+import androidx.compose.material.ModalBottomSheetState
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
@@ -13,6 +14,7 @@ import com.poptato.setting.servicedelete.ServiceDeleteScreen
 import com.poptato.splash.SplashScreen
 import com.poptato.yesterdaylist.YesterdayListScreen
 import com.poptato.today.TodayScreen
+import kotlinx.coroutines.flow.SharedFlow
 import com.poptato.yesterdaylist.allcheck.AllCheckScreen
 
 fun NavGraphBuilder.splashNavGraph(navController: NavHostController) {
@@ -35,13 +37,19 @@ fun NavGraphBuilder.loginNavGraph(navController: NavHostController) {
     }
 }
 
-fun NavGraphBuilder.mainNavGraph(navController: NavHostController, showBottomSheet: (TodoItemModel) -> Unit) {
+fun NavGraphBuilder.backlogNavGraph(
+    navController: NavHostController,
+    showBottomSheet: (TodoItemModel) -> Unit,
+    todoBottomSheetClosedFlow: SharedFlow<Unit>,
+    updateDeadlineFlow: SharedFlow<String>,
+) {
     navigation(startDestination = NavRoutes.BacklogScreen.route, route = NavRoutes.BacklogGraph.route) {
         composable(NavRoutes.BacklogScreen.route) {
             BacklogScreen(
                 goToYesterdayList = { navController.navigate(NavRoutes.YesterdayListScreen.route) },
-                showBottomSheet = showBottomSheet
-
+                showBottomSheet = showBottomSheet,
+                todoBottomSheetClosedFlow = todoBottomSheetClosedFlow,
+                updateDeadlineFlow = updateDeadlineFlow,
             )
         }
     }

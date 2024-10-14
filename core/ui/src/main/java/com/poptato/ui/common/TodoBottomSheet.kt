@@ -3,12 +3,12 @@ package com.poptato.ui.common
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -18,6 +18,11 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,13 +43,37 @@ import com.poptato.design_system.modify
 import com.poptato.domain.model.response.today.TodoItemModel
 
 @Composable
+fun TodoBottomSheet(
+    item: TodoItemModel = TodoItemModel(),
+    setDeadline: (String) -> Unit = {},
+    onClickShowDatePicker: () -> Unit = {},
+) {
+    var deadline by remember { mutableStateOf(item.deadline) }
+
+    LaunchedEffect(item) {
+        deadline = item.deadline
+    }
+
+    TodoBottomSheetContent(
+        item = item.copy(deadline = deadline),
+        removeDeadline = {
+            deadline = ""
+            setDeadline("")
+        },
+        onClickShowDatePicker = onClickShowDatePicker
+    )
+}
+
+@Composable
 fun TodoBottomSheetContent(
     item: TodoItemModel = TodoItemModel(),
-    deadline: String = "",
+    removeDeadline: () -> Unit = {},
+    onClickShowDatePicker: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
+            .height(324.dp)
             .background(Gray100)
     ) {
         Row(
@@ -66,13 +95,13 @@ fun TodoBottomSheetContent(
 
             if (item.isBookmark) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_star_empty),
+                    painter = painterResource(id = R.drawable.ic_star_filled),
                     contentDescription = "",
                     tint = Color.Unspecified
                 )
             } else {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_star_filled),
+                    painter = painterResource(id = R.drawable.ic_star_empty),
                     contentDescription = "",
                     tint = Color.Unspecified
                 )
@@ -120,17 +149,21 @@ fun TodoBottomSheetContent(
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp, vertical = 16.dp)
             ) {
-                if (deadline.isEmpty()) {
+                if (item.deadline.isEmpty()) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_btn_add),
                         contentDescription = "",
-                        tint = Color.Unspecified
+                        tint = Color.Unspecified,
+                        modifier = Modifier
+                            .clickable { onClickShowDatePicker() }
                     )
                 } else {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_btn_minus),
                         contentDescription = "",
-                        tint = Color.Unspecified
+                        tint = Color.Unspecified,
+                        modifier = Modifier
+                            .clickable { removeDeadline() }
                     )
                 }
 
@@ -147,7 +180,7 @@ fun TodoBottomSheetContent(
                 Spacer(modifier = Modifier.width(10.dp))
 
                 Text(
-                    text = deadline,
+                    text = item.deadline,
                     color = Gray40,
                     style = PoptatoTypo.mdMedium,
                     modifier = Modifier.weight(1f),
