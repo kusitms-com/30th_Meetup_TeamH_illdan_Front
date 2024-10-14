@@ -1,5 +1,6 @@
 package com.poptato.ui.common
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -29,10 +31,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.poptato.core.enums.DateType
 import com.poptato.core.util.TimeFormatter
+import com.poptato.design_system.Cancel
 import com.poptato.design_system.Complete
+import com.poptato.design_system.Confirm
 import com.poptato.design_system.Day
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
+import com.poptato.design_system.Gray40
+import com.poptato.design_system.Gray95
 import com.poptato.design_system.Month
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.Primary60
@@ -132,12 +138,29 @@ fun DatePickerBottomSheetContent(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Box(
+        Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp)
-                .padding(horizontal = 16.dp)
-                .clickable {
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            DatePickerButtons(
+                btnColor = Gray95,
+                btnText = Cancel,
+                textColor = Gray40,
+                onClickBtn = onDismissRequest,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 16.dp)
+            )
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            DatePickerButtons(
+                btnColor = Primary60,
+                btnText = Confirm,
+                textColor = Gray100,
+                onClickBtn = {
                     val selectedYear = 2000 + yearState.firstVisibleItemIndex
                     val selectedMonth = 1 + monthState.firstVisibleItemIndex
                     val selectedDay = 1 + dayState.firstVisibleItemIndex
@@ -149,15 +172,10 @@ fun DatePickerBottomSheetContent(
                     }
 
                     onDismissRequest()
-                }
-                .clip(RoundedCornerShape(12.dp))
-                .background(Primary60),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = Complete,
-                style = PoptatoTypo.lgSemiBold,
-                color = Gray100
+                },
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 16.dp)
             )
         }
 
@@ -218,5 +236,30 @@ fun DialPicker(
                 }
             }
         }
+    }
+}
+
+@SuppressLint("ModifierParameter")
+@Composable
+fun DatePickerButtons(
+    btnText: String = "",
+    btnColor: Color = Color.Unspecified,
+    textColor: Color = Color.Unspecified,
+    onClickBtn: () -> Unit = {},
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .height(48.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(btnColor)
+            .clickable { onClickBtn() },
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = btnText,
+            style = PoptatoTypo.lgSemiBold,
+            color = textColor
+        )
     }
 }
