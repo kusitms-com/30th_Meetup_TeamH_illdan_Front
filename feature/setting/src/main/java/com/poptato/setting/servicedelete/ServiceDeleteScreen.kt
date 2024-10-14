@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -19,7 +20,9 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -72,11 +75,10 @@ fun ServiceDeleteContent(
 
         Box(
             modifier = Modifier
-                .weight(1f)
-                .fillMaxSize()
                 .padding(top = 32.dp)
         ) {
             DeleteNotice()
+
         }
 
         UserDeleteBtn()
@@ -162,22 +164,46 @@ fun DeleteNoticeItem(
 
 @Composable
 fun UserDeleteBtn() {
+
     Box(
         modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .padding(horizontal = 16.dp)
-            .padding(bottom = 8.dp)
-            .background(Danger50, shape = RoundedCornerShape(12.dp))
+            .fillMaxSize(),
+        contentAlignment = Alignment.BottomCenter
     ) {
-        Text(
-            text = UserDeleteBtn,
-            style = PoptatoTypo.lgSemiBold,
-            color = Gray100,
+        Box(
             modifier = Modifier
-                .padding(vertical = 15.dp)
-                .align(Alignment.Center)
+                .size(600.dp)
+                .offset(y = 175.dp)
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Danger50.copy(alpha = 0.05f),
+                            Color.Transparent
+                        ),
+                        startY = 400f,
+                        endY = 200f
+                    ),
+                    shape = RectangleShape
+                )
         )
+
+        Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 8.dp)
+                    .background(Danger50, shape = RoundedCornerShape(12.dp))
+                ) {
+            Text(
+                text = UserDeleteBtn,
+                style = PoptatoTypo.lgSemiBold,
+                color = Gray100,
+                modifier = Modifier
+                    .padding(vertical = 15.dp)
+                    .align(Alignment.Center)
+            )
+        }
     }
 }
 
