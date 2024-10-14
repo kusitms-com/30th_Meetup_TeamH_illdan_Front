@@ -4,6 +4,7 @@ import com.poptato.core.util.move
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -32,7 +33,7 @@ class BacklogViewModel @Inject constructor(
     }
 
     fun removeBacklogItem(item: TodoItemModel) {
-        val newList = uiState.value.backlogList.filter { it != item }
+        val newList = uiState.value.backlogList.filter { it.todoId != item.todoId }
 
         updateState(
             uiState.value.copy(
@@ -51,6 +52,29 @@ class BacklogViewModel @Inject constructor(
         updateState(
             uiState.value.copy(
                 backlogList = updatedList
+            )
+        )
+    }
+
+    fun setDeadline(deadline: String) {
+        val updatedItem = uiState.value.selectedItem.copy(deadline = deadline)
+        val newList = uiState.value.backlogList.map {
+            if (it.todoId == updatedItem.todoId) updatedItem
+            else it
+        }
+
+        updateState(
+            uiState.value.copy(
+                backlogList = newList,
+                selectedItem = updatedItem
+            )
+        )
+    }
+
+    fun onSelectedItem(item: TodoItemModel) {
+        updateState(
+            uiState.value.copy(
+                selectedItem = item
             )
         )
     }
