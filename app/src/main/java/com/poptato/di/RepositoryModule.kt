@@ -1,7 +1,7 @@
 package com.poptato.di
 
 import com.poptato.data.repository.AuthRepositoryImpl
-import com.poptato.domain.model.repository.AuthRepository
+import com.poptato.domain.repository.AuthRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
