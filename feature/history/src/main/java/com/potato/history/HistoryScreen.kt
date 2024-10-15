@@ -80,6 +80,13 @@ fun HistoryContent(
                 )
             }
         } else {
+            Text(
+                text = "기록",
+                color = Gray00,
+                style = PoptatoTypo.xLSemiBold,
+                modifier = Modifier
+                    .padding(start = 16.dp, top = 13.dp, bottom = 13.dp)
+            )
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
