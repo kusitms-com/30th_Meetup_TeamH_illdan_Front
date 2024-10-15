@@ -1,8 +1,8 @@
 package com.poptato.login
 
 import androidx.lifecycle.viewModelScope
-import com.poptato.domain.repository.AuthRepository
 import com.poptato.domain.model.response.login.AuthModel
+import com.poptato.domain.usecase.PostKaKaoLoginUseCase
 import com.poptato.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -11,12 +11,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class KaKaoLoginViewModel @Inject constructor(
-    private val authRepository: AuthRepository
+    private val postKaKaoLoginUseCase: PostKaKaoLoginUseCase
 ) : BaseViewModel<KaKaoLoginPageState>(KaKaoLoginPageState()) {
 
     fun kakaoLogin(token: String) {
         viewModelScope.launch {
-            authRepository.login(token).collect {
+            postKaKaoLoginUseCase.invoke(request = token).collect {
                 resultResponse(it, ::onSuccessKaKaoLogin)
             }
         }
