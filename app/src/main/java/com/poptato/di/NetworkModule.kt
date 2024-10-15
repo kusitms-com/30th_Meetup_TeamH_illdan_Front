@@ -1,5 +1,6 @@
 package com.poptato.di
 
+import com.poptato.core.base.BASE_URL
 import com.poptato.data.datastore.PoptatoDataStore
 import dagger.Module
 import dagger.Provides
@@ -56,7 +57,7 @@ object NetworkModule {
         okHttpClient: OkHttpClient
     ): Retrofit {
         return Retrofit.Builder()
-//            .baseUrl(BASE_URL)
+            .baseUrl(BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()

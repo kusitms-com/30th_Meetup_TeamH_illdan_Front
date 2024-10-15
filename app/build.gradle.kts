@@ -40,4 +40,6 @@ dependencies {
 
     // ThreeTen
     implementation(libs.threeten)
+
+    implementation(libs.hilt.core)
 }
