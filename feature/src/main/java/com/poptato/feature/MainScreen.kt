@@ -58,10 +58,12 @@ import com.poptato.domain.model.enums.BottomSheetType
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.navigation.NavRoutes
 import com.poptato.navigation.loginNavGraph
+import com.poptato.navigation.myPageNavGraph
 import com.poptato.navigation.backlogNavGraph
 import com.poptato.navigation.splashNavGraph
-import com.poptato.navigation.yesterdayListNavGraph
 import com.poptato.navigation.todayNavGraph
+import com.poptato.navigation.yesterdayListNavGraph
+import com.poptato.ui.common.TodoBottomSheetContent
 import com.poptato.ui.common.DatePickerBottomSheet
 import com.poptato.ui.common.TodoBottomSheet
 import com.poptato.ui.util.DismissKeyboardOnClick
@@ -212,6 +214,7 @@ fun MainScreen() {
                         splashNavGraph(navController = navController)
                         loginNavGraph(navController = navController)
                         yesterdayListNavGraph(navController = navController)
+                        myPageNavGraph(navController = navController)
                         backlogNavGraph(
                             navController = navController,
                             showBottomSheet = showBottomSheet,
@@ -288,7 +291,9 @@ fun BottomNavItem(
                     }
 
                     BottomNavType.HISTORY -> TODO()
-                    BottomNavType.SETTINGS -> TODO()
+                    BottomNavType.SETTINGS -> {
+                        onClick(NavRoutes.MyPageScreen.route)
+                    }
                     BottomNavType.DEFAULT -> TODO()
                 }
             },
