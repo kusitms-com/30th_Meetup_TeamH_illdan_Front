@@ -13,6 +13,17 @@ sealed class NavRoutes(val route: String) {
     data object BacklogGraph: NavRoutes("backlog_graph")
     data object BacklogScreen: NavRoutes("backlog")
 
+    // YesterdayList
+    data object YesterdayListGraph: NavRoutes("yesterday_list_graph")
+    data object YesterdayListScreen: NavRoutes("yesterday_list")
+    data object YesterdayAllCheckScreen: NavRoutes("yesterday_all_check")
+
+    // MyPage
+    data object MyPageGraph: NavRoutes("my_page_graph")
+    data object MyPageScreen: NavRoutes("my_page")
+    data object SettingScreen: NavRoutes("setting")
+    data object ServiceDeleteScreen: NavRoutes("service_delete")
+
     // Today Graph
     data object TodayGraph: NavRoutes("today_graph")
     data object TodayScreen: NavRoutes("today")
