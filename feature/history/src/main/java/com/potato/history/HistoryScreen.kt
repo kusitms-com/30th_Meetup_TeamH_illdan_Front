@@ -46,7 +46,6 @@ import com.poptato.design_system.R
 import com.potato.history.model.HistoryItemModel
 
 
-@Preview
 @Composable
 fun HistoryScreen(
 
@@ -55,32 +54,19 @@ fun HistoryScreen(
     val uiState: HistoryPageState by viewModel.uiState.collectAsStateWithLifecycle()
 
     HistoryContent(
-        uiState = uiState,
-        onSearchTextChange = { viewModel.onSearchTextChanged(it) },
-        onClearText = { viewModel.onSearchTextClear() },
-        onCalendarClick = { viewModel.onCalendarClick() }
+        uiState = uiState
     )
 }
 
 @Composable
 fun HistoryContent(
-    uiState: HistoryPageState,
-    onSearchTextChange: (String) -> Unit,
-    onClearText: () -> Unit,
-    onCalendarClick: () -> Unit
+    uiState: HistoryPageState = HistoryPageState()
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Gray100)
     ) {
-        TopSearchBar(
-            searchText = uiState.searchText,
-            onSearchTextChange = onSearchTextChange,
-            onClearText = onClearText,
-            onCalendarClick = onCalendarClick
-        )
-
         if (uiState.historyList.isEmpty()) {
             Box(
                 modifier = Modifier
@@ -110,86 +96,6 @@ fun HistoryContent(
         }
     }
 }
-
-@Composable
-fun TopSearchBar(
-    searchText: String,
-    onSearchTextChange: (String) -> Unit,
-    onClearText: () -> Unit,
-    onCalendarClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 16.dp, end = 5.dp, top = 10.dp, bottom = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .height(36.dp)
-                .background(
-                    color = if (searchText.isEmpty()) Gray100 else Gray95,
-                    shape = RoundedCornerShape(8.dp)
-                ),
-            contentAlignment = Alignment.CenterStart
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp)
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_history_search),
-                    contentDescription = "Search icon",
-                    tint = Color.Unspecified,
-                    modifier = Modifier.padding(end = 8.dp)
-                )
-
-                BasicTextField(
-                    value = searchText,
-                    onValueChange = onSearchTextChange,
-                    modifier = Modifier.weight(1f),
-                    singleLine = true,
-                    cursorBrush = SolidColor(Gray20),
-                    decorationBox = { innerTextField ->
-                        if (searchText.isEmpty()) {
-                            Text(
-                                text = HistorySearchHint,
-                                color = Gray70
-                            )
-                        }
-                        innerTextField()
-                    }
-                )
-
-                if (searchText.isNotEmpty()) {
-                    IconButton(onClick = onClearText, modifier = Modifier.size(24.dp)) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_history_delete),
-                            contentDescription = "Clear text",
-                            tint = Color.Gray
-                        )
-                    }
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.width(8.dp))
-
-        IconButton(onClick = onCalendarClick) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_history_calendar),
-                contentDescription = "Calendar",
-                tint = Color.Unspecified
-            )
-        }
-    }
-}
-
-
 
 @Composable
 fun DateHeader(date: String) {
@@ -241,4 +147,10 @@ fun HistoryListItem(item: HistoryItemModel) {
             modifier = Modifier.weight(1f)
         )
     }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun PreviewHistory() {
+    HistoryContent()
 }
