@@ -291,8 +291,9 @@ fun BottomNavItem(
                     BottomNavType.BACK_LOG -> {
                         onClick(NavRoutes.BacklogScreen.route)
                     }
-
-                    BottomNavType.HISTORY -> TODO()
+                    BottomNavType.HISTORY -> {
+                        onClick(NavRoutes.HistoryScreen.route)
+                    }
                     BottomNavType.SETTINGS -> {
                         onClick(NavRoutes.MyPageScreen.route)
                     }

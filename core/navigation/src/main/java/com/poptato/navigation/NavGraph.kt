@@ -16,6 +16,7 @@ import com.poptato.yesterdaylist.YesterdayListScreen
 import com.poptato.today.TodayScreen
 import kotlinx.coroutines.flow.SharedFlow
 import com.poptato.yesterdaylist.allcheck.AllCheckScreen
+import com.potato.history.HistoryScreen
 
 fun NavGraphBuilder.splashNavGraph(navController: NavHostController) {
     navigation(startDestination = NavRoutes.SplashScreen.route, route = NavRoutes.SplashGraph.route) {
@@ -110,7 +111,7 @@ fun NavGraphBuilder.todayNavGraph(navController: NavHostController) {
 fun NavGraphBuilder.historyNavGraph(navController: NavHostController) {
     navigation(startDestination = NavRoutes.HistoryScreen.route, route = NavRoutes.HistoryGraph.route) {
         composable(NavRoutes.HistoryScreen.route) {
-        //    HistoryScreen()
+            HistoryScreen()
         }
     }
 }
