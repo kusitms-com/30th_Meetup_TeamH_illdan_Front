@@ -4,6 +4,7 @@ import com.poptato.data.base.ApiResponse
 import com.poptato.data.base.Endpoints
 import com.poptato.data.model.response.auth.TokenResponse
 import com.poptato.data.model.response.login.AuthResponse
+import com.poptato.domain.model.request.KaKaoLoginRequest
 import com.poptato.domain.model.request.ReissueRequestModel
 import retrofit2.Response
 import retrofit2.http.Body
@@ -13,7 +14,7 @@ interface AuthService {
 
     @POST(Endpoints.Auth.LOGIN)
     suspend fun login(
-        @Body request: String
+        @Body request: KaKaoLoginRequest
     ): Response<ApiResponse<AuthResponse>>
 
     @POST(Endpoints.Auth.REFRESH)

@@ -1,6 +1,7 @@
 package com.poptato.login
 
 import androidx.lifecycle.viewModelScope
+import com.poptato.domain.model.request.KaKaoLoginRequest
 import com.poptato.domain.model.response.login.AuthModel
 import com.poptato.domain.usecase.PostKaKaoLoginUseCase
 import com.poptato.ui.base.BaseViewModel
@@ -16,14 +17,14 @@ class KaKaoLoginViewModel @Inject constructor(
 
     fun kakaoLogin(token: String) {
         viewModelScope.launch {
-            postKaKaoLoginUseCase.invoke(request = token).collect {
+            postKaKaoLoginUseCase.invoke(request = KaKaoLoginRequest(token)).collect {
                 resultResponse(it, ::onSuccessKaKaoLogin)
             }
         }
-        emitEventFlow(KaKaoLoginEvent.GoToBacklog)
     }
 
     private fun onSuccessKaKaoLogin(model: AuthModel) {
         Timber.e(model.toString())
+        emitEventFlow(KaKaoLoginEvent.GoToBacklog)
     }
 }
