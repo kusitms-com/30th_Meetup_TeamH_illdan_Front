@@ -93,7 +93,8 @@ fun HistoryContent(
                     .padding(top = 0.dp)
                     .offset(x = (0).dp, y = (-16).dp)
             ) {
-                items(uiState.historyList) { groupedItem ->
+                items(uiState.historyList,
+                    key = { groupedItem -> groupedItem.date }) { groupedItem ->
                     DateHeader(date = groupedItem.date)
                     groupedItem.items.forEach { item ->
                         HistoryListItem(item = item)
