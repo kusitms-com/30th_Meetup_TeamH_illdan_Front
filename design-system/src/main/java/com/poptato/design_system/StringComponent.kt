@@ -57,5 +57,5 @@ const val EmptyTodoTitle = "오늘 할 일은 무엇인가요?"
 const val BtnGetTodoText = "할 일 가져오기"
 
 //history
-const val HistorySearchHint = "검색.."
+const val HistoryTitle = "기록"
 const val HistoryListEmpty = "아직 완료한 일이 없어요"

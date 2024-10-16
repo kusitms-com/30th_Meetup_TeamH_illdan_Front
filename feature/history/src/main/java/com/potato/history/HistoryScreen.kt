@@ -40,7 +40,7 @@ import com.poptato.design_system.Gray70
 import com.poptato.design_system.Gray80
 import com.poptato.design_system.Gray95
 import com.poptato.design_system.HistoryListEmpty
-import com.poptato.design_system.HistorySearchHint
+import com.poptato.design_system.HistoryTitle
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.R
 import com.potato.history.model.HistoryItemModel
@@ -81,7 +81,7 @@ fun HistoryContent(
             }
         } else {
             Text(
-                text = "기록",
+                text = HistoryTitle,
                 color = Gray00,
                 style = PoptatoTypo.xLSemiBold,
                 modifier = Modifier
