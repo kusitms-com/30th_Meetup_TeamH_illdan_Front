@@ -4,6 +4,7 @@ import com.poptato.data.base.BaseRepository
 import com.poptato.data.datastore.PoptatoDataStore
 import com.poptato.data.mapper.AuthResponseMapper
 import com.poptato.data.mapper.ReissueResponseMapper
+import com.poptato.data.mapper.UnitResponseMapper
 import com.poptato.data.service.AuthService
 import com.poptato.domain.model.request.KaKaoLoginRequest
 import com.poptato.domain.model.request.ReissueRequestModel
@@ -29,5 +30,9 @@ class AuthRepositoryImpl @Inject constructor (
     override suspend fun saveToken(request: TokenModel): Flow<Result<Unit>> = flow {
         dataStore.saveAccessToken(request.accessToken)
         dataStore.saveRefreshToken(request.refreshToken)
+    }
+
+    override suspend fun logout(): Flow<Result<Unit>> {
+        return apiLaunch(apiCall = { authService.logout() }, UnitResponseMapper)
     }
 }
