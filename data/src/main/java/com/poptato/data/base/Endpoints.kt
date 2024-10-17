@@ -12,4 +12,9 @@ object Endpoints {
         const val BACKLOG = "/backlog"
         const val BACKLOGS = "/backlogs"
     }
+
+    object Todo {
+        private const val TODO = "/todo"
+        const val DELETE = "$TODO/{todoId}"
+    }
 }
