@@ -78,9 +78,6 @@ fun SettingContent(
             title = EditProfile
         )
         SettingServiceItem(
-            title = ProfileDetail
-        )
-        SettingServiceItem(
             title = LogOut
         )
 
