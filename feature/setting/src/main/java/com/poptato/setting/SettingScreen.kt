@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,12 +46,23 @@ import com.poptato.setting.logout.LogOutDialogState
 @Composable
 fun SettingScreen(
     goBackToMyPage: () -> Unit = {},
-    goToServiceDelete: () -> Unit = {}
+    goToServiceDelete: () -> Unit = {},
+    goBackToLogIn: () -> Unit = {}
 ) {
 
     val viewModel: SettingViewModel = hiltViewModel()
     val uiState: SettingPageState by viewModel.uiState.collectAsStateWithLifecycle()
     val logOutDialogState = viewModel.logOutDialogState.value
+
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collect { event ->
+            when (event) {
+                is SettingEvent.GoBackToLogIn -> {
+                    goBackToLogIn()
+                }
+            }
+        }
+    }
 
     SettingContent(
         logOutDialogState = logOutDialogState,

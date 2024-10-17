@@ -44,7 +44,7 @@ class SettingViewModel @Inject constructor(
         viewModelScope.launch {
             logOutUseCase(request = Unit).collect {
                 resultResponse(it, {
-                    Timber.d("[마이페이지] 로그아웃 서버통신 성공")
+                    emitEventFlow(SettingEvent.GoBackToLogIn)
                 }, { error ->
                     Timber.d("[마이페이지] 로그아웃 서버통신 실패 -> ${error.message}")
                 })
