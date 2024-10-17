@@ -1,10 +1,14 @@
 package com.poptato.backlog
 
+import androidx.compose.animation.core.snap
 import androidx.lifecycle.viewModelScope
 import com.poptato.core.util.move
 import com.poptato.domain.model.request.backlog.CreateBacklogRequestModel
+import com.poptato.domain.model.request.backlog.GetBacklogListRequestModel
+import com.poptato.domain.model.response.backlog.BacklogListModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.domain.usecase.backlog.CreateBacklogUseCase
+import com.poptato.domain.usecase.backlog.GetBacklogListUseCase
 import com.poptato.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -15,11 +19,36 @@ import kotlin.random.Random
 
 @HiltViewModel
 class BacklogViewModel @Inject constructor(
-    private val createBacklogUseCase: CreateBacklogUseCase
+    private val createBacklogUseCase: CreateBacklogUseCase,
+    private val getBacklogListUseCase: GetBacklogListUseCase
 ) : BaseViewModel<BacklogPageState>(
     BacklogPageState()
 ) {
     private var snapshotList: List<TodoItemModel> = emptyList()
+
+    init {
+        getBacklogList(0, 8)
+    }
+
+    private fun getBacklogList(page: Int, size: Int) {
+        viewModelScope.launch {
+            getBacklogListUseCase.invoke(request = GetBacklogListRequestModel(page = page, size = size)).collect {
+                resultResponse(it, ::onSuccessGetBacklogList)
+            }
+        }
+    }
+
+    private fun onSuccessGetBacklogList(response: BacklogListModel) {
+        snapshotList = response.backlogs
+
+        updateState(
+            uiState.value.copy(
+                backlogList = response.backlogs,
+                totalPageCount = response.totalPageCount,
+                totalItemCount = response.totalCount
+            )
+        )
+    }
 
     fun onValueChange(newValue: String) {
         updateState(

@@ -10,5 +10,6 @@ object Endpoints {
 
     object Backlog {
         const val BACKLOG = "/backlog"
+        const val BACKLOGS = "/backlogs"
     }
 }
