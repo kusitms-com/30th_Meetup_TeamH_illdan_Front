@@ -1,5 +1,6 @@
 package com.poptato.backlog
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -48,6 +49,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
@@ -60,6 +62,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.poptato.design_system.Backlog
 import com.poptato.design_system.BacklogHint
 import com.poptato.design_system.BacklogTitle
+import com.poptato.design_system.ERROR_CREATE_BACKLOG
 import com.poptato.design_system.EmptyBacklogTitle
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
@@ -87,6 +90,7 @@ fun BacklogScreen(
     updateDeadlineFlow: SharedFlow<String>,
 ) {
     val viewModel: BacklogViewModel = hiltViewModel()
+    val context = LocalContext.current
     val uiState: BacklogPageState by viewModel.uiState.collectAsStateWithLifecycle()
     val dragDropListState = rememberDragDropListState(
         lazyListState = rememberLazyListState(),
@@ -98,6 +102,16 @@ fun BacklogScreen(
     LaunchedEffect(todoBottomSheetClosedFlow) {
         todoBottomSheetClosedFlow.collect {
             // TODO: 데이터 갱신 함수 호출
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collect { event ->
+            when (event) {
+                is BacklogEvent.OnFailedCreateBacklog -> {
+                    Toast.makeText(context, ERROR_CREATE_BACKLOG, Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 

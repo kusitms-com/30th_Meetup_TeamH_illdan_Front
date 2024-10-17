@@ -55,3 +55,6 @@ const val SecondNoticeContent = "오늘, 할 일, 기록에 저장된 모든 데
 const val TodayTopBarSub = "오늘도 하나씩 해보는 거야!"
 const val EmptyTodoTitle = "오늘 할 일은 무엇인가요?"
 const val BtnGetTodoText = "할 일 가져오기"
+
+// Error
+const val ERROR_CREATE_BACKLOG = "에러가 발생하였습니다"
