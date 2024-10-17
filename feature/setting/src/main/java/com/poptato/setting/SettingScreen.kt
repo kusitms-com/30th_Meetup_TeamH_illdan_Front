@@ -113,7 +113,11 @@ fun SettingContent(
     }
 
     if (logOutDialogState.isShowDialog) {
-        LogOutDialog()
+        LogOutDialog(
+            onDismiss = logOutDialogState.onDismissRequest,
+            onClickBack = logOutDialogState.onClickBackBtn,
+            onClickLogOut = logOutDialogState.onClickLogOutBtn
+        )
     }
 }
 

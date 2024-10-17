@@ -16,6 +16,21 @@ class SettingViewModel @Inject constructor(
 
     val logOutDialogState: MutableState<LogOutDialogState> = mutableStateOf(LogOutDialogState())
 
+    init {
+
+        logOutDialogState.value = LogOutDialogState(
+            onDismissRequest = {
+                logOutDialogState.value = logOutDialogState.value.copy(isShowDialog = false)
+            },
+            onClickBackBtn = {
+                logOutDialogState.value = logOutDialogState.value.copy(isShowDialog = false)
+            },
+            onClickLogOutBtn = {
+                logOutDialogState.value = logOutDialogState.value.copy(isShowDialog = false)
+            },
+        )
+    }
+
     fun showLogOutDialog() {
         logOutDialogState.value = logOutDialogState.value.copy(isShowDialog = true)
     }

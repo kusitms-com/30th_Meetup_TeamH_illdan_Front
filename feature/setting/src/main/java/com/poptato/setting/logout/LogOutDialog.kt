@@ -1,6 +1,7 @@
 package com.poptato.setting.logout
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -53,14 +54,20 @@ fun LogOutDialog(
                         .align(Alignment.CenterHorizontally)
                 )
 
-                LogOutDialogBtnContent()
+                LogOutDialogBtnContent(
+                    onClickBack = onClickBack,
+                    onClickLogOut = onClickLogOut
+                )
             }
         }
     }
 }
 
 @Composable
-fun LogOutDialogBtnContent() {
+fun LogOutDialogBtnContent(
+    onClickBack: () -> Unit = {},
+    onClickLogOut: () -> Unit = {}
+) {
     Row(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -73,6 +80,7 @@ fun LogOutDialogBtnContent() {
                 .background(color = Gray95)
                 .padding(vertical = 16.dp)
                 .weight(1f)
+                .clickable { onClickBack() }
         )
         Text(
             text = LogOutDialogDoBtn,
@@ -83,6 +91,7 @@ fun LogOutDialogBtnContent() {
                 .background(color = Danger50)
                 .padding(vertical = 16.dp)
                 .weight(1f)
+                .clickable { onClickLogOut() }
         )
     }
 }
