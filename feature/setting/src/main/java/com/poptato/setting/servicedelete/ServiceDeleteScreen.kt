@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -27,6 +28,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.poptato.design_system.Danger50
 import com.poptato.design_system.FirstNoticeContent
 import com.poptato.design_system.FirstNoticeTitle
@@ -46,14 +49,19 @@ fun ServiceDeleteScreen(
     goBackToSetting: () -> Unit = {}
 ) {
 
+    val viewModel: ServiceDeleteViewModel = hiltViewModel()
+    val uiState: ServiceDeletePageState by viewModel.uiState.collectAsStateWithLifecycle()
+
     ServiceDeleteContent(
-        onClickCloseBtn = { goBackToSetting() }
+        onClickCloseBtn = { goBackToSetting() },
+        onClickDeleteBtn = { viewModel.userDelete() }
     )
 }
 
 @Composable
 fun ServiceDeleteContent(
-    onClickCloseBtn: () -> Unit = {}
+    onClickCloseBtn: () -> Unit = {},
+    onClickDeleteBtn: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -81,7 +89,9 @@ fun ServiceDeleteContent(
 
         }
 
-        UserDeleteBtn()
+        UserDeleteBtn(
+            onClickDeleteBtn = onClickDeleteBtn
+        )
     }
 }
 
@@ -163,7 +173,9 @@ fun DeleteNoticeItem(
 }
 
 @Composable
-fun UserDeleteBtn() {
+fun UserDeleteBtn(
+    onClickDeleteBtn: () -> Unit = {}
+) {
 
     Box(
         modifier = Modifier
@@ -188,13 +200,14 @@ fun UserDeleteBtn() {
         )
 
         Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(horizontal = 16.dp)
-                    .padding(bottom = 8.dp)
-                    .background(Danger50, shape = RoundedCornerShape(12.dp))
-                ) {
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(horizontal = 16.dp)
+                .padding(bottom = 8.dp)
+                .background(Danger50, shape = RoundedCornerShape(12.dp))
+                .clickable { onClickDeleteBtn() }
+        ) {
             Text(
                 text = UserDeleteBtn,
                 style = PoptatoTypo.lgSemiBold,

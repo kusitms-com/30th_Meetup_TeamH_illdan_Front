@@ -10,6 +10,6 @@ class UserDeleteUseCase @Inject constructor(
 ) : UseCase<Unit, Result<Unit>>() {
 
     override suspend fun invoke(request: Unit): Flow<Result<Unit>> {
-        TODO("Not yet implemented")
+        return myPageRepository.userDelete()
     }
 }
