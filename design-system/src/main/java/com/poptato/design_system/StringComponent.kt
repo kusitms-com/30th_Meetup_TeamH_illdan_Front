@@ -58,5 +58,9 @@ const val TodayTopBarSub = "오늘도 하나씩 해보는 거야!"
 const val EmptyTodoTitle = "오늘 할 일은 무엇인가요?"
 const val BtnGetTodoText = "할 일 가져오기"
 
+//history
+const val HistoryTitle = "기록"
+const val HistoryListEmpty = "아직 완료한 일이 없어요"
+
 // Error
 const val ERROR_CREATE_BACKLOG = "에러가 발생하였습니다"

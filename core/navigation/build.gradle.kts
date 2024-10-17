@@ -17,4 +17,5 @@ dependencies {
     implementation(projects.feature.setting)
     implementation(projects.feature.mypage)
     implementation(projects.feature.today)
+    implementation(projects.feature.history)
 }

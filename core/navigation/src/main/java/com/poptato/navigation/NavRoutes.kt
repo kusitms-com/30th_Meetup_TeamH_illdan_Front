@@ -27,4 +27,8 @@ sealed class NavRoutes(val route: String) {
     // Today Graph
     data object TodayGraph: NavRoutes("today_graph")
     data object TodayScreen: NavRoutes("today")
+
+    // HistoryGraph
+    data object HistoryGraph: NavRoutes("history_graph")
+    data object HistoryScreen: NavRoutes("history")
 }
