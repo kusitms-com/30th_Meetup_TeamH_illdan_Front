@@ -54,6 +54,7 @@ fun NavGraphBuilder.backlogNavGraph(
     showBottomSheet: (TodoItemModel) -> Unit,
     todoBottomSheetClosedFlow: SharedFlow<Unit>,
     updateDeadlineFlow: SharedFlow<String>,
+    deleteTodoFlow: SharedFlow<Long>
 ) {
     navigation(startDestination = NavRoutes.BacklogScreen.route, route = NavRoutes.BacklogGraph.route) {
         composable(NavRoutes.BacklogScreen.route) {
@@ -62,6 +63,7 @@ fun NavGraphBuilder.backlogNavGraph(
                 showBottomSheet = showBottomSheet,
                 todoBottomSheetClosedFlow = todoBottomSheetClosedFlow,
                 updateDeadlineFlow = updateDeadlineFlow,
+                deleteTodoFlow = deleteTodoFlow
             )
         }
     }

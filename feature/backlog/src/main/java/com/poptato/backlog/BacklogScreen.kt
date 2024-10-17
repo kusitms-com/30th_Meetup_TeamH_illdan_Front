@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -55,7 +54,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -64,7 +62,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.poptato.design_system.BACKLOG_YESTERDAY_TASK_GUIDE
 import com.poptato.design_system.Backlog
 import com.poptato.design_system.BacklogHint
-import com.poptato.design_system.BacklogTitle
 import com.poptato.design_system.CONFIRM_ACTION
 import com.poptato.design_system.ERROR_CREATE_BACKLOG
 import com.poptato.design_system.EmptyBacklogTitle
@@ -74,17 +71,15 @@ import com.poptato.design_system.Gray70
 import com.poptato.design_system.Gray80
 import com.poptato.design_system.Gray95
 import com.poptato.design_system.PoptatoTypo
-import com.poptato.design_system.Primary10
 import com.poptato.design_system.Primary60
-import com.poptato.design_system.Primary70
 import com.poptato.design_system.R
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.ui.common.TopBar
 import com.poptato.ui.util.DragDropListState
 import com.poptato.ui.util.rememberDragDropListState
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @Composable
 fun BacklogScreen(
@@ -92,6 +87,7 @@ fun BacklogScreen(
     showBottomSheet: (TodoItemModel) -> Unit = {},
     todoBottomSheetClosedFlow: SharedFlow<Unit>,
     updateDeadlineFlow: SharedFlow<String>,
+    deleteTodoFlow: SharedFlow<Long>
 ) {
     val viewModel: BacklogViewModel = hiltViewModel()
     val context = LocalContext.current
@@ -110,10 +106,16 @@ fun BacklogScreen(
         }
     }
 
+    LaunchedEffect(deleteTodoFlow) {
+        deleteTodoFlow.collect {
+            viewModel.deleteBacklog(it)
+        }
+    }
+
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collect { event ->
             when (event) {
-                is BacklogEvent.OnFailedCreateBacklog -> {
+                is BacklogEvent.OnFailedUpdateBacklogList -> {
                     Toast.makeText(context, ERROR_CREATE_BACKLOG, Toast.LENGTH_SHORT).show()
                 }
             }
