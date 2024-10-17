@@ -9,4 +9,5 @@ import kotlinx.coroutines.flow.Flow
 interface AuthRepository {
     suspend fun login(request: KaKaoLoginRequest): Flow<Result<AuthModel>>
     suspend fun reissueToken(request: ReissueRequestModel): Flow<Result<TokenModel>>
+    suspend fun saveToken(request: TokenModel): Flow<Result<Unit>>
 }
