@@ -90,7 +90,6 @@ fun HistoryContent(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = 0.dp)
                     .offset(x = (0).dp, y = (-16).dp)
             ) {
                 items(uiState.historyList,
