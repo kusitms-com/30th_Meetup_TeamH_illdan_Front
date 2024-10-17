@@ -57,6 +57,7 @@ import com.poptato.design_system.Year
 import com.poptato.domain.model.enums.BottomSheetType
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.navigation.NavRoutes
+import com.poptato.navigation.historyNavGraph
 import com.poptato.navigation.loginNavGraph
 import com.poptato.navigation.myPageNavGraph
 import com.poptato.navigation.backlogNavGraph
@@ -222,6 +223,7 @@ fun MainScreen() {
                             updateDeadlineFlow = updateDeadlineFlow,
                         )
                         todayNavGraph(navController = navController)
+                        historyNavGraph(navController = navController)
                     }
                 }
             }
@@ -289,8 +291,9 @@ fun BottomNavItem(
                     BottomNavType.BACK_LOG -> {
                         onClick(NavRoutes.BacklogScreen.route)
                     }
-
-                    BottomNavType.HISTORY -> TODO()
+                    BottomNavType.HISTORY -> {
+                        onClick(NavRoutes.HistoryScreen.route)
+                    }
                     BottomNavType.SETTINGS -> {
                         onClick(NavRoutes.MyPageScreen.route)
                     }
