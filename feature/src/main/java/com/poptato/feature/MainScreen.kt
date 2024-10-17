@@ -3,10 +3,13 @@ package com.poptato.feature
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -81,7 +84,7 @@ fun MainScreen() {
     val sheetState = androidx.compose.material.rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden
     )
-    val slideDuration = 300
+    val animationDuration = 300
     val showBottomSheet: (TodoItemModel) -> Unit = { item: TodoItemModel ->
         viewModel.onSelectedTodoItem(item)
         scope.launch { sheetState.show() }
@@ -172,12 +175,22 @@ fun MainScreen() {
         ) {
             Scaffold(
                 bottomBar = {
-                    if (uiState.bottomNavType != BottomNavType.DEFAULT) {
+                    AnimatedVisibility(
+                        visible = uiState.bottomNavType != BottomNavType.DEFAULT,
+                        enter = slideInHorizontally(animationSpec = tween(durationMillis = animationDuration)),
+                        exit = slideOutHorizontally(animationSpec = tween(durationMillis = animationDuration)),
+                        modifier = Modifier.background(Gray100)
+                    ) {
                         BottomNavBar(
                             type = uiState.bottomNavType,
                             onClick = { route: String ->
                                 if (navController.currentDestination?.route != route) {
-                                    navController.navigate(route)
+                                    navController.navigate(route) {
+                                        popUpTo(navController.currentDestination?.route!!) {
+                                            inclusive = true
+                                        }
+                                        launchSingleTop = true
+                                    }
                                 }
                             },
                             modifier = Modifier.navigationBarsPadding()
@@ -196,19 +209,19 @@ fun MainScreen() {
                         enterTransition = {
                             slideIntoContainer(
                                 AnimatedContentTransitionScope.SlideDirection.Start,
-                                tween(slideDuration)
+                                tween(animationDuration)
                             )
                         },
                         popEnterTransition = {
                             slideIntoContainer(
                                 AnimatedContentTransitionScope.SlideDirection.End,
-                                tween(slideDuration)
+                                tween(animationDuration)
                             )
                         },
                         popExitTransition = {
                             slideOutOfContainer(
                                 AnimatedContentTransitionScope.SlideDirection.End,
-                                tween(slideDuration)
+                                tween(animationDuration)
                             )
                         }
                     ) {
@@ -287,7 +300,6 @@ fun BottomNavItem(
                     BottomNavType.TODAY -> {
                         onClick(NavRoutes.TodayScreen.route)
                     }
-
                     BottomNavType.BACK_LOG -> {
                         onClick(NavRoutes.BacklogScreen.route)
                     }
@@ -297,7 +309,7 @@ fun BottomNavItem(
                     BottomNavType.SETTINGS -> {
                         onClick(NavRoutes.MyPageScreen.route)
                     }
-                    BottomNavType.DEFAULT -> TODO()
+                    BottomNavType.DEFAULT -> {}
                 }
             },
         horizontalAlignment = Alignment.CenterHorizontally
