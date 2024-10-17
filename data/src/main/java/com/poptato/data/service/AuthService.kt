@@ -23,5 +23,5 @@ interface AuthService {
     ): Response<ApiResponse<TokenResponse>>
 
     @POST(Endpoints.Auth.LOGOUT)
-    suspend fun logout(): Response<ApiResponse<Unit>>
+    suspend fun logout(): Response<ApiResponse<String>>
 }
