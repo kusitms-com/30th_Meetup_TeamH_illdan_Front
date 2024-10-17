@@ -1,12 +1,18 @@
 package com.poptato.feature
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -39,6 +45,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -47,6 +54,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.poptato.core.enums.BottomNavType
 import com.poptato.design_system.Day
+import com.poptato.design_system.FINISH_APP_GUIDE
 import com.poptato.design_system.Gray100
 import com.poptato.design_system.Gray80
 import com.poptato.design_system.Month
@@ -68,20 +76,23 @@ import com.poptato.ui.common.TodoBottomSheetContent
 import com.poptato.ui.common.DatePickerBottomSheet
 import com.poptato.ui.common.TodoBottomSheet
 import com.poptato.ui.util.DismissKeyboardOnClick
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun MainScreen() {
     val viewModel: MainViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val navController = rememberNavController()
+    val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val sheetState = androidx.compose.material.rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden
     )
-    val slideDuration = 300
+    val animationDuration = 300
     val showBottomSheet: (TodoItemModel) -> Unit = { item: TodoItemModel ->
         viewModel.onSelectedTodoItem(item)
         scope.launch { sheetState.show() }
@@ -89,6 +100,23 @@ fun MainScreen() {
     val todoBottomSheetClosedFlow = MutableSharedFlow<Unit>()
     val updateDeadlineFlow = MutableSharedFlow<String>()
     var bottomSheetType by remember { mutableStateOf(BottomSheetType.Main) }
+    var backPressedOnce by remember { mutableStateOf(false) }
+    val backPressHandler: () -> Unit = {
+        if (backPressedOnce) {
+            (context as? Activity)?.finish()
+        } else {
+            backPressedOnce = true
+            Toast.makeText(context, FINISH_APP_GUIDE, Toast.LENGTH_SHORT).show()
+            scope.launch {
+                delay(2000)
+                backPressedOnce = false
+            }
+        }
+    }
+
+    if (uiState.bottomNavType != BottomNavType.DEFAULT) {
+        BackHandler(onBack = backPressHandler)
+    }
 
     LaunchedEffect(navController) {
         navController.currentBackStackEntryFlow
@@ -172,12 +200,22 @@ fun MainScreen() {
         ) {
             Scaffold(
                 bottomBar = {
-                    if (uiState.bottomNavType != BottomNavType.DEFAULT) {
+                    AnimatedVisibility(
+                        visible = uiState.bottomNavType != BottomNavType.DEFAULT,
+                        enter = slideInHorizontally(animationSpec = tween(durationMillis = animationDuration)),
+                        exit = slideOutHorizontally(animationSpec = tween(durationMillis = animationDuration)),
+                        modifier = Modifier.background(Gray100)
+                    ) {
                         BottomNavBar(
                             type = uiState.bottomNavType,
                             onClick = { route: String ->
                                 if (navController.currentDestination?.route != route) {
-                                    navController.navigate(route)
+                                    navController.navigate(route) {
+                                        popUpTo(navController.currentDestination?.route!!) {
+                                            inclusive = true
+                                        }
+                                        launchSingleTop = true
+                                    }
                                 }
                             },
                             modifier = Modifier.navigationBarsPadding()
@@ -196,19 +234,19 @@ fun MainScreen() {
                         enterTransition = {
                             slideIntoContainer(
                                 AnimatedContentTransitionScope.SlideDirection.Start,
-                                tween(slideDuration)
+                                tween(animationDuration)
                             )
                         },
                         popEnterTransition = {
                             slideIntoContainer(
                                 AnimatedContentTransitionScope.SlideDirection.End,
-                                tween(slideDuration)
+                                tween(animationDuration)
                             )
                         },
                         popExitTransition = {
                             slideOutOfContainer(
                                 AnimatedContentTransitionScope.SlideDirection.End,
-                                tween(slideDuration)
+                                tween(animationDuration)
                             )
                         }
                     ) {
@@ -291,13 +329,16 @@ fun BottomNavItem(
                     BottomNavType.BACK_LOG -> {
                         onClick(NavRoutes.BacklogScreen.route)
                     }
+
                     BottomNavType.HISTORY -> {
                         onClick(NavRoutes.HistoryScreen.route)
                     }
+
                     BottomNavType.SETTINGS -> {
                         onClick(NavRoutes.MyPageScreen.route)
                     }
-                    BottomNavType.DEFAULT -> TODO()
+
+                    BottomNavType.DEFAULT -> {}
                 }
             },
         horizontalAlignment = Alignment.CenterHorizontally

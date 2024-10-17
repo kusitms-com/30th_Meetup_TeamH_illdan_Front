@@ -1,7 +1,6 @@
 package com.poptato.di
 
 import com.poptato.app.BuildConfig
-import com.poptato.core.base.BASE_URL
 import com.poptato.data.datastore.PoptatoDataStore
 import dagger.Module
 import dagger.Provides
@@ -14,6 +13,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
@@ -38,6 +38,9 @@ object NetworkModule {
             token?.let {
                 request.addHeader(AUTHORIZATION, "Bearer $it")
             }
+
+            val requestWithHeaders = request.build()
+            Timber.i("Request Headers: ${requestWithHeaders.headers}")
 
             chain.proceed(request.build())
         }
