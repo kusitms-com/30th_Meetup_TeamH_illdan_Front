@@ -8,5 +8,6 @@ java {
 }
 
 dependencies {
-
+    implementation(libs.coroutines.core)
+    implementation(libs.hilt.core)
 }

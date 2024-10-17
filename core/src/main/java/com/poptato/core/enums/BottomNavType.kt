@@ -1,9 +1,9 @@
 package com.poptato.core.enums
 
 enum class BottomNavType(val navName: String) {
-    TODAY("투데이"),
-    BACK_LOG("목록"),
-    HISTORY("히스토리"),
-    SETTINGS("설정"),
+    TODAY("오늘"),
+    BACK_LOG("할 일"),
+    HISTORY("기록"),
+    SETTINGS("My"),
     DEFAULT("")
 }

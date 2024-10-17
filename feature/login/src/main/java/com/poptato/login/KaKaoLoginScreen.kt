@@ -40,28 +40,30 @@ fun KaKaoLoginScreen(
     goToBacklog: () -> Unit = {}
 ) {
     val viewModel: KaKaoLoginViewModel = hiltViewModel()
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collect { event ->
             when(event) {
                 is KaKaoLoginEvent.GoToBacklog -> {
                     goToBacklog()
+                    Toast.makeText(context, "로그인 성공하였습니다.", Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
 
     KaKaoLoginContent(
-        onSuccessKaKaoLogin = { viewModel.kakaoLogin() }
+        onSuccessKaKaoLogin = { viewModel.kakaoLogin(it) },
+        context = context
     )
 }
 
 @Composable
 fun KaKaoLoginContent(
-    onSuccessKaKaoLogin: () -> Unit = {}
+    onSuccessKaKaoLogin: (String) -> Unit = {},
+    context: Context
 ) {
-    val context = LocalContext.current
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -105,7 +107,7 @@ fun KaKaoLoginContent(
     }
 }
 
-private fun signInKakao(context: Context, onSuccessKaKaoLogin: () -> Unit) {
+private fun signInKakao(context: Context, onSuccessKaKaoLogin: (String) -> Unit) {
     if (UserApiClient.instance.isKakaoTalkLoginAvailable(context)) {
         signInKakaoApp(context, onSuccessKaKaoLogin)
     } else {
@@ -113,31 +115,32 @@ private fun signInKakao(context: Context, onSuccessKaKaoLogin: () -> Unit) {
     }
 }
 
-private fun signInKakaoApp(context: Context, onSuccessKaKaoLogin: () -> Unit) {
+private fun signInKakaoApp(context: Context, onSuccessKaKaoLogin: (String) -> Unit) {
     UserApiClient.instance.loginWithKakaoTalk(context) { token, error ->
         if (error != null) {
             Timber.tag("KaKao Login Error").e(error.stackTraceToString())
             return@loginWithKakaoTalk
         }
-        Toast.makeText(context, "로그인 성공하였습니다.", Toast.LENGTH_SHORT).show()
-        onSuccessKaKaoLogin()
+        token?.let {
+            onSuccessKaKaoLogin(token.accessToken)
+        }
     }
 }
 
-private fun signInKakaoEmail(context: Context, onSuccessKaKaoLogin: () -> Unit) {
+private fun signInKakaoEmail(context: Context, onSuccessKaKaoLogin: (String) -> Unit) {
     UserApiClient.instance.loginWithKakaoAccount(context) { token, error ->
         if (error != null) {
             Timber.tag("KaKao Login Error").e(error.stackTraceToString())
             return@loginWithKakaoAccount
         }
-
-        Toast.makeText(context, "로그인 성공하였습니다.", Toast.LENGTH_SHORT).show()
-        onSuccessKaKaoLogin()
+        token?.let {
+            onSuccessKaKaoLogin(token.accessToken)
+        }
     }
 }
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun PreviewKaKaoLogin() {
-    KaKaoLoginContent()
+    KaKaoLoginContent(context = LocalContext.current)
 }
