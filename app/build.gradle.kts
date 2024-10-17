@@ -20,6 +20,9 @@ android {
         manifestPlaceholders["KAKAO_HOST_SCHEME"] = "kakao$kakaoAppKey"
         versionCode = 1
         versionName = "1.0"
+
+        val baseUrl = properties.getProperty("BASE_URL")
+        buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
     }
 }
 
@@ -40,4 +43,6 @@ dependencies {
 
     // ThreeTen
     implementation(libs.threeten)
+
+    implementation(libs.hilt.core)
 }

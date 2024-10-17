@@ -4,17 +4,17 @@ import com.google.gson.annotations.SerializedName
 
 data class ApiResponse<T>(
     @SerializedName("success")
-    val success: Boolean,
+    val success: Boolean = false,
 
     @SerializedName("status")
-    val status: Int,
+    val status: Int = -1,
 
     @SerializedName("message")
-    val message: String,
+    val message: String = "",
 
-    @SerializedName("data")
-    val data: T,
+    @SerializedName("result")
+    val result: T? = null,
 
     @SerializedName("timestamp")
-    val timestamp: String
+    val timestamp: String = ""
 )
