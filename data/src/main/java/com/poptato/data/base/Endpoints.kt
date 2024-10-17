@@ -7,4 +7,8 @@ object Endpoints {
         const val LOGIN = "$AUTH/login"
         const val REFRESH = "$AUTH/refresh"
     }
+
+    object Backlog {
+        const val BACKLOG = "/backlog"
+    }
 }
