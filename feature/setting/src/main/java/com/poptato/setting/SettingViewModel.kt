@@ -2,14 +2,18 @@ package com.poptato.setting
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.viewModelScope
+import com.poptato.domain.usecase.mypage.LogOutUseCase
 import com.poptato.setting.logout.LogOutDialogState
 import com.poptato.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class SettingViewModel @Inject constructor(
-
+    private val logOutUseCase: LogOutUseCase
 ): BaseViewModel<SettingPageState>(
     SettingPageState()
 ) {
@@ -26,6 +30,7 @@ class SettingViewModel @Inject constructor(
                 logOutDialogState.value = logOutDialogState.value.copy(isShowDialog = false)
             },
             onClickLogOutBtn = {
+                logOut()
                 logOutDialogState.value = logOutDialogState.value.copy(isShowDialog = false)
             },
         )
@@ -33,5 +38,17 @@ class SettingViewModel @Inject constructor(
 
     fun showLogOutDialog() {
         logOutDialogState.value = logOutDialogState.value.copy(isShowDialog = true)
+    }
+
+    private fun logOut() {
+        viewModelScope.launch {
+            logOutUseCase(request = Unit).collect {
+                resultResponse(it, {
+                    Timber.d("[마이페이지] 로그아웃 서버통신 성공")
+                }, { error ->
+                    Timber.d("[마이페이지] 로그아웃 서버통신 실패 -> ${error.message}")
+                })
+            }
+        }
     }
 }
