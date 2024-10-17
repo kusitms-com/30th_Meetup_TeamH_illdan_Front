@@ -19,7 +19,7 @@ class ServiceDeleteViewModel @Inject constructor(
         viewModelScope.launch {
             userDeleteUseCase(request = Unit).collect {
                 resultResponse(it, {
-                    Timber.d("[마이페이지] 회원탈퇴 서버통신 성공")
+                    emitEventFlow(ServiceDeleteEvent.GoBackToLogIn)
                 }, { error ->
                     Timber.d("[마이페이지] 회원탈퇴 서버통신 실패 -> ${error.message}")
                 })

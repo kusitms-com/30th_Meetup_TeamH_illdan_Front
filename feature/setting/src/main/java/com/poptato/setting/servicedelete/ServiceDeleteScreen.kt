@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,11 +47,22 @@ import com.poptato.design_system.UserDeleteTitle
 
 @Composable
 fun ServiceDeleteScreen(
-    goBackToSetting: () -> Unit = {}
+    goBackToSetting: () -> Unit = {},
+    goBackToLogIn: () -> Unit = {}
 ) {
 
     val viewModel: ServiceDeleteViewModel = hiltViewModel()
     val uiState: ServiceDeletePageState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collect { event ->
+            when (event) {
+                is ServiceDeleteEvent.GoBackToLogIn -> {
+                    goBackToLogIn()
+                }
+            }
+        }
+    }
 
     ServiceDeleteContent(
         onClickCloseBtn = { goBackToSetting() },
