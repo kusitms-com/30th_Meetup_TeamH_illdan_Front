@@ -1,5 +1,6 @@
 package com.poptato.backlog
 
+import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -12,6 +13,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.scrollBy
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -59,9 +61,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.poptato.design_system.BACKLOG_YESTERDAY_TASK_GUIDE
 import com.poptato.design_system.Backlog
 import com.poptato.design_system.BacklogHint
 import com.poptato.design_system.BacklogTitle
+import com.poptato.design_system.CONFIRM_ACTION
 import com.poptato.design_system.ERROR_CREATE_BACKLOG
 import com.poptato.design_system.EmptyBacklogTitle
 import com.poptato.design_system.Gray00
@@ -91,6 +95,7 @@ fun BacklogScreen(
 ) {
     val viewModel: BacklogViewModel = hiltViewModel()
     val context = LocalContext.current
+    val interactionSource = remember { MutableInteractionSource() }
     val uiState: BacklogPageState by viewModel.uiState.collectAsStateWithLifecycle()
     val dragDropListState = rememberDragDropListState(
         lazyListState = rememberLazyListState(),
@@ -131,7 +136,8 @@ fun BacklogScreen(
         onClickBtnTodoSettings = {
             showBottomSheet(uiState.backlogList[it])
             viewModel.onSelectedItem(uiState.backlogList[it])
-        }
+        },
+        interactionSource = interactionSource
     )
 }
 
@@ -143,7 +149,8 @@ fun BacklogContent(
     onClickYesterdayList: () -> Unit = {},
     onItemSwiped: (TodoItemModel) -> Unit = {},
     dragDropListState: DragDropListState? = null,
-    onClickBtnTodoSettings: (Int) -> Unit = {}
+    onClickBtnTodoSettings: (Int) -> Unit = {},
+    interactionSource: MutableInteractionSource
 ) {
     Column(
         modifier = Modifier
@@ -157,47 +164,52 @@ fun BacklogContent(
             subTextColor = Primary60
         )
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
+        Box(
+            modifier = Modifier.fillMaxSize()
         ) {
-            Spacer(modifier = Modifier.height(8.dp))
-
-            BacklogGuideItem(
-                onClickYesterdayList = onClickYesterdayList
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            CreateBacklogTextFiled(
-                onValueChange = onValueChange,
-                taskInput = uiState.taskInput,
-                createBacklog = createBacklog
-            )
-
-            if (uiState.backlogList.isEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = EmptyBacklogTitle,
-                        style = PoptatoTypo.lgMedium,
-                        textAlign = TextAlign.Center,
-                        color = Gray80
-                    )
-                }
-            } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
                 Spacer(modifier = Modifier.height(16.dp))
 
-                BacklogTaskList(
-                    taskList = uiState.backlogList,
-                    onItemSwiped = onItemSwiped,
-                    dragDropListState = dragDropListState!!,
-                    onClickBtnTodoSettings = onClickBtnTodoSettings
+                CreateBacklogTextFiled(
+                    onValueChange = onValueChange,
+                    taskInput = uiState.taskInput,
+                    createBacklog = createBacklog
                 )
+
+                if (uiState.backlogList.isEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = EmptyBacklogTitle,
+                            style = PoptatoTypo.lgMedium,
+                            textAlign = TextAlign.Center,
+                            color = Gray80
+                        )
+                    }
+                } else {
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    BacklogTaskList(
+                        taskList = uiState.backlogList,
+                        onItemSwiped = onItemSwiped,
+                        dragDropListState = dragDropListState!!,
+                        onClickBtnTodoSettings = onClickBtnTodoSettings
+                    )
+                }
             }
+
+            BacklogGuideItem(
+                onClickYesterdayList = onClickYesterdayList,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter),
+                interactionSource = interactionSource
+            )
         }
     }
 }
@@ -424,40 +436,53 @@ fun BacklogItem(
     }
 }
 
+@SuppressLint("ModifierParameter")
 @Composable
 fun BacklogGuideItem(
     onClickYesterdayList: () -> Unit = {},
+    modifier: Modifier = Modifier,
+    interactionSource: MutableInteractionSource
 ) {
-    Box(
-        modifier = Modifier
+    Row(
+        modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .clip(RoundedCornerShape(8.dp))
-            .background(Primary70)
-            .clickable { onClickYesterdayList() }
+            .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
+            .background(Primary60)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = BacklogTitle,
-            style = PoptatoTypo.smRegular,
-            color = Primary10,
+            text = BACKLOG_YESTERDAY_TASK_GUIDE,
+            style = PoptatoTypo.smMedium,
+            color = Gray100,
+            textAlign = TextAlign.Start,
             modifier = Modifier
-                .padding(start = 16.dp)
-                .padding(vertical = 12.dp)
+                .weight(1f)
         )
 
-        Icon(
-            painter = painterResource(id = R.drawable.ic_backlog_guide),
-            contentDescription = "",
-            tint = Color.Unspecified,
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .size(width = 77.dp, height = 54.dp)
-                .align(Alignment.BottomEnd)
-        )
+                .clickable(
+                    indication = null,
+                    interactionSource = interactionSource,
+                    onClick = { onClickYesterdayList() }
+                )
+
+        ) {
+            Text(
+                text = CONFIRM_ACTION,
+                style = PoptatoTypo.smSemiBold,
+                color = Gray100
+            )
+
+            Spacer(modifier = Modifier.width(4.dp))
+
+            Icon(
+                painter = painterResource(id = R.drawable.ic_right_arrow),
+                contentDescription = "",
+                tint = Color.Unspecified
+            )
+        }
     }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun PreviewBacklog() {
-    BacklogContent()
 }
