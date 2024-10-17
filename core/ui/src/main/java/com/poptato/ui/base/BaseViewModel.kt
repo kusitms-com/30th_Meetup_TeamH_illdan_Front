@@ -40,16 +40,18 @@ abstract class BaseViewModel<STATE: PageState>(
     ) {
         if (needLoading) LoadingManager.startLoading()
 
-        response.fold(
-            onSuccess = { data ->
-                successCallback.invoke(data)
-            },
-            onFailure = { throwable ->
-                Timber.e("에러 발생", throwable.stackTraceToString())
-                errorCallback?.invoke(throwable)
-            }
-        )
+        viewModelScope.launch {
+            response.fold(
+                onSuccess = { data ->
+                    successCallback.invoke(data)
+                },
+                onFailure = { throwable ->
+                    Timber.e("에러 발생", throwable.stackTraceToString())
+                    errorCallback?.invoke(throwable)
+                }
+            )
 
-        if (needLoading) LoadingManager.endLoading()
+            if (needLoading) LoadingManager.endLoading()
+        }
     }
 }
