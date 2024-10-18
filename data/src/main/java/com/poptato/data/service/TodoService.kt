@@ -2,6 +2,7 @@ package com.poptato.data.service
 
 import com.poptato.data.base.ApiResponse
 import com.poptato.data.base.Endpoints
+import com.poptato.domain.model.request.todo.DeadlineContentModel
 import com.poptato.domain.model.request.todo.DragDropRequestModel
 import com.poptato.domain.model.request.todo.ModifyTodoRequestModel
 import com.poptato.domain.model.request.todo.TodoContentModel
@@ -31,6 +32,7 @@ interface TodoService {
 
     @PATCH(Endpoints.Todo.DEADLINE)
     suspend fun updateDeadline(
-        @Body request: UpdateDeadlineRequestModel
+        @Path("todoId") todoId: Long,
+        @Body request: DeadlineContentModel
     ): Response<ApiResponse<Unit>>
 }

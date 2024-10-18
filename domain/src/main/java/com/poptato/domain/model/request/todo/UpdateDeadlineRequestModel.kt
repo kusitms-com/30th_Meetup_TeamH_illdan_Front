@@ -1,5 +1,6 @@
 package com.poptato.domain.model.request.todo
 
 data class UpdateDeadlineRequestModel(
-    val deadline: String? = null
+    val todoId: Long,
+    val deadline: DeadlineContentModel
 )
