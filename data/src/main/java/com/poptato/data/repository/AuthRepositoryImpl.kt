@@ -32,6 +32,10 @@ class AuthRepositoryImpl @Inject constructor (
         dataStore.saveRefreshToken(request.refreshToken)
     }
 
+    override suspend fun clearToken(): Flow<Result<Unit>> = flow {
+        dataStore.clearToken()
+    }
+
     override suspend fun logout(): Flow<Result<Unit>> {
         return apiLaunch(apiCall = { authService.logout() }, AuthLogOutResponseMapper)
     }

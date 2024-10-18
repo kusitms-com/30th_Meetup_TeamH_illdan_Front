@@ -10,5 +10,6 @@ interface AuthRepository {
     suspend fun login(request: KaKaoLoginRequest): Flow<Result<AuthModel>>
     suspend fun reissueToken(request: ReissueRequestModel): Flow<Result<TokenModel>>
     suspend fun saveToken(request: TokenModel): Flow<Result<Unit>>
+    suspend fun clearToken(): Flow<Result<Unit>>
     suspend fun logout(): Flow<Result<Unit>>
 }
