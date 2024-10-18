@@ -27,8 +27,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
 import com.poptato.design_system.Gray40
-import com.poptato.design_system.MyPageExampleMail
-import com.poptato.design_system.MyPageExampleName
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.R
 
@@ -41,12 +39,14 @@ fun MyPageScreen(
     val uiState: MyPagePageState by viewModel.uiState.collectAsStateWithLifecycle()
 
     MyPageContent(
+        uiState = uiState,
         onClickSettingBtn = { goToSettingPage() }
     )
 }
 
 @Composable
 fun MyPageContent(
+    uiState: MyPagePageState = MyPagePageState(),
     onClickSettingBtn: () -> Unit = {}
 ) {
     Column(
@@ -59,7 +59,9 @@ fun MyPageContent(
             onClickSettingBtn = onClickSettingBtn
         )
 
-        MyData()
+        MyData(
+            uiState = uiState
+        )
 
         Image(
             painter = painterResource(id = R.drawable.ic_setting_bg),
@@ -94,7 +96,9 @@ fun SettingBtn(
 }
 
 @Composable
-fun MyData() {
+fun MyData(
+    uiState: MyPagePageState = MyPagePageState()
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -109,7 +113,7 @@ fun MyData() {
 
             Column {
                 Text(
-                    text = MyPageExampleName,
+                    text = uiState.userDataModel.name,
                     color = Gray00,
                     style = PoptatoTypo.lgSemiBold,
                     modifier = Modifier
@@ -117,7 +121,7 @@ fun MyData() {
                 )
 
                 Text(
-                    text = MyPageExampleMail,
+                    text = uiState.userDataModel.email,
                     color = Gray40,
                     style = PoptatoTypo.smRegular,
                     modifier = Modifier
