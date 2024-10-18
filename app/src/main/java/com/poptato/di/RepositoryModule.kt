@@ -7,7 +7,6 @@ import com.poptato.domain.repository.AuthRepository
 import com.poptato.domain.repository.BacklogRepository
 import com.poptato.domain.repository.HistoryRepository
 import com.poptato.data.repository.MyPageRepositoryImpl
-import com.poptato.domain.repository.AuthRepository
 import com.poptato.domain.repository.MyPageRepository
 import dagger.Binds
 import dagger.Module
