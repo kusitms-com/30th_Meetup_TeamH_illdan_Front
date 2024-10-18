@@ -161,7 +161,7 @@ fun DateHeader(date: String) {
     ) {
 
         Text(
-            text = date,
+            text = date.replace("-", "."),
             color = Gray70,
             style = PoptatoTypo.xsRegular,
             modifier = Modifier
