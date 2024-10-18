@@ -54,6 +54,7 @@ fun SettingScreen(
 
     val viewModel: SettingViewModel = hiltViewModel()
     val uiState: SettingPageState by viewModel.uiState.collectAsStateWithLifecycle()
+    val interactionSource = remember { MutableInteractionSource() }
     val logOutDialogState = viewModel.logOutDialogState.value
 
     LaunchedEffect(Unit) {
@@ -70,7 +71,8 @@ fun SettingScreen(
         logOutDialogState = logOutDialogState,
         onClickCloseBtn = { goBackToMyPage() },
         onClickServiceDeleteBtn = { goToServiceDelete() },
-        onClickLogOutBtn = { viewModel.showLogOutDialog() }
+        onClickLogOutBtn = { viewModel.showLogOutDialog() },
+        interactionSource = interactionSource
     )
 }
 
@@ -79,7 +81,8 @@ fun SettingContent(
     logOutDialogState: LogOutDialogState,
     onClickCloseBtn: () -> Unit = {},
     onClickServiceDeleteBtn: () -> Unit = {},
-    onClickLogOutBtn: () -> Unit = {}
+    onClickLogOutBtn: () -> Unit = {},
+    interactionSource: MutableInteractionSource = MutableInteractionSource()
 ) {
     Column(
         modifier = Modifier
@@ -95,11 +98,13 @@ fun SettingContent(
             title = ProfileTitle
         )
         SettingServiceItem(
-            title = EditProfile
+            title = EditProfile,
+            interactionSource = interactionSource
         )
         SettingServiceItem(
             title = LogOut,
-            onClickAction = onClickLogOutBtn
+            onClickAction = onClickLogOutBtn,
+            interactionSource = interactionSource
         )
 
         SettingSubTitle(
@@ -107,22 +112,27 @@ fun SettingContent(
             topPadding = 40
         )
         SettingServiceItem(
-            title = Notice
+            title = Notice,
+            interactionSource = interactionSource
         )
         SettingServiceItem(
-            title = FAQ
+            title = FAQ,
+            interactionSource = interactionSource
         )
         SettingServiceItem(
-            title = Policy
+            title = Policy,
+            interactionSource = interactionSource
         )
         SettingServiceItem(
             title = Version,
-            isVersion = true
+            isVersion = true,
+            interactionSource = interactionSource
         )
         SettingServiceItem(
             title = UserDelete,
             color = Gray60,
-            onClickAction = { onClickServiceDeleteBtn() }
+            onClickAction = { onClickServiceDeleteBtn() },
+            interactionSource = interactionSource
         )
     }
 
@@ -184,7 +194,8 @@ fun SettingServiceItem(
     title: String,
     color: Color = Gray20,
     isVersion: Boolean = false,
-    onClickAction: () -> Unit = {}
+    onClickAction: () -> Unit = {},
+    interactionSource: MutableInteractionSource
 ) {
     Box(
         modifier = Modifier
@@ -193,7 +204,7 @@ fun SettingServiceItem(
             .padding(start = 24.dp)
             .clickable(
                 indication = null,
-                interactionSource = remember { MutableInteractionSource() },
+                interactionSource = interactionSource,
                 onClick = { onClickAction() }
             )
     ) {

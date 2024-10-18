@@ -36,6 +36,8 @@ fun LogOutDialog(
     onClickLogOut: () -> Unit = {},
     onClickBack: () -> Unit = {}
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+
     Dialog(onDismissRequest = onDismiss) {
         Card(
             modifier = Modifier
@@ -58,7 +60,8 @@ fun LogOutDialog(
 
                 LogOutDialogBtnContent(
                     onClickBack = onClickBack,
-                    onClickLogOut = onClickLogOut
+                    onClickLogOut = onClickLogOut,
+                    interactionSource = interactionSource
                 )
             }
         }
@@ -68,7 +71,8 @@ fun LogOutDialog(
 @Composable
 fun LogOutDialogBtnContent(
     onClickBack: () -> Unit = {},
-    onClickLogOut: () -> Unit = {}
+    onClickLogOut: () -> Unit = {},
+    interactionSource: MutableInteractionSource
 ) {
     Row(
         modifier = Modifier.fillMaxWidth()
@@ -84,7 +88,7 @@ fun LogOutDialogBtnContent(
                 .weight(1f)
                 .clickable(
                     indication = null,
-                    interactionSource = remember { MutableInteractionSource() },
+                    interactionSource = interactionSource,
                     onClick = { onClickBack() }
                 )
         )
@@ -100,7 +104,7 @@ fun LogOutDialogBtnContent(
                 .weight(1f)
                 .clickable(
                     indication = null,
-                    interactionSource = remember { MutableInteractionSource() },
+                    interactionSource = interactionSource,
                     onClick = { onClickLogOut() }
                 )
         )
