@@ -39,13 +39,16 @@ import com.poptato.design_system.R
 import com.poptato.design_system.UserNameTitle
 
 @Composable
-fun EditUserDataScreen() {
+fun EditUserDataScreen(
+    goBackToSetting: () -> Unit = {},
+) {
 
     val viewModel: EditUserDataViewModel = hiltViewModel()
     val uiState: EditUserDataPageState by viewModel.uiState.collectAsStateWithLifecycle()
 
     EditUserDataContent(
         uiState = uiState,
+        onClickCloseBtn = { goBackToSetting()  },
         onValueChange = { newValue -> viewModel.onValueChange(newValue) }
     )
 }
@@ -53,6 +56,7 @@ fun EditUserDataScreen() {
 @Composable
 fun EditUserDataContent(
     uiState: EditUserDataPageState = EditUserDataPageState(),
+    onClickCloseBtn: () -> Unit = {},
     onValueChange: (String) -> Unit = {},
 ) {
     Column(
@@ -61,7 +65,9 @@ fun EditUserDataContent(
             .background(Gray100)
     ) {
 
-        SettingTitle()
+        SettingTitle(
+            onClickCloseBtn = onClickCloseBtn
+        )
 
         UserImg()
 

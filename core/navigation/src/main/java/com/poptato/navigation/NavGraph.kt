@@ -129,7 +129,9 @@ fun NavGraphBuilder.myPageNavGraph(navController: NavHostController) {
         }
 
         composable(NavRoutes.EditUserDataScreen.route) {
-            EditUserDataScreen()
+            EditUserDataScreen(
+                goBackToSetting = { navController.popBackStack() },
+            )
         }
     }
 }
