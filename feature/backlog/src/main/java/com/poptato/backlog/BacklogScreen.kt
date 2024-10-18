@@ -34,6 +34,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -45,14 +46,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -73,6 +80,8 @@ import com.poptato.design_system.Gray95
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.Primary60
 import com.poptato.design_system.R
+import com.poptato.domain.model.request.todo.ModifyTodoRequestModel
+import com.poptato.domain.model.request.todo.TodoContentModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.ui.common.TopBar
 import com.poptato.ui.util.DragDropListState
@@ -87,7 +96,8 @@ fun BacklogScreen(
     showBottomSheet: (TodoItemModel) -> Unit = {},
     todoBottomSheetClosedFlow: SharedFlow<Unit>,
     updateDeadlineFlow: SharedFlow<String>,
-    deleteTodoFlow: SharedFlow<Long>
+    deleteTodoFlow: SharedFlow<Long>,
+    activateItemFlow: SharedFlow<Long>
 ) {
     val viewModel: BacklogViewModel = hiltViewModel()
     val context = LocalContext.current
@@ -99,6 +109,13 @@ fun BacklogScreen(
             viewModel.moveItem(from, to)
         }
     )
+    var activeItemId by remember { mutableStateOf<Long?>(null) }
+
+    LaunchedEffect(activateItemFlow) {
+        activateItemFlow.collect { id ->
+            activeItemId = id
+        }
+    }
 
     LaunchedEffect(todoBottomSheetClosedFlow) {
         todoBottomSheetClosedFlow.collect {
@@ -139,7 +156,19 @@ fun BacklogScreen(
             showBottomSheet(uiState.backlogList[it])
             viewModel.onSelectedItem(uiState.backlogList[it])
         },
-        interactionSource = interactionSource
+        interactionSource = interactionSource,
+        activeItemId = activeItemId,
+        onClearActiveItem = { activeItemId = null },
+        onTodoItemModified = { id: Long, content: String ->
+            viewModel.modifyTodo(
+                item = ModifyTodoRequestModel(
+                    todoId = id,
+                    content = TodoContentModel(
+                        content = content
+                    )
+                )
+            )
+        }
     )
 }
 
@@ -152,7 +181,10 @@ fun BacklogContent(
     onItemSwiped: (TodoItemModel) -> Unit = {},
     dragDropListState: DragDropListState? = null,
     onClickBtnTodoSettings: (Int) -> Unit = {},
-    interactionSource: MutableInteractionSource
+    interactionSource: MutableInteractionSource,
+    activeItemId: Long?,
+    onClearActiveItem: () -> Unit = {},
+    onTodoItemModified: (Long, String) -> Unit = {_,_ ->}
 ) {
     Column(
         modifier = Modifier
@@ -201,7 +233,10 @@ fun BacklogContent(
                         taskList = uiState.backlogList,
                         onItemSwiped = onItemSwiped,
                         dragDropListState = dragDropListState!!,
-                        onClickBtnTodoSettings = onClickBtnTodoSettings
+                        onClickBtnTodoSettings = onClickBtnTodoSettings,
+                        activeItemId = activeItemId,
+                        onClearActiveItem = onClearActiveItem,
+                        onTodoItemModified = onTodoItemModified
                     )
                 }
             }
@@ -294,7 +329,10 @@ fun BacklogTaskList(
     taskList: List<TodoItemModel> = emptyList(),
     onItemSwiped: (TodoItemModel) -> Unit = {},
     dragDropListState: DragDropListState,
-    onClickBtnTodoSettings: (Int) -> Unit = {}
+    onClickBtnTodoSettings: (Int) -> Unit = {},
+    activeItemId: Long?,
+    onClearActiveItem: () -> Unit = {},
+    onTodoItemModified: (Long, String) -> Unit = {_,_ ->}
 ) {
     var draggedItem by remember { mutableStateOf<TodoItemModel?>(null) }
     val scope = rememberCoroutineScope()
@@ -337,6 +375,7 @@ fun BacklogTaskList(
         itemsIndexed(taskList, key = { _, item -> item.todoId }) { index, item ->
             var offsetX by remember { mutableFloatStateOf(0f) }
             val isDragged = index == dragDropListState.currentIndexOfDraggedItem
+            val isActive = activeItemId == item.todoId
 
             Box(
                 modifier = Modifier
@@ -386,12 +425,17 @@ fun BacklogTaskList(
                     BacklogItem(
                         item = item,
                         index = index,
-                        onClickBtnTodoSettings = onClickBtnTodoSettings
+                        isActive = isActive,
+                        onClickBtnTodoSettings = onClickBtnTodoSettings,
+                        onClearActiveItem = onClearActiveItem,
+                        onTodoItemModified = onTodoItemModified
                     )
                 }
             }
             Spacer(modifier = Modifier.height(12.dp))
         }
+
+        item { Spacer(modifier = Modifier.height(45.dp)) }
     }
 
     LaunchedEffect(taskList.size) {
@@ -405,7 +449,10 @@ fun BacklogTaskList(
 fun BacklogItem(
     item: TodoItemModel,
     index: Int = -1,
-    onClickBtnTodoSettings: (Int) -> Unit = {}
+    isActive: Boolean = false,
+    onClickBtnTodoSettings: (Int) -> Unit = {},
+    onClearActiveItem: () -> Unit = {},
+    onTodoItemModified: (Long, String) -> Unit = {_,_ ->}
 ) {
     Row(
         modifier = Modifier
@@ -416,13 +463,61 @@ fun BacklogItem(
             .padding(start = 16.dp, end = 18.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = item.content,
-            color = Gray00,
-            style = PoptatoTypo.mdRegular,
-            modifier = Modifier
-                .weight(1f)
-        )
+        val focusRequester = remember { FocusRequester() }
+        val keyboardController = LocalSoftwareKeyboardController.current
+        var textFieldValue by remember {
+            mutableStateOf(
+                TextFieldValue(
+                    text = item.content,
+                    selection = TextRange(item.content.length)
+                )
+            )
+        }
+
+        if (isActive) {
+
+            LaunchedEffect(Unit) {
+                focusRequester.requestFocus()
+            }
+
+            BasicTextField(
+                value = textFieldValue,
+                onValueChange = { newTextFieldValue ->
+                    textFieldValue = newTextFieldValue
+                },
+                textStyle = PoptatoTypo.mdRegular.copy(color = Gray00),
+                modifier = Modifier
+                    .weight(1f)
+                    .focusRequester(focusRequester)
+                    .onFocusChanged { focusState ->
+                        if (focusState.isFocused) {
+                            textFieldValue = textFieldValue.copy(
+                                selection = TextRange(textFieldValue.text.length)
+                            )
+                        }
+                    },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        keyboardController?.hide()
+                        onClearActiveItem()
+                        if (item.content != textFieldValue.text) onTodoItemModified(item.todoId, textFieldValue.text)
+                    }
+                ),
+                cursorBrush = SolidColor(Gray00)
+            )
+        } else {
+            Text(
+                text = item.content,
+                color = Gray00,
+                style = PoptatoTypo.mdRegular,
+                modifier = Modifier
+                    .weight(1f)
+            )
+        }
 
         Spacer(modifier = Modifier.width(8.dp))
 

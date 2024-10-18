@@ -48,7 +48,7 @@ fun TodoBottomSheet(
     setDeadline: (String) -> Unit = {},
     onClickShowDatePicker: () -> Unit = {},
     onClickBtnDelete: (Long) -> Unit = {},
-    onClickBtnModify: (Long, String) -> Unit = {_, _ ->}
+    onClickBtnModify: (Long) -> Unit = {},
 ) {
     var deadline by remember { mutableStateOf(item.deadline) }
 
@@ -74,7 +74,7 @@ fun TodoBottomSheetContent(
     removeDeadline: () -> Unit = {},
     onClickShowDatePicker: () -> Unit = {},
     onClickBtnDelete: (Long) -> Unit = {},
-    onClickBtnModify: (Long, String) -> Unit = {_, _ ->}
+    onClickBtnModify: (Long) -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -89,6 +89,7 @@ fun TodoBottomSheetContent(
                 .padding(top = 24.dp)
                 .padding(horizontal = 24.dp)
         ) {
+
             Text(
                 text = item.content,
                 style = PoptatoTypo.xLMedium,
@@ -126,7 +127,7 @@ fun TodoBottomSheetContent(
                 buttonColor = Gray95,
                 textColor = Gray40,
                 modifier = Modifier.weight(1f),
-                onClickBtn = { onClickBtnModify(item.todoId, item.content) }
+                onClickBtn = { onClickBtnModify(item.todoId) }
             )
 
             Spacer(modifier = Modifier.width(16.dp))

@@ -4,11 +4,14 @@ import androidx.lifecycle.viewModelScope
 import com.poptato.core.util.move
 import com.poptato.domain.model.request.backlog.CreateBacklogRequestModel
 import com.poptato.domain.model.request.backlog.GetBacklogListRequestModel
+import com.poptato.domain.model.request.todo.ModifyTodoRequestModel
+import com.poptato.domain.model.request.todo.TodoContentModel
 import com.poptato.domain.model.response.backlog.BacklogListModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.domain.usecase.backlog.CreateBacklogUseCase
 import com.poptato.domain.usecase.backlog.GetBacklogListUseCase
 import com.poptato.domain.usecase.todo.DeleteTodoUseCase
+import com.poptato.domain.usecase.todo.ModifyTodoUseCase
 import com.poptato.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -20,14 +23,15 @@ import kotlin.random.Random
 class BacklogViewModel @Inject constructor(
     private val createBacklogUseCase: CreateBacklogUseCase,
     private val getBacklogListUseCase: GetBacklogListUseCase,
-    private val deleteTodoUseCase: DeleteTodoUseCase
+    private val deleteTodoUseCase: DeleteTodoUseCase,
+    private val modifyTodoUseCase: ModifyTodoUseCase
 ) : BaseViewModel<BacklogPageState>(
     BacklogPageState()
 ) {
     private var snapshotList: List<TodoItemModel> = emptyList()
 
     init {
-        getBacklogList(0, 8)
+        getBacklogList(0, 16)
     }
 
     private fun getBacklogList(page: Int, size: Int) {
@@ -69,12 +73,12 @@ class BacklogViewModel @Inject constructor(
 
         viewModelScope.launch(Dispatchers.IO) {
             createBacklogUseCase.invoke(request = CreateBacklogRequestModel(content)).collect {
-                resultResponse(it, { onSuccessCreateBacklog() }, { onFailedUpdateBacklogList() })
+                resultResponse(it, { onSuccessUpdateBacklogList() }, { onFailedUpdateBacklogList() })
             }
         }
     }
 
-    private fun onSuccessCreateBacklog() {
+    private fun onSuccessUpdateBacklogList() {
         snapshotList = uiState.value.backlogList
     }
 
@@ -144,12 +148,32 @@ class BacklogViewModel @Inject constructor(
 
         viewModelScope.launch {
             deleteTodoUseCase.invoke(id).collect {
-                resultResponse(it, { onSuccessDeleteBacklog() }, { onFailedUpdateBacklogList() })
+                resultResponse(it, { onSuccessUpdateBacklogList() }, { onFailedUpdateBacklogList() })
             }
         }
     }
 
-    private fun onSuccessDeleteBacklog() {
-        snapshotList = uiState.value.backlogList
+    fun modifyTodo(item: ModifyTodoRequestModel) {
+        val newList = uiState.value.backlogList.map {
+            if (it.todoId == item.todoId) {
+                it.copy(content = item.content.content)
+            } else {
+                it
+            }
+        }
+
+        updateState(
+            uiState.value.copy(
+                backlogList = newList
+            )
+        )
+
+        viewModelScope.launch {
+            modifyTodoUseCase.invoke(
+                request = item
+            ).collect {
+                resultResponse(it, { onSuccessUpdateBacklogList() }, { onFailedUpdateBacklogList() })
+            }
+        }
     }
 }
