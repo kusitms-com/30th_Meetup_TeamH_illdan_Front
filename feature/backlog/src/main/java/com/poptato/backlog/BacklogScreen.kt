@@ -16,6 +16,8 @@ import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,7 +36,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -54,7 +55,6 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextRange
@@ -75,11 +75,14 @@ import com.poptato.design_system.ERROR_CREATE_BACKLOG
 import com.poptato.design_system.EmptyBacklogTitle
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
+import com.poptato.design_system.Gray40
 import com.poptato.design_system.Gray70
 import com.poptato.design_system.Gray80
+import com.poptato.design_system.Gray90
 import com.poptato.design_system.Gray95
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.Primary60
+import com.poptato.design_system.Primary80
 import com.poptato.design_system.R
 import com.poptato.domain.model.request.todo.ModifyTodoRequestModel
 import com.poptato.domain.model.request.todo.TodoContentModel
@@ -87,9 +90,7 @@ import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.ui.common.TopBar
 import com.poptato.ui.util.DragDropListState
 import com.poptato.ui.util.rememberDragDropListState
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @Composable
@@ -473,6 +474,7 @@ fun BacklogTaskList(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun BacklogItem(
     item: TodoItemModel,
@@ -486,7 +488,7 @@ fun BacklogItem(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
-            .background(if(item.isBookmark) Bookmark else Gray95)
+            .background(if (item.isBookmark) Bookmark else Gray95)
             .padding(vertical = 16.dp)
             .padding(start = 16.dp, end = 18.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -538,13 +540,45 @@ fun BacklogItem(
                 cursorBrush = SolidColor(Gray00)
             )
         } else {
-            Text(
-                text = item.content,
-                color = Gray00,
-                style = PoptatoTypo.mdRegular,
-                modifier = Modifier
-                    .weight(1f)
-            )
+//            HighlightedText(
+//                highlightColor = Primary80,
+//                highlightText = if(item.dDay != null && item.dDay != 0) "D-${item.dDay}" else if(item.dDay == 0) "D-day" else "",
+//                generalText = item.content,
+//                generalTextColor = Gray00,
+//                textStyle = PoptatoTypo.mdRegular,
+//                modifier = Modifier.weight(1f)
+//            )
+            Row(
+                modifier = Modifier.weight(1f),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (item.dDay != null) {
+
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(if (item.isBookmark) Primary80 else Gray90)
+                            .padding(vertical = 1.dp, horizontal = 6.dp)
+                    ) {
+                        Text(
+                            text = if (item.dDay == 0) "D-day" else "D-${item.dDay}",
+                            style = PoptatoTypo.xsMedium,
+                            color = if (item.isBookmark) Gray00 else Gray40
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
+
+                Text(
+                    text = item.content,
+                    style = PoptatoTypo.mdRegular,
+                    color = Gray00,
+                    modifier = Modifier.weight(1f)
+                )
+
+
+            }
         }
 
         Spacer(modifier = Modifier.width(8.dp))
