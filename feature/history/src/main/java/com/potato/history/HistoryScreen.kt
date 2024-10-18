@@ -43,7 +43,7 @@ import com.poptato.design_system.HistoryListEmpty
 import com.poptato.design_system.HistoryTitle
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.R
-import com.potato.history.model.HistoryItemModel
+import com.poptato.domain.model.response.history.HistoryItemModel
 
 
 @Composable
@@ -148,7 +148,7 @@ fun HistoryListItem(item: HistoryItemModel) {
         )
 
         Text(
-            text = item.title,
+            text = item.content,
             color = Gray00,
             style = PoptatoTypo.smMedium,
             modifier = Modifier.weight(1f)

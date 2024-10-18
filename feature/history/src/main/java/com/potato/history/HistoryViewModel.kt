@@ -1,36 +1,39 @@
 package com.potato.history
 
 import androidx.lifecycle.viewModelScope
+import com.poptato.domain.model.request.backlog.GetBacklogListRequestModel
+import com.poptato.domain.model.request.history.HistoryListRequestModel
+import com.poptato.domain.model.response.backlog.BacklogListModel
+import com.poptato.domain.model.response.history.HistoryItemModel
+import com.poptato.domain.model.response.history.HistoryListModel
+import com.poptato.domain.usecase.backlog.GetBacklogListUseCase
+import com.poptato.domain.usecase.history.GetHistoryListUseCase
 import com.poptato.ui.base.BaseViewModel
 import com.potato.history.model.HistoryGroupedItem
-import com.potato.history.model.HistoryItemModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
-
+    private val getHistoryListUseCase: GetHistoryListUseCase
 ) : BaseViewModel<HistoryPageState>(
     HistoryPageState()
 ) {
     init {
-        loadDummyHistoryItems()
+        getHistoryList(0, 15)
     }
 
-    private fun loadDummyHistoryItems() {
-        val dummyItems =  // emptyList<HistoryItemModel>()
+    private fun getHistoryList(page: Int, size: Int) {
+        viewModelScope.launch {
+            getHistoryListUseCase.invoke(request = HistoryListRequestModel(page = page, size = size)).collect {
+                resultResponse(it, ::onSuccessGetHistoryList)
+            }
+        }
+    }
 
-            listOf(
-                HistoryItemModel(id = 1, title = "메일보내기", date = "2024.09.30", isChecked = true),
-                HistoryItemModel(id = 2, title = "메일보내기", date = "2024.09.29", isChecked = true),
-                HistoryItemModel(id = 3, title = "문서 검토하기", date = "2024.09.29", isChecked = true),
-                HistoryItemModel(id = 4, title = "프로젝트 계획 작성", date = "2024.09.29", isChecked = true),
-                HistoryItemModel(id = 5, title = "팀 미팅", date = "2024.09.28", isChecked = true),
-                HistoryItemModel(id = 6, title = "메일보내기", date = "2024.09.29", isChecked = true)
-            )
-
-
+    private fun onSuccessGetHistoryList(response: HistoryListModel) {
+        val dummyItems = response.histories
 
         val groupedItems = dummyItems.groupBy { it.date }.map { (date, items) ->
             HistoryGroupedItem(date, items)
