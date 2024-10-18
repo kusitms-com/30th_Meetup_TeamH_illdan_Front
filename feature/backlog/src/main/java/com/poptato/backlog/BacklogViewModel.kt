@@ -35,7 +35,7 @@ class BacklogViewModel @Inject constructor(
     private var snapshotList: List<TodoItemModel> = emptyList()
 
     init {
-        getBacklogList(0, 16)
+        getBacklogList(0, 30)
     }
 
     private fun getBacklogList(page: Int, size: Int) {
@@ -69,13 +69,18 @@ class BacklogViewModel @Inject constructor(
     fun createBacklog(content: String) {
         val newList = uiState.value.backlogList.toMutableList()
         newList.add(0, TodoItemModel(content = content, todoId = Random.nextLong()))
+        updateNewItemFlag(true)
         updateList(newList)
 
         viewModelScope.launch(Dispatchers.IO) {
             createBacklogUseCase.invoke(request = CreateBacklogRequestModel(content)).collect {
-                resultResponse(it, { onSuccessUpdateBacklogList() }, { onFailedUpdateBacklogList() })
+                resultResponse(it, { onSuccessCreateBacklog() }, { onFailedUpdateBacklogList() })
             }
         }
+    }
+
+    private fun onSuccessCreateBacklog() {
+        getBacklogList(page = 0, size = uiState.value.backlogList.size)
     }
 
     private fun onSuccessUpdateBacklogList() {
@@ -95,8 +100,14 @@ class BacklogViewModel @Inject constructor(
 
     fun moveItem(fromIndex: Int, toIndex: Int) {
         val currentList = uiState.value.backlogList.toMutableList()
-        currentList.move(fromIndex, toIndex)
-        updateList(currentList)
+        val safeToIndex = toIndex.coerceIn(0, currentList.size - 1)
+        val safeFromIndex = fromIndex.coerceIn(0, currentList.size - 1)
+
+        if (safeFromIndex != safeToIndex) {
+            currentList.move(safeFromIndex, safeToIndex)
+            updateList(currentList)
+        }
+
         val todoIdList = currentList.map { it.todoId }
 
         viewModelScope.launch {
@@ -171,5 +182,13 @@ class BacklogViewModel @Inject constructor(
                 resultResponse(it, { onSuccessUpdateBacklogList() }, { onFailedUpdateBacklogList() })
             }
         }
+    }
+
+    fun updateNewItemFlag(flag: Boolean) {
+        updateState(
+            uiState.value.copy(
+                isNewItemCreated = flag
+            )
+        )
     }
 }

@@ -86,6 +86,7 @@ import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.ui.common.TopBar
 import com.poptato.ui.util.DragDropListState
 import com.poptato.ui.util.rememberDragDropListState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -168,7 +169,8 @@ fun BacklogScreen(
                     )
                 )
             )
-        }
+        },
+        resetNewItemFlag = { viewModel.updateNewItemFlag(false) }
     )
 }
 
@@ -184,7 +186,8 @@ fun BacklogContent(
     interactionSource: MutableInteractionSource,
     activeItemId: Long?,
     onClearActiveItem: () -> Unit = {},
-    onTodoItemModified: (Long, String) -> Unit = {_,_ ->}
+    onTodoItemModified: (Long, String) -> Unit = {_,_ ->},
+    resetNewItemFlag: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -236,7 +239,9 @@ fun BacklogContent(
                         onClickBtnTodoSettings = onClickBtnTodoSettings,
                         activeItemId = activeItemId,
                         onClearActiveItem = onClearActiveItem,
-                        onTodoItemModified = onTodoItemModified
+                        onTodoItemModified = onTodoItemModified,
+                        isNewItemCreated = uiState.isNewItemCreated,
+                        resetNewItemFlag = resetNewItemFlag
                     )
                 }
             }
@@ -332,9 +337,12 @@ fun BacklogTaskList(
     onClickBtnTodoSettings: (Int) -> Unit = {},
     activeItemId: Long?,
     onClearActiveItem: () -> Unit = {},
-    onTodoItemModified: (Long, String) -> Unit = {_,_ ->}
+    onTodoItemModified: (Long, String) -> Unit = {_,_ ->},
+    isNewItemCreated: Boolean = false,
+    resetNewItemFlag: () -> Unit = {}
 ) {
     var draggedItem by remember { mutableStateOf<TodoItemModel?>(null) }
+    var isDragging by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     LazyColumn(
@@ -347,14 +355,17 @@ fun BacklogTaskList(
                         dragDropListState.onDragStart(offset)
                         draggedItem = taskList[dragDropListState.currentIndexOfDraggedItem
                             ?: return@detectDragGesturesAfterLongPress]
+                        isDragging = true
                     },
                     onDragEnd = {
                         dragDropListState.onDragInterrupted()
                         draggedItem = null
+                        isDragging = false
                     },
                     onDragCancel = {
                         dragDropListState.onDragInterrupted()
                         draggedItem = null
+                        isDragging = false
                     },
                     onDrag = { change, offset ->
                         change.consume()
@@ -364,8 +375,10 @@ fun BacklogTaskList(
                             .checkForOverScroll()
                             .takeIf { it != 0f }
                             ?.let {
-                                dragDropListState.overscrollJob =
-                                    scope.launch { dragDropListState.lazyListState.scrollBy(it) }
+                                dragDropListState.overscrollJob = scope.launch {
+                                    val adjustedScroll = it * 0.5f
+                                    dragDropListState.lazyListState.scrollBy(adjustedScroll)
+                                }
                             } ?: run { dragDropListState.overscrollJob?.cancel() }
                     }
                 )
@@ -405,12 +418,18 @@ fun BacklogTaskList(
                             }
                         )
                     }
-                    .animateItem(
-                        fadeInSpec = null,
-                        fadeOutSpec = null
+                    .then(
+                        if (!isDragging) {
+                            Modifier.animateItem(
+                                fadeInSpec = null,
+                                fadeOutSpec = null
+                            )
+                        } else {
+                            Modifier
+                        }
                     )
                     .border(
-                        if (isDragged) BorderStroke(2.dp, Color.White) else BorderStroke(
+                        if (isDragged) BorderStroke(1.dp, Color.White) else BorderStroke(
                             0.dp,
                             Color.Transparent
                         ),
@@ -438,9 +457,10 @@ fun BacklogTaskList(
         item { Spacer(modifier = Modifier.height(45.dp)) }
     }
 
-    LaunchedEffect(taskList.size) {
-        if (dragDropListState.lazyListState.firstVisibleItemIndex != 0) {
+    LaunchedEffect(taskList.size, isDragging) {
+        if (dragDropListState.lazyListState.firstVisibleItemIndex != 0 && !isDragging && isNewItemCreated) {
             dragDropListState.lazyListState.scrollToItem(0)
+            resetNewItemFlag()
         }
     }
 }
