@@ -75,7 +75,7 @@ fun EditUserDataContent(
         UserImg()
 
         UserName(
-            textInput = uiState.textInput,
+            textInput = uiState.name,
             onValueChange = onValueChange
         )
     }

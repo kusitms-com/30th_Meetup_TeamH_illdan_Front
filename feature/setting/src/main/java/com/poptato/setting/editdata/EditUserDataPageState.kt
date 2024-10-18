@@ -4,5 +4,5 @@ import com.poptato.ui.base.PageState
 
 data class EditUserDataPageState (
     val temp: String = "",
-    var textInput: String = "state"
+    var name: String = ""
 ): PageState
