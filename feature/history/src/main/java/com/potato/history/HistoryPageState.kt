@@ -12,6 +12,5 @@ data class HistoryPageState(
     val isLoadingMore: Boolean = false,
     var currentPage: Int = 0,
     val pageSize: Int = 15,
-    var firstDate: String = "",
     val isRenderingComplete: Boolean = false
 ) : PageState

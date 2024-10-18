@@ -75,8 +75,7 @@ class HistoryViewModel @Inject constructor(
                 totalPageCount = response.totalPageCount,
                 currentPage = uiState.value.currentPage + 1,
                 lastItemDate = if (uiState.value.currentPage == 0) lastDate else uiState.value.nowLastItemDate,
-                nowLastItemDate = lastDate,
-                firstDate = groupedItems.firstOrNull()?.date ?: ""
+                nowLastItemDate = lastDate
             )
         )
     }
