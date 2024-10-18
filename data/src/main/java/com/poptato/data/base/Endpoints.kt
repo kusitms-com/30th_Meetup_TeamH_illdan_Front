@@ -18,5 +18,6 @@ object Endpoints {
         const val DELETE = "$TODO/{todoId}"
         const val MODIFY = "$DELETE/content"
         const val DRAG_DROP = "/dragAndDrop"
+        const val DEADLINE = "$DELETE/deadline"
     }
 }
