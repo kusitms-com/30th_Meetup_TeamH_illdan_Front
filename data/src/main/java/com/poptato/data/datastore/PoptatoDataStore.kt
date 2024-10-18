@@ -41,4 +41,11 @@ class PoptatoDataStore(context: Context) {
             Timber.i("Refresh Token", token)
         }
     }
+
+    suspend fun clearToken() {
+        dataStore.edit { preferences ->
+            preferences.remove(ACCESS_TOKEN_KEY)
+            preferences.remove(REFRESH_TOKEN_KEY)
+        }
+    }
 }

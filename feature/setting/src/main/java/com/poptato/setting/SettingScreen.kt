@@ -2,6 +2,7 @@ package com.poptato.setting
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,7 +12,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,17 +24,16 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.poptato.design_system.EditProfile
-import com.poptato.design_system.Notice
 import com.poptato.design_system.FAQ
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
 import com.poptato.design_system.Gray20
 import com.poptato.design_system.Gray60
 import com.poptato.design_system.LogOut
+import com.poptato.design_system.Notice
 import com.poptato.design_system.Policy
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.Primary60
-import com.poptato.design_system.ProfileDetail
 import com.poptato.design_system.ProfileTitle
 import com.poptato.design_system.R
 import com.poptato.design_system.ServiceTitle
@@ -40,26 +42,47 @@ import com.poptato.design_system.UserDelete
 import com.poptato.design_system.Version
 import com.poptato.design_system.VersionSetting
 import com.poptato.setting.BuildConfig.VERSION_NAME
+import com.poptato.setting.logout.LogOutDialog
+import com.poptato.setting.logout.LogOutDialogState
 
 @Composable
 fun SettingScreen(
     goBackToMyPage: () -> Unit = {},
-    goToServiceDelete: () -> Unit = {}
+    goToServiceDelete: () -> Unit = {},
+    goBackToLogIn: () -> Unit = {}
 ) {
 
     val viewModel: SettingViewModel = hiltViewModel()
     val uiState: SettingPageState by viewModel.uiState.collectAsStateWithLifecycle()
+    val interactionSource = remember { MutableInteractionSource() }
+    val logOutDialogState = viewModel.logOutDialogState.value
+
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collect { event ->
+            when (event) {
+                is SettingEvent.GoBackToLogIn -> {
+                    goBackToLogIn()
+                }
+            }
+        }
+    }
 
     SettingContent(
+        logOutDialogState = logOutDialogState,
         onClickCloseBtn = { goBackToMyPage() },
-        onClickServiceDeleteBtn = { goToServiceDelete() }
+        onClickServiceDeleteBtn = { goToServiceDelete() },
+        onClickLogOutBtn = { viewModel.showLogOutDialog() },
+        interactionSource = interactionSource
     )
 }
 
 @Composable
 fun SettingContent(
+    logOutDialogState: LogOutDialogState,
     onClickCloseBtn: () -> Unit = {},
-    onClickServiceDeleteBtn: () -> Unit = {}
+    onClickServiceDeleteBtn: () -> Unit = {},
+    onClickLogOutBtn: () -> Unit = {},
+    interactionSource: MutableInteractionSource = MutableInteractionSource()
 ) {
     Column(
         modifier = Modifier
@@ -75,13 +98,13 @@ fun SettingContent(
             title = ProfileTitle
         )
         SettingServiceItem(
-            title = EditProfile
+            title = EditProfile,
+            interactionSource = interactionSource
         )
         SettingServiceItem(
-            title = ProfileDetail
-        )
-        SettingServiceItem(
-            title = LogOut
+            title = LogOut,
+            onClickAction = onClickLogOutBtn,
+            interactionSource = interactionSource
         )
 
         SettingSubTitle(
@@ -89,22 +112,35 @@ fun SettingContent(
             topPadding = 40
         )
         SettingServiceItem(
-            title = Notice
+            title = Notice,
+            interactionSource = interactionSource
         )
         SettingServiceItem(
-            title = FAQ
+            title = FAQ,
+            interactionSource = interactionSource
         )
         SettingServiceItem(
-            title = Policy
+            title = Policy,
+            interactionSource = interactionSource
         )
         SettingServiceItem(
             title = Version,
-            isVersion = true
+            isVersion = true,
+            interactionSource = interactionSource
         )
         SettingServiceItem(
             title = UserDelete,
             color = Gray60,
-            onClickAction = { onClickServiceDeleteBtn() }
+            onClickAction = { onClickServiceDeleteBtn() },
+            interactionSource = interactionSource
+        )
+    }
+
+    if (logOutDialogState.isShowDialog) {
+        LogOutDialog(
+            onDismiss = logOutDialogState.onDismissRequest,
+            onClickBack = logOutDialogState.onClickBackBtn,
+            onClickLogOut = logOutDialogState.onClickLogOutBtn
         )
     }
 }
@@ -158,14 +194,19 @@ fun SettingServiceItem(
     title: String,
     color: Color = Gray20,
     isVersion: Boolean = false,
-    onClickAction: () -> Unit = {}
+    onClickAction: () -> Unit = {},
+    interactionSource: MutableInteractionSource
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 16.dp)
             .padding(start = 24.dp)
-            .clickable { onClickAction() }
+            .clickable(
+                indication = null,
+                interactionSource = interactionSource,
+                onClick = { onClickAction() }
+            )
     ) {
         Text(
             text = title,
@@ -189,5 +230,5 @@ fun SettingServiceItem(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun PreviewSetting() {
-    SettingContent()
+    SettingContent(logOutDialogState = LogOutDialogState())
 }
