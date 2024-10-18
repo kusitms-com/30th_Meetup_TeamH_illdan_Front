@@ -166,7 +166,7 @@ fun DatePickerBottomSheetContent(
                     val selectedDay = 1 + dayState.firstVisibleItemIndex
 
                     if (bottomSheetType == BottomSheetType.FullDate) {
-                        onFullDateSelected("$selectedYear$Year $selectedMonth$Month $selectedDay$Day")
+                        onFullDateSelected("$selectedYear-$selectedMonth-$selectedDay")
                     } else if (bottomSheetType == BottomSheetType.SubDate) {
                         onSubDateSelected(selectedYear, selectedMonth)
                     }

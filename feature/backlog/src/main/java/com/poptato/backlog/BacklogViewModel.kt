@@ -5,9 +5,11 @@ import com.poptato.core.enums.TodoType
 import com.poptato.core.util.move
 import com.poptato.domain.model.request.backlog.CreateBacklogRequestModel
 import com.poptato.domain.model.request.backlog.GetBacklogListRequestModel
+import com.poptato.domain.model.request.todo.DeadlineContentModel
 import com.poptato.domain.model.request.todo.DragDropRequestModel
 import com.poptato.domain.model.request.todo.ModifyTodoRequestModel
 import com.poptato.domain.model.request.todo.TodoContentModel
+import com.poptato.domain.model.request.todo.UpdateDeadlineRequestModel
 import com.poptato.domain.model.response.backlog.BacklogListModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.domain.usecase.backlog.CreateBacklogUseCase
@@ -15,6 +17,7 @@ import com.poptato.domain.usecase.backlog.GetBacklogListUseCase
 import com.poptato.domain.usecase.todo.DeleteTodoUseCase
 import com.poptato.domain.usecase.todo.DragDropUseCase
 import com.poptato.domain.usecase.todo.ModifyTodoUseCase
+import com.poptato.domain.usecase.todo.UpdateDeadlineUseCase
 import com.poptato.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -28,7 +31,8 @@ class BacklogViewModel @Inject constructor(
     private val getBacklogListUseCase: GetBacklogListUseCase,
     private val deleteTodoUseCase: DeleteTodoUseCase,
     private val modifyTodoUseCase: ModifyTodoUseCase,
-    private val dragDropUseCase: DragDropUseCase
+    private val dragDropUseCase: DragDropUseCase,
+    private val updateDeadlineUseCase: UpdateDeadlineUseCase
 ) : BaseViewModel<BacklogPageState>(
     BacklogPageState()
 ) {
@@ -130,8 +134,8 @@ class BacklogViewModel @Inject constructor(
         )
     }
 
-    fun setDeadline(deadline: String) {
-        val updatedItem = uiState.value.selectedItem.copy(deadline = deadline)
+    fun setDeadline(deadline: String?) {
+        val updatedItem = uiState.value.selectedItem.copy(deadline = deadline ?: "")
         val newList = uiState.value.backlogList.map {
             if (it.todoId == updatedItem.todoId) updatedItem
             else it
@@ -143,6 +147,17 @@ class BacklogViewModel @Inject constructor(
                 selectedItem = updatedItem
             )
         )
+
+        viewModelScope.launch {
+            updateDeadlineUseCase.invoke(
+                request = UpdateDeadlineRequestModel(
+                    todoId = uiState.value.selectedItem.todoId,
+                    deadline = DeadlineContentModel(deadline)
+                )
+            ).collect {
+                resultResponse(it, { onSuccessUpdateBacklogList() }, { onFailedUpdateBacklogList() })
+            }
+        }
     }
 
     fun onSelectedItem(item: TodoItemModel) {
