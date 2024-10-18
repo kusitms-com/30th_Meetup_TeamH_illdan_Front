@@ -17,6 +17,7 @@ import com.poptato.domain.usecase.backlog.GetBacklogListUseCase
 import com.poptato.domain.usecase.todo.DeleteTodoUseCase
 import com.poptato.domain.usecase.todo.DragDropUseCase
 import com.poptato.domain.usecase.todo.ModifyTodoUseCase
+import com.poptato.domain.usecase.todo.UpdateBookmarkUseCase
 import com.poptato.domain.usecase.todo.UpdateDeadlineUseCase
 import com.poptato.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -32,7 +33,8 @@ class BacklogViewModel @Inject constructor(
     private val deleteTodoUseCase: DeleteTodoUseCase,
     private val modifyTodoUseCase: ModifyTodoUseCase,
     private val dragDropUseCase: DragDropUseCase,
-    private val updateDeadlineUseCase: UpdateDeadlineUseCase
+    private val updateDeadlineUseCase: UpdateDeadlineUseCase,
+    private val updateBookmarkUseCase: UpdateBookmarkUseCase
 ) : BaseViewModel<BacklogPageState>(
     BacklogPageState()
 ) {
@@ -205,5 +207,22 @@ class BacklogViewModel @Inject constructor(
                 isNewItemCreated = flag
             )
         )
+    }
+
+    fun updateBookmark(id: Long) {
+        val newList = uiState.value.backlogList.map {
+            if (it.todoId == id) {
+                it.copy(isBookmark = !it.isBookmark)
+            } else {
+                it
+            }
+        }
+        updateList(newList)
+
+        viewModelScope.launch {
+            updateBookmarkUseCase.invoke(id).collect {
+                resultResponse(it, { onSuccessUpdateBacklogList() }, { onFailedUpdateBacklogList() })
+            }
+        }
     }
 }

@@ -69,6 +69,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.poptato.design_system.BACKLOG_YESTERDAY_TASK_GUIDE
 import com.poptato.design_system.Backlog
 import com.poptato.design_system.BacklogHint
+import com.poptato.design_system.Bookmark
 import com.poptato.design_system.CONFIRM_ACTION
 import com.poptato.design_system.ERROR_CREATE_BACKLOG
 import com.poptato.design_system.EmptyBacklogTitle
@@ -98,7 +99,8 @@ fun BacklogScreen(
     todoBottomSheetClosedFlow: SharedFlow<Unit>,
     updateDeadlineFlow: SharedFlow<String>,
     deleteTodoFlow: SharedFlow<Long>,
-    activateItemFlow: SharedFlow<Long>
+    activateItemFlow: SharedFlow<Long>,
+    updateBookmarkFlow: SharedFlow<Long>
 ) {
     val viewModel: BacklogViewModel = hiltViewModel()
     val context = LocalContext.current
@@ -143,6 +145,12 @@ fun BacklogScreen(
     LaunchedEffect(updateDeadlineFlow) {
         updateDeadlineFlow.collect {
             viewModel.setDeadline(it)
+        }
+    }
+
+    LaunchedEffect(updateBookmarkFlow) {
+        updateBookmarkFlow.collect {
+            viewModel.updateBookmark(it)
         }
     }
 
@@ -478,7 +486,7 @@ fun BacklogItem(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
-            .background(Gray95)
+            .background(if(item.isBookmark) Bookmark else Gray95)
             .padding(vertical = 16.dp)
             .padding(start = 16.dp, end = 18.dp),
         verticalAlignment = Alignment.CenterVertically
