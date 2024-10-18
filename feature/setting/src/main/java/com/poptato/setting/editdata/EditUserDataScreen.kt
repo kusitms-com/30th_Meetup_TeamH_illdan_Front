@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Icon
@@ -34,6 +36,7 @@ import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
 import com.poptato.design_system.Gray95
 import com.poptato.design_system.PoptatoTypo
+import com.poptato.design_system.Primary60
 import com.poptato.design_system.ProfileDetail
 import com.poptato.design_system.R
 import com.poptato.design_system.UserNameTitle
@@ -116,13 +119,35 @@ fun UserImg() {
             .wrapContentHeight()
             .padding(top = 16.dp)
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.ic_person),
-            contentDescription = "img_temp_person",
-            modifier = Modifier
-                .size(80.dp)
-                .align(Alignment.Center)
-        )
+
+        Box(
+            modifier = Modifier.align(Alignment.Center).wrapContentSize()
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_person),
+                contentDescription = "img_temp_person",
+                modifier = Modifier
+                    .size(80.dp)
+                    .align(Alignment.Center)
+            )
+
+            Box(
+                modifier = Modifier
+                    .size(24.dp)
+                    .clip(CircleShape)
+                    .background(color = Primary60)
+                    .align(Alignment.BottomEnd)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_edit_pen),
+                    contentDescription = "",
+                    tint = Color.Unspecified,
+                    modifier = Modifier
+                        .size(16.dp)
+                        .align(Alignment.Center)
+                )
+            }
+        }
     }
 }
 
