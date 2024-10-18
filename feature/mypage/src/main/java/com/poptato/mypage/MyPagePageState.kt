@@ -1,7 +1,8 @@
 package com.poptato.mypage
 
+import com.poptato.domain.model.response.mypage.UserDataModel
 import com.poptato.ui.base.PageState
 
 data class MyPagePageState(
-    val temp: String = ""
+    val userDataModel: UserDataModel = UserDataModel()
 ) : PageState
