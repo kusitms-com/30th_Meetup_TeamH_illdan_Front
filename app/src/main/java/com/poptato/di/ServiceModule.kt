@@ -2,6 +2,7 @@ package com.poptato.di
 
 import com.poptato.data.service.AuthService
 import com.poptato.data.service.BacklogService
+import com.poptato.data.service.HistoryService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,5 +21,10 @@ object ServiceModule {
     @Provides
     fun provideBacklogService(retrofit: Retrofit): BacklogService {
         return retrofit.create(BacklogService::class.java)
+    }
+
+    @Provides
+    fun provideHistoryService(retrofit: Retrofit): HistoryService {
+        return retrofit.create(HistoryService::class.java)
     }
 }
