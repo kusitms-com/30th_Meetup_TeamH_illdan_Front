@@ -12,4 +12,8 @@ object Endpoints {
         const val BACKLOG = "/backlog"
         const val BACKLOGS = "/backlogs"
     }
+
+    object History {
+        const val HISTORIES = "/histories"
+    }
 }
