@@ -10,4 +10,5 @@ interface TodoRepository {
     suspend fun modifyTodo(request: ModifyTodoRequestModel): Flow<Result<Unit>>
     suspend fun dragDrop(request: DragDropRequestModel): Flow<Result<Unit>>
     suspend fun updateDeadline(request: UpdateDeadlineRequestModel): Flow<Result<Unit>>
+    suspend fun updateBookmark(todoId: Long): Flow<Result<Unit>>
 }

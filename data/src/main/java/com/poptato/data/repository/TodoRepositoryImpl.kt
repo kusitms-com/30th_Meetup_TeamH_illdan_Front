@@ -28,4 +28,8 @@ class TodoRepositoryImpl @Inject constructor(
     override suspend fun updateDeadline(request: UpdateDeadlineRequestModel): Flow<Result<Unit>> {
         return apiLaunch(apiCall = { todoService.updateDeadline(todoId = request.todoId, request = request.deadline) }, UnitResponseMapper)
     }
+
+    override suspend fun updateBookmark(todoId: Long): Flow<Result<Unit>> {
+        return apiLaunch(apiCall = { todoService.updateBookmark(todoId) }, UnitResponseMapper)
+    }
 }

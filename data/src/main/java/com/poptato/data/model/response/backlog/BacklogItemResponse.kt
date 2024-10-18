@@ -9,6 +9,7 @@ data class BacklogItemResponse(
     val content: String = "",
     @SerializedName("isBookmark")
     val isBookmark: Boolean = false,
+    @SerializedName("deadline")
     val deadline: String = "",
     @SerializedName("dDay")
     val dDay: Int = -1

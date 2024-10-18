@@ -35,4 +35,9 @@ interface TodoService {
         @Path("todoId") todoId: Long,
         @Body request: DeadlineContentModel
     ): Response<ApiResponse<Unit>>
+
+    @PATCH(Endpoints.Todo.BOOKMARK)
+    suspend fun updateBookmark(
+        @Path("todoId") todoId: Long
+    ): Response<ApiResponse<Unit>>
 }

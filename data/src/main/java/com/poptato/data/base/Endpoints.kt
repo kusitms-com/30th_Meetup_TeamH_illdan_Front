@@ -19,5 +19,6 @@ object Endpoints {
         const val MODIFY = "$DELETE/content"
         const val DRAG_DROP = "/dragAndDrop"
         const val DEADLINE = "$DELETE/deadline"
+        const val BOOKMARK = "$DELETE/bookmark"
     }
 }
