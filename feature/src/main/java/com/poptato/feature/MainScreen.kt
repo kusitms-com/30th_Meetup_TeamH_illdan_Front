@@ -112,6 +112,7 @@ fun MainScreen() {
     val updateDeadlineFlow = MutableSharedFlow<String>()
     val deleteTodoFlow = MutableSharedFlow<Long>()
     val activateItemFlow = MutableSharedFlow<Long>()
+    val updateBookmarkFlow = MutableSharedFlow<Long>()
     var bottomSheetType by remember { mutableStateOf(BottomSheetType.Main) }
     var backPressedOnce by remember { mutableStateOf(false) }
     val backPressHandler: () -> Unit = {
@@ -196,6 +197,11 @@ fun MainScreen() {
                                     scope.launch {
                                         activateItemFlow.emit(it)
                                         sheetState.hide()
+                                    }
+                                },
+                                onClickBtnBookmark = {
+                                    scope.launch {
+                                        updateBookmarkFlow.emit(it)
                                     }
                                 }
                             )
@@ -285,7 +291,8 @@ fun MainScreen() {
                             todoBottomSheetClosedFlow = todoBottomSheetClosedFlow,
                             updateDeadlineFlow = updateDeadlineFlow,
                             deleteTodoFlow = deleteTodoFlow,
-                            activateItemFlow = activateItemFlow
+                            activateItemFlow = activateItemFlow,
+                            updateBookmarkFlow = updateBookmarkFlow
                         )
                         todayNavGraph(navController = navController)
                         historyNavGraph(navController = navController)

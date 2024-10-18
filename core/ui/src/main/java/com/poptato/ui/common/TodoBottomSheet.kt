@@ -49,22 +49,29 @@ fun TodoBottomSheet(
     onClickShowDatePicker: () -> Unit = {},
     onClickBtnDelete: (Long) -> Unit = {},
     onClickBtnModify: (Long) -> Unit = {},
+    onClickBtnBookmark: (Long) -> Unit = {}
 ) {
     var deadline by remember { mutableStateOf(item.deadline) }
+    var isBookmark by remember { mutableStateOf(item.isBookmark) }
 
     LaunchedEffect(item) {
         deadline = item.deadline
+        isBookmark = item.isBookmark
     }
 
     TodoBottomSheetContent(
-        item = item.copy(deadline = deadline),
+        item = item.copy(deadline = deadline, isBookmark = isBookmark),
         removeDeadline = {
             deadline = ""
             setDeadline("")
         },
         onClickShowDatePicker = onClickShowDatePicker,
         onClickBtnDelete = onClickBtnDelete,
-        onClickBtnModify = onClickBtnModify
+        onClickBtnModify = onClickBtnModify,
+        onClickBtnBookmark = {
+            onClickBtnBookmark(it)
+            isBookmark = !isBookmark
+        }
     )
 }
 
@@ -74,7 +81,8 @@ fun TodoBottomSheetContent(
     removeDeadline: () -> Unit = {},
     onClickShowDatePicker: () -> Unit = {},
     onClickBtnDelete: (Long) -> Unit = {},
-    onClickBtnModify: (Long) -> Unit = {}
+    onClickBtnModify: (Long) -> Unit = {},
+    onClickBtnBookmark: (Long) -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -104,13 +112,15 @@ fun TodoBottomSheetContent(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_star_filled),
                     contentDescription = "",
-                    tint = Color.Unspecified
+                    tint = Color.Unspecified,
+                    modifier = Modifier.clickable { onClickBtnBookmark(item.todoId) }
                 )
             } else {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_star_empty),
                     contentDescription = "",
-                    tint = Color.Unspecified
+                    tint = Color.Unspecified,
+                    modifier = Modifier.clickable { onClickBtnBookmark(item.todoId) }
                 )
             }
         }
