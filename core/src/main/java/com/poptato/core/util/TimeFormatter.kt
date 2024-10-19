@@ -3,6 +3,7 @@ package com.poptato.core.util
 import org.threeten.bp.LocalDate
 import org.threeten.bp.Year
 import org.threeten.bp.format.DateTimeFormatter
+import org.threeten.bp.temporal.ChronoUnit
 
 object TimeFormatter {
 
@@ -31,5 +32,15 @@ object TimeFormatter {
             else -> 30
         }
         return (1..daysInMonth).toList()
+    }
+
+    fun calculateDDay(deadline: String?): Int? {
+        if (deadline == null) return null
+
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val today = LocalDate.now()
+        val deadlineDate = LocalDate.parse(deadline, formatter)
+
+        return ChronoUnit.DAYS.between(today, deadlineDate).toInt()
     }
 }

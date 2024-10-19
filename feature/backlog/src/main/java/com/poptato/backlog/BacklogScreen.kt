@@ -16,8 +16,6 @@ import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -100,7 +98,7 @@ fun BacklogScreen(
     goToYesterdayList: () -> Unit = {},
     showBottomSheet: (TodoItemModel) -> Unit = {},
     todoBottomSheetClosedFlow: SharedFlow<Unit>,
-    updateDeadlineFlow: SharedFlow<String>,
+    updateDeadlineFlow: SharedFlow<String?>,
     deleteTodoFlow: SharedFlow<Long>,
     activateItemFlow: SharedFlow<Long>,
     updateBookmarkFlow: SharedFlow<Long>
@@ -120,12 +118,6 @@ fun BacklogScreen(
     LaunchedEffect(activateItemFlow) {
         activateItemFlow.collect { id ->
             activeItemId = id
-        }
-    }
-
-    LaunchedEffect(todoBottomSheetClosedFlow) {
-        todoBottomSheetClosedFlow.collect {
-            // TODO: 데이터 갱신 함수 호출
         }
     }
 

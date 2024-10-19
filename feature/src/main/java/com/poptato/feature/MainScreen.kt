@@ -109,7 +109,7 @@ fun MainScreen() {
         scope.launch { sheetState.show() }
     }
     val todoBottomSheetClosedFlow = MutableSharedFlow<Unit>()
-    val updateDeadlineFlow = MutableSharedFlow<String>()
+    val updateDeadlineFlow = MutableSharedFlow<String?>()
     val deleteTodoFlow = MutableSharedFlow<Long>()
     val activateItemFlow = MutableSharedFlow<Long>()
     val updateBookmarkFlow = MutableSharedFlow<Long>()
@@ -212,7 +212,10 @@ fun MainScreen() {
                                 bottomSheetType = BottomSheetType.FullDate,
                                 onFullDateSelected = { date ->
                                     viewModel.onUpdatedDeadline(date)
-                                    scope.launch { updateDeadlineFlow.emit(date) }
+                                    scope.launch {
+                                        updateDeadlineFlow.emit(date)
+                                        sheetState.hide()
+                                    }
                                 }
                             )
                         }

@@ -2,6 +2,7 @@ package com.poptato.backlog
 
 import androidx.lifecycle.viewModelScope
 import com.poptato.core.enums.TodoType
+import com.poptato.core.util.TimeFormatter
 import com.poptato.core.util.move
 import com.poptato.domain.model.request.backlog.CreateBacklogRequestModel
 import com.poptato.domain.model.request.backlog.GetBacklogListRequestModel
@@ -137,7 +138,8 @@ class BacklogViewModel @Inject constructor(
     }
 
     fun setDeadline(deadline: String?) {
-        val updatedItem = uiState.value.selectedItem.copy(deadline = deadline ?: "")
+        val dDay = TimeFormatter.calculateDDay(deadline)
+        val updatedItem = uiState.value.selectedItem.copy(deadline = deadline ?: "", dDay = dDay)
         val newList = uiState.value.backlogList.map {
             if (it.todoId == updatedItem.todoId) updatedItem
             else it

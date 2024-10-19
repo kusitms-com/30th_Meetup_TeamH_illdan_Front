@@ -170,8 +170,6 @@ fun DatePickerBottomSheetContent(
                     } else if (bottomSheetType == BottomSheetType.SubDate) {
                         onSubDateSelected(selectedYear, selectedMonth)
                     }
-
-                    onDismissRequest()
                 },
                 modifier = Modifier
                     .weight(1f)

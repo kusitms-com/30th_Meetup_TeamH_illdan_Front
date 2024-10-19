@@ -45,7 +45,7 @@ import com.poptato.domain.model.response.today.TodoItemModel
 @Composable
 fun TodoBottomSheet(
     item: TodoItemModel = TodoItemModel(),
-    setDeadline: (String) -> Unit = {},
+    setDeadline: (String?) -> Unit = {},
     onClickShowDatePicker: () -> Unit = {},
     onClickBtnDelete: (Long) -> Unit = {},
     onClickBtnModify: (Long) -> Unit = {},
@@ -63,7 +63,7 @@ fun TodoBottomSheet(
         item = item.copy(deadline = deadline, isBookmark = isBookmark),
         removeDeadline = {
             deadline = ""
-            setDeadline("")
+            setDeadline(null)
         },
         onClickShowDatePicker = onClickShowDatePicker,
         onClickBtnDelete = onClickBtnDelete,

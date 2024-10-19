@@ -53,7 +53,7 @@ fun NavGraphBuilder.backlogNavGraph(
     navController: NavHostController,
     showBottomSheet: (TodoItemModel) -> Unit,
     todoBottomSheetClosedFlow: SharedFlow<Unit>,
-    updateDeadlineFlow: SharedFlow<String>,
+    updateDeadlineFlow: SharedFlow<String?>,
     deleteTodoFlow: SharedFlow<Long>,
     activateItemFlow: SharedFlow<Long>,
     updateBookmarkFlow: SharedFlow<Long>
