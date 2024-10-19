@@ -1,8 +1,11 @@
 package com.poptato.today
 
 import androidx.lifecycle.viewModelScope
+import com.poptato.core.util.TimeFormatter
 import com.poptato.domain.model.enums.TodoStatus
 import com.poptato.domain.model.request.today.GetTodayListRequestModel
+import com.poptato.domain.model.request.todo.DeadlineContentModel
+import com.poptato.domain.model.request.todo.UpdateDeadlineRequestModel
 import com.poptato.domain.model.response.today.TodayListModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.domain.usecase.today.GetTodayListUseCase
@@ -75,6 +78,22 @@ class TodayViewModel @Inject constructor(
         updateState(
             uiState.value.copy(
                 todayList = newList
+            )
+        )
+    }
+
+    fun setDeadline(deadline: String?) {
+        val dDay = TimeFormatter.calculateDDay(deadline)
+        val updatedItem = uiState.value.selectedItem.copy(deadline = deadline ?: "", dDay = dDay)
+        val newList = uiState.value.todayList.map {
+            if (it.todoId == updatedItem.todoId) updatedItem
+            else it
+        }
+
+        updateState(
+            uiState.value.copy(
+                todayList = newList,
+                selectedItem = updatedItem
             )
         )
     }

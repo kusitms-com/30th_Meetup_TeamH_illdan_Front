@@ -16,7 +16,8 @@ object TodayListResponseMapper: Mapper<TodayListResponse, TodayListModel> {
                         content = item.content,
                         todoStatus = item.todoStatus,
                         isBookmark = item.isBookmark,
-                        dDay = item.deadline
+                        deadline = item.deadline ?: "",
+                        dDay = item.dDay
                     )
                 },
                 totalPageCount = it.totalPageCount

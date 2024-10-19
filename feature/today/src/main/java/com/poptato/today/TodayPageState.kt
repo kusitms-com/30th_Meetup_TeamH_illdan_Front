@@ -6,5 +6,6 @@ import com.poptato.ui.base.PageState
 
 data class TodayPageState(
     val todayList: List<TodoItemModel> = emptyList(),
-    val totalPageCount: Int = 0
+    val totalPageCount: Int = 0,
+    val selectedItem: TodoItemModel = TodoItemModel(),
 ) : PageState

@@ -13,5 +13,7 @@ data class TodayItemResponse(
     @SerializedName("isBookmark")
     val isBookmark: Boolean = false,
     @SerializedName("deadline")
-    val deadline: Int = -1
+    val deadline: String? = null,
+    @SerializedName("dday")
+    val dDay: Int? = null
 )
