@@ -70,3 +70,5 @@ const val ERROR_CREATE_BACKLOG = "에러가 발생하였습니다"
 
 // Etc
 const val FINISH_APP_GUIDE = "뒤로가기를 한 번 더 누르면 종료돼요."
+const val DEADLINE = "D-%s"
+const val DEADLINE_DDAY = "D-day"

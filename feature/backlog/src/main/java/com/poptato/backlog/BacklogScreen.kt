@@ -71,6 +71,8 @@ import com.poptato.design_system.Backlog
 import com.poptato.design_system.BacklogHint
 import com.poptato.design_system.Bookmark
 import com.poptato.design_system.CONFIRM_ACTION
+import com.poptato.design_system.DEADLINE
+import com.poptato.design_system.DEADLINE_DDAY
 import com.poptato.design_system.ERROR_CREATE_BACKLOG
 import com.poptato.design_system.EmptyBacklogTitle
 import com.poptato.design_system.Gray00
@@ -474,7 +476,6 @@ fun BacklogTaskList(
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun BacklogItem(
     item: TodoItemModel,
@@ -540,19 +541,18 @@ fun BacklogItem(
                 cursorBrush = SolidColor(Gray00)
             )
         } else {
-//            HighlightedText(
-//                highlightColor = Primary80,
-//                highlightText = if(item.dDay != null && item.dDay != 0) "D-${item.dDay}" else if(item.dDay == 0) "D-day" else "",
-//                generalText = item.content,
-//                generalTextColor = Gray00,
-//                textStyle = PoptatoTypo.mdRegular,
-//                modifier = Modifier.weight(1f)
-//            )
             Row(
                 modifier = Modifier.weight(1f),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                Text(
+                    text = item.content,
+                    style = PoptatoTypo.mdRegular,
+                    color = Gray00
+                )
+
                 if (item.dDay != null) {
+                    Spacer(modifier = Modifier.width(8.dp))
 
                     Box(
                         modifier = Modifier
@@ -561,23 +561,12 @@ fun BacklogItem(
                             .padding(vertical = 1.dp, horizontal = 6.dp)
                     ) {
                         Text(
-                            text = if (item.dDay == 0) "D-day" else "D-${item.dDay}",
+                            text = if (item.dDay == 0) DEADLINE_DDAY else String.format(DEADLINE, item.dDay),
                             style = PoptatoTypo.xsMedium,
                             color = if (item.isBookmark) Gray00 else Gray40
                         )
                     }
-
-                    Spacer(modifier = Modifier.width(8.dp))
                 }
-
-                Text(
-                    text = item.content,
-                    style = PoptatoTypo.mdRegular,
-                    color = Gray00,
-                    modifier = Modifier.weight(1f)
-                )
-
-
             }
         }
 
