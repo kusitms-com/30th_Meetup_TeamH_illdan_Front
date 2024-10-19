@@ -7,6 +7,8 @@ import com.poptato.domain.repository.AuthRepository
 import com.poptato.domain.repository.BacklogRepository
 import com.poptato.domain.repository.HistoryRepository
 import com.poptato.data.repository.MyPageRepositoryImpl
+import com.poptato.data.repository.TodoRepositoryImpl
+import com.poptato.domain.repository.TodoRepository
 import com.poptato.domain.repository.MyPageRepository
 import dagger.Binds
 import dagger.Module
@@ -29,6 +31,10 @@ abstract class RepositoryModule {
     @Singleton
     @Binds
     abstract fun providesHistoryRepository(repositoryImpl: HistoryRepositoryImpl): HistoryRepository
+
+    @Singleton
+    @Binds
+    abstract fun providesTodoRepository(repositoryImpl: TodoRepositoryImpl): TodoRepository
 
     @Singleton
     @Binds

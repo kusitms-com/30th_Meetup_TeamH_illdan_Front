@@ -18,6 +18,13 @@ object Endpoints {
         const val HISTORIES = "/histories"
     }
 
+    object Todo {
+        private const val TODO = "/todo"
+        const val DELETE = "$TODO/{todoId}"
+        const val MODIFY = "$DELETE/content"
+        const val DRAG_DROP = "/dragAndDrop"
+    }
+
     object MyPage {
         const val USER_DELETE = "/user"
 
