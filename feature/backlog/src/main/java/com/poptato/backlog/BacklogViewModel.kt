@@ -6,10 +6,10 @@ import com.poptato.core.util.TimeFormatter
 import com.poptato.core.util.move
 import com.poptato.domain.model.request.backlog.CreateBacklogRequestModel
 import com.poptato.domain.model.request.backlog.GetBacklogListRequestModel
+import com.poptato.domain.model.request.todo.TodoIdModel
 import com.poptato.domain.model.request.todo.DeadlineContentModel
 import com.poptato.domain.model.request.todo.DragDropRequestModel
 import com.poptato.domain.model.request.todo.ModifyTodoRequestModel
-import com.poptato.domain.model.request.todo.TodoContentModel
 import com.poptato.domain.model.request.todo.UpdateDeadlineRequestModel
 import com.poptato.domain.model.response.backlog.BacklogListModel
 import com.poptato.domain.model.response.today.TodoItemModel
@@ -18,12 +18,14 @@ import com.poptato.domain.usecase.backlog.GetBacklogListUseCase
 import com.poptato.domain.usecase.todo.DeleteTodoUseCase
 import com.poptato.domain.usecase.todo.DragDropUseCase
 import com.poptato.domain.usecase.todo.ModifyTodoUseCase
+import com.poptato.domain.usecase.todo.SwipeTodoUseCase
 import com.poptato.domain.usecase.todo.UpdateBookmarkUseCase
 import com.poptato.domain.usecase.todo.UpdateDeadlineUseCase
 import com.poptato.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -35,7 +37,8 @@ class BacklogViewModel @Inject constructor(
     private val modifyTodoUseCase: ModifyTodoUseCase,
     private val dragDropUseCase: DragDropUseCase,
     private val updateDeadlineUseCase: UpdateDeadlineUseCase,
-    private val updateBookmarkUseCase: UpdateBookmarkUseCase
+    private val updateBookmarkUseCase: UpdateBookmarkUseCase,
+    private val swipeTodoUseCase: SwipeTodoUseCase
 ) : BaseViewModel<BacklogPageState>(
     BacklogPageState()
 ) {
@@ -99,10 +102,18 @@ class BacklogViewModel @Inject constructor(
         emitEventFlow(BacklogEvent.OnFailedUpdateBacklogList)
     }
 
-    fun removeBacklogItem(item: TodoItemModel) { // TODO(홈으로 넘기는 함수. 이후에 API 연결하면서 네이밍 수정 필요)
+    fun swipeBacklogItem(item: TodoItemModel) {
         val newList = uiState.value.backlogList.filter { it.todoId != item.todoId }
 
         updateList(newList)
+
+        Timber.i(item.todoId.toString())
+
+        viewModelScope.launch {
+            swipeTodoUseCase.invoke(TodoIdModel(item.todoId)).collect {
+                resultResponse(it, { onSuccessUpdateBacklogList() }, { onFailedUpdateBacklogList() })
+            }
+        }
     }
 
     fun moveItem(fromIndex: Int, toIndex: Int) {
