@@ -32,13 +32,6 @@ class HistoryViewModel @Inject constructor(
                     isLoadingMore = true
                 )
             )
-            if(uiState.value.currentPage!=0) {
-                updateState(
-                    uiState.value.copy(
-                        lastItemDate = uiState.value.nowLastItemDate
-                    )
-                )
-            }
 
             viewModelScope.launch {
                 try {
