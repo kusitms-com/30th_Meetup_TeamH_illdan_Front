@@ -2,11 +2,10 @@ package com.poptato.data.service
 
 import com.poptato.data.base.ApiResponse
 import com.poptato.data.base.Endpoints
+import com.poptato.domain.model.request.todo.TodoIdModel
 import com.poptato.domain.model.request.todo.DeadlineContentModel
 import com.poptato.domain.model.request.todo.DragDropRequestModel
-import com.poptato.domain.model.request.todo.ModifyTodoRequestModel
 import com.poptato.domain.model.request.todo.TodoContentModel
-import com.poptato.domain.model.request.todo.UpdateDeadlineRequestModel
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -39,5 +38,10 @@ interface TodoService {
     @PATCH(Endpoints.Todo.BOOKMARK)
     suspend fun updateBookmark(
         @Path("todoId") todoId: Long
+    ): Response<ApiResponse<Unit>>
+
+    @PATCH(Endpoints.Todo.SWIPE)
+    suspend fun swipeTodo(
+        @Body request: TodoIdModel
     ): Response<ApiResponse<Unit>>
 }

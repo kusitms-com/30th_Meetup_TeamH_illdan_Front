@@ -3,6 +3,7 @@ package com.poptato.data.repository
 import com.poptato.data.base.BaseRepository
 import com.poptato.data.mapper.UnitResponseMapper
 import com.poptato.data.service.TodoService
+import com.poptato.domain.model.request.todo.TodoIdModel
 import com.poptato.domain.model.request.todo.DragDropRequestModel
 import com.poptato.domain.model.request.todo.ModifyTodoRequestModel
 import com.poptato.domain.model.request.todo.UpdateDeadlineRequestModel
@@ -31,5 +32,9 @@ class TodoRepositoryImpl @Inject constructor(
 
     override suspend fun updateBookmark(todoId: Long): Flow<Result<Unit>> {
         return apiLaunch(apiCall = { todoService.updateBookmark(todoId) }, UnitResponseMapper)
+    }
+
+    override suspend fun swipeTodo(request: TodoIdModel): Flow<Result<Unit>> {
+        return apiLaunch(apiCall = { todoService.swipeTodo(request) }, UnitResponseMapper)
     }
 }

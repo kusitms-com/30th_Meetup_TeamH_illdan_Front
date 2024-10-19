@@ -21,6 +21,7 @@ object Endpoints {
         const val DRAG_DROP = "/dragAndDrop"
         const val DEADLINE = "$DELETE/deadline"
         const val BOOKMARK = "$DELETE/bookmark"
+        const val SWIPE = "swipe"
     }
 
     object MyPage {
