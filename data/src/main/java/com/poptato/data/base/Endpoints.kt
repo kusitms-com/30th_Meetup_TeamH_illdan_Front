@@ -27,4 +27,8 @@ object Endpoints {
     object MyPage {
         const val USER_DELETE = "/user"
     }
+
+    object Today {
+        const val TODAYS = "/todays"
+    }
 }
