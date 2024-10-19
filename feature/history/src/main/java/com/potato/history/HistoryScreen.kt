@@ -58,6 +58,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.poptato.core.util.reachedLastItem
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -202,12 +203,6 @@ fun HistoryListItem(item: HistoryItemModel) {
             modifier = Modifier.weight(1f)
         )
     }
-}
-
-
-private fun LazyListState.reachedLastItem(): Boolean {
-    val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()
-    return lastVisibleItem?.index == layoutInfo.totalItemsCount - 1
 }
 
 @SuppressLint("ComposableNaming")
