@@ -3,6 +3,7 @@ package com.poptato.di
 import com.poptato.data.service.AuthService
 import com.poptato.data.service.BacklogService
 import com.poptato.data.service.TodoService
+import com.poptato.data.service.MyPageService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -26,5 +27,10 @@ object ServiceModule {
     @Provides
     fun provideTodoService(retrofit: Retrofit): TodoService {
         return retrofit.create(TodoService::class.java)
+    }
+
+    @Provides
+    fun provideMyPageService(retrofit: Retrofit): MyPageService {
+        return retrofit.create(MyPageService::class.java)
     }
 }

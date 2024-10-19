@@ -6,6 +6,7 @@ object Endpoints {
         private const val AUTH = "/auth"
         const val LOGIN = "$AUTH/login"
         const val REFRESH = "$AUTH/refresh"
+        const val LOGOUT = "$AUTH/logout"
     }
 
     object Backlog {
@@ -17,5 +18,9 @@ object Endpoints {
         private const val TODO = "/todo"
         const val DELETE = "$TODO/{todoId}"
         const val MODIFY = "$DELETE/content"
+    }
+
+    object MyPage {
+        const val USER_DELETE = "/user"
     }
 }
