@@ -72,18 +72,14 @@ fun HistoryScreen(
 
     HistoryContent(
         uiState = uiState,
-        onLoadNextPage = { viewModel.getHistoryList() },
-        isRendering = {viewModel.updateRenderingComplete(true)},
-        clearRendering = {viewModel.updateRenderingComplete(false)}
+        onLoadNextPage = { viewModel.getHistoryList() }
     )
 }
 
 @Composable
 fun HistoryContent(
     uiState: HistoryPageState = HistoryPageState(),
-    onLoadNextPage: () -> Unit,
-    isRendering: () -> Unit,
-    clearRendering: () -> Unit,
+    onLoadNextPage: () -> Unit
 ) {
     val listState = rememberLazyListState()
 
@@ -117,35 +113,21 @@ fun HistoryContent(
                 state = listState,
                 loadMore = onLoadNextPage
             ) {
-
                 items(uiState.historyList) { groupedItem ->
-                    val isFirstOfDate = uiState.historyList.indexOfFirst { it.date == groupedItem.date } == uiState.historyList.indexOf(groupedItem)
-
-                    if (isFirstOfDate) {
-                        DateHeader(date = groupedItem.date)
-                    }
+                    DateHeader(date = groupedItem.date)
 
                     groupedItem.items.forEach { item ->
                         HistoryListItem(item = item)
                     }
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                    if(groupedItem.date != uiState.lastItemDate || !isFirstOfDate){
-                        Spacer(modifier = Modifier.height(16.dp))
-                    }
-
-                    if (groupedItem.date == uiState.nowLastItemDate && !uiState.isRenderingComplete) {
-                        isRendering()
-                    }
                 }
             }
 
             LaunchedEffect(Unit) {
                 snapshotFlow { uiState.historyList }
                     .collect {
-                        if (uiState.isRenderingComplete) {
-                            onLoadNextPage()
-                            clearRendering()
-                        }
+                        onLoadNextPage()
                     }
             }
         }
