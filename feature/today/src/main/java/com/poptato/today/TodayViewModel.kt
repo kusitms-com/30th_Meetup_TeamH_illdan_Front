@@ -1,19 +1,30 @@
 package com.poptato.today
 
+import androidx.lifecycle.viewModelScope
 import com.poptato.domain.model.enums.TodoStatus
+import com.poptato.domain.model.request.today.GetTodayListRequestModel
+import com.poptato.domain.model.response.today.TodayListModel
+import com.poptato.domain.model.response.today.TodoItemModel
+import com.poptato.domain.usecase.today.GetTodayListUseCase
 import com.poptato.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class TodayViewModel @Inject constructor(
-
+    private val getTodayListUseCase: GetTodayListUseCase
 ) : BaseViewModel<TodayPageState>(TodayPageState()) {
+    private var snapshotList: List<TodoItemModel> = emptyList()
+
+    init {
+        getTodayList(0, 8)
+    }
 
     fun onCheckedTodo(status: TodoStatus, id: Long) {
         val newStatus = if(status == TodoStatus.COMPLETED) TodoStatus.INCOMPLETE else TodoStatus.COMPLETED
-        val selectedItem = uiState.value.todayList.todays.find { it.todoId == id }?.copy(todoStatus = newStatus)
-        val remainingItems = uiState.value.todayList.todays.filter { it.todoId != id }
+        val selectedItem = uiState.value.todayList.find { it.todoId == id }?.copy(todoStatus = newStatus)
+        val remainingItems = uiState.value.todayList.filter { it.todoId != id }
         val newTodays = if (selectedItem != null) {
             val incompleteItems = remainingItems.filter { it.todoStatus == TodoStatus.INCOMPLETE }.toMutableList()
             val completeItems = remainingItems.filter { it.todoStatus == TodoStatus.COMPLETED }.toMutableList()
@@ -29,11 +40,41 @@ class TodayViewModel @Inject constructor(
             remainingItems
         }
 
+        updateList(newTodays)
+    }
+
+    private fun getTodayList(page: Int, size: Int) {
+        viewModelScope.launch {
+            getTodayListUseCase.invoke(request = GetTodayListRequestModel(page = page, size = size)).collect {
+                resultResponse(it, ::onSuccessGetTodayList, { onFailedUpdateBacklogList() })
+            }
+        }
+    }
+
+    private fun onSuccessGetTodayList(response: TodayListModel) {
+        snapshotList = response.todays
+
         updateState(
             uiState.value.copy(
-                todayList = uiState.value.todayList.copy(
-                    todays = newTodays
-                )
+                todayList = response.todays,
+                totalPageCount = response.totalPageCount
+            )
+        )
+    }
+
+    private fun onSuccessUpdateBacklogList() {
+        snapshotList = uiState.value.todayList
+    }
+
+    private fun onFailedUpdateBacklogList() {
+        updateList(snapshotList)
+        emitEventFlow(TodayEvent.OnFailedUpdateTodayList)
+    }
+
+    private fun updateList(newList: List<TodoItemModel>) {
+        updateState(
+            uiState.value.copy(
+                todayList = newList
             )
         )
     }

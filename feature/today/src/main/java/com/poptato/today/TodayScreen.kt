@@ -109,11 +109,11 @@ fun TodayContent(
                 .fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            if (uiState.todayList.todays.isEmpty()) EmptyTodoView(
+            if (uiState.todayList.isEmpty()) EmptyTodoView(
                 onClickBtnGetTodo = onClickBtnGetTodo
             )
             else TodayTodoList(
-                list = uiState.todayList.todays,
+                list = uiState.todayList,
                 onCheckedChange = onCheckedChange
             )
         }
