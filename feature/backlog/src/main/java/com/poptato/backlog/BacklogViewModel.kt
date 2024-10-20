@@ -49,8 +49,8 @@ class BacklogViewModel @Inject constructor(
     private var snapshotList: List<TodoItemModel> = emptyList()
 
     init {
-        getBacklogList(0, 8)
         getYesterdayList(0, 8)
+        getBacklogList(0, 30)
     }
 
     private fun getBacklogList(page: Int, size: Int) {
