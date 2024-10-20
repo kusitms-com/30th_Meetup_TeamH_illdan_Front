@@ -44,4 +44,9 @@ interface TodoService {
     suspend fun swipeTodo(
         @Body request: TodoIdModel
     ): Response<ApiResponse<Unit>>
+
+    @PATCH(Endpoints.Todo.COMPLETION)
+    suspend fun updateTodoCompletion(
+        @Path("todoId") todoId: Long
+    ): Response<ApiResponse<Unit>>
 }

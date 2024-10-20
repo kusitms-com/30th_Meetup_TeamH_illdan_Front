@@ -22,6 +22,7 @@ object Endpoints {
         const val DEADLINE = "$DELETE/deadline"
         const val BOOKMARK = "$DELETE/bookmark"
         const val SWIPE = "swipe"
+        const val COMPLETION = "$DELETE/achieve"
     }
 
     object MyPage {
