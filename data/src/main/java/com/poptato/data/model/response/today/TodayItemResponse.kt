@@ -10,7 +10,7 @@ data class TodayItemResponse(
     val content: String = "",
     @SerializedName("todoStatus")
     val todoStatus: TodoStatus = TodoStatus.INCOMPLETE,
-    @SerializedName("isBookmark")
+    @SerializedName("bookmark")
     val isBookmark: Boolean = false,
     @SerializedName("deadline")
     val deadline: String? = null,
