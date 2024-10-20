@@ -62,6 +62,7 @@ import com.poptato.design_system.R
 import com.poptato.design_system.TodayTopBarSub
 import com.poptato.domain.model.enums.TodoStatus
 import com.poptato.domain.model.response.today.TodoItemModel
+import com.poptato.ui.common.BookmarkItem
 import com.poptato.ui.common.PoptatoCheckBox
 import com.poptato.ui.common.TopBar
 import com.poptato.ui.util.toPx
@@ -104,7 +105,8 @@ fun TodayContent(
             titleTextColor = Gray00,
             subText = TodayTopBarSub,
             subTextStyle = PoptatoTypo.mdMedium,
-            subTextColor = Gray40
+            subTextColor = Gray40,
+            isTodayTopBar = true
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -210,7 +212,7 @@ fun TodayTodoItem(
             Row(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
-                    .padding(top = if (item.isBookmark || item.dDay != null) 8.dp else 0.dp),
+                    .padding(top = if (item.isBookmark || item.dDay != null) 16.dp else 0.dp),
                 horizontalArrangement = Arrangement.Start
             ) {
                 if (item.isBookmark) {
@@ -229,12 +231,11 @@ fun TodayTodoItem(
                     .fillMaxWidth()
                     .padding(
                         bottom = 16.dp,
-                        top = if (item.isBookmark || item.dDay != null) 4.dp else 16.dp
+                        top = if (item.isBookmark || item.dDay != null) 8.dp else 16.dp
                     )
                     .padding(start = 16.dp, end = 18.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Timber.i("id : ${item.todoId}, status: ${item.todoStatus}")
                 PoptatoCheckBox(
                     isChecked = item.todoStatus == TodoStatus.COMPLETED,
                     onCheckedChange = {
@@ -250,32 +251,8 @@ fun TodayTodoItem(
                     style = PoptatoTypo.mdRegular,
                     modifier = Modifier.weight(1f)
                 )
-
-                Spacer(modifier = Modifier.width(8.dp))
             }
         }
-    }
-}
-
-@Composable
-fun BookmarkItem() {
-    Row(
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            painter = painterResource(id = R.drawable.ic_star_filled),
-            contentDescription = "",
-            modifier = Modifier.size(12.dp),
-            tint = Primary60
-        )
-
-        Spacer(modifier = Modifier.width(2.dp))
-
-        Text(
-            text = BOOKMARK,
-            style = PoptatoTypo.xsSemiBold,
-            color = Primary60
-        )
     }
 }
 

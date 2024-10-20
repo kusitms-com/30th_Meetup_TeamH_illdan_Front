@@ -14,6 +14,7 @@ import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -42,6 +43,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -87,6 +89,7 @@ import com.poptato.design_system.R
 import com.poptato.domain.model.request.todo.ModifyTodoRequestModel
 import com.poptato.domain.model.request.todo.TodoContentModel
 import com.poptato.domain.model.response.today.TodoItemModel
+import com.poptato.ui.common.BookmarkItem
 import com.poptato.ui.common.TopBar
 import com.poptato.ui.util.DragDropListState
 import com.poptato.ui.util.rememberDragDropListState
@@ -198,8 +201,8 @@ fun BacklogContent(
             .background(Gray100)
     ) {
         TopBar(
-            titleText = Backlog,
-            subText = uiState.backlogList.size.toString(),
+            titleText = com.poptato.design_system.TODO,
+            subText = uiState.totalItemCount.toString(),
             subTextStyle = PoptatoTypo.xLSemiBold,
             subTextColor = Primary60
         )
@@ -483,8 +486,8 @@ fun BacklogItem(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
-            .background(if (item.isBookmark) Bookmark else Gray95)
-            .padding(vertical = 16.dp)
+            .background(Gray95)
+            .padding(bottom = 16.dp)
             .padding(start = 16.dp, end = 18.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -499,67 +502,72 @@ fun BacklogItem(
             )
         }
 
-        if (isActive) {
-
-            LaunchedEffect(Unit) {
-                focusRequester.requestFocus()
+        Column(
+            modifier = Modifier
+                .weight(1f),
+            horizontalAlignment = Alignment.Start
+        ) {
+            Row(
+                modifier = Modifier
+                    .padding(top = if (item.isBookmark || item.dDay != null) 16.dp else 0.dp),
+                horizontalArrangement = Arrangement.Start
+            ) {
+                if (item.isBookmark) {
+                    BookmarkItem()
+                    Spacer(modifier = Modifier.width(6.dp))
+                }
+                if (item.dDay != null) Text(
+                    text = String.format(DEADLINE, item.dDay),
+                    style = PoptatoTypo.xsSemiBold,
+                    color = Gray70
+                )
             }
 
-            BasicTextField(
-                value = textFieldValue,
-                onValueChange = { newTextFieldValue ->
-                    textFieldValue = newTextFieldValue
-                },
-                textStyle = PoptatoTypo.mdRegular.copy(color = Gray00),
-                modifier = Modifier
-                    .weight(1f)
-                    .focusRequester(focusRequester)
-                    .onFocusChanged { focusState ->
-                        if (focusState.isFocused) {
-                            textFieldValue = textFieldValue.copy(
-                                selection = TextRange(textFieldValue.text.length)
-                            )
-                        }
+            if (!item.isBookmark && item.dDay == null) Spacer(modifier = Modifier.height(16.dp)) else Spacer(modifier = Modifier.height(8.dp))
+
+            if (isActive) {
+
+                LaunchedEffect(Unit) {
+                    focusRequester.requestFocus()
+                }
+
+                BasicTextField(
+                    value = textFieldValue,
+                    onValueChange = { newTextFieldValue ->
+                        textFieldValue = newTextFieldValue
                     },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        keyboardController?.hide()
-                        onClearActiveItem()
-                        if (item.content != textFieldValue.text) onTodoItemModified(item.todoId, textFieldValue.text)
-                    }
-                ),
-                cursorBrush = SolidColor(Gray00)
-            )
-        } else {
-            Row(
-                modifier = Modifier.weight(1f),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = item.content,
-                    style = PoptatoTypo.mdRegular,
-                    color = Gray00
+                    textStyle = PoptatoTypo.mdRegular.copy(color = Gray00),
+                    modifier = Modifier
+                        .focusRequester(focusRequester)
+                        .onFocusChanged { focusState ->
+                            if (focusState.isFocused) {
+                                textFieldValue = textFieldValue.copy(
+                                    selection = TextRange(textFieldValue.text.length)
+                                )
+                            }
+                        },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboardController?.hide()
+                            onClearActiveItem()
+                            if (item.content != textFieldValue.text) onTodoItemModified(item.todoId, textFieldValue.text)
+                        }
+                    ),
+                    cursorBrush = SolidColor(Gray00)
                 )
-
-                if (item.dDay != null) {
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(4.dp))
-                            .background(if (item.isBookmark) Primary80 else Gray90)
-                            .padding(vertical = 1.dp, horizontal = 6.dp)
-                    ) {
-                        Text(
-                            text = if (item.dDay == 0) DEADLINE_DDAY else String.format(DEADLINE, item.dDay),
-                            style = PoptatoTypo.xsMedium,
-                            color = if (item.isBookmark) Gray00 else Gray40
-                        )
-                    }
+            } else {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = item.content,
+                        style = PoptatoTypo.mdRegular,
+                        color = Gray00
+                    )
                 }
             }
         }
@@ -571,6 +579,8 @@ fun BacklogItem(
             contentDescription = "",
             tint = Color.Unspecified,
             modifier = Modifier
+                .align(if (item.isBookmark || item.dDay != null) Alignment.Top else Alignment.CenterVertically)
+                .padding(top = 16.dp)
                 .clickable {
                     onClickBtnTodoSettings(index)
                 }

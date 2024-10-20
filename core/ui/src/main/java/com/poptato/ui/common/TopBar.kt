@@ -10,11 +10,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -22,6 +24,7 @@ import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
 import com.poptato.design_system.Gray40
 import com.poptato.design_system.PoptatoTypo
+import com.poptato.design_system.R
 
 @SuppressLint("ModifierParameter")
 @Composable
@@ -32,7 +35,8 @@ fun TopBar(
     subTextStyle: TextStyle = PoptatoTypo.mdMedium,
     titleTextColor: Color = Gray00,
     subTextColor: Color = Gray40,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isTodayTopBar: Boolean = false
 ) {
     Row(
         modifier = modifier
@@ -51,11 +55,21 @@ fun TopBar(
 
         Spacer(modifier = Modifier.width(12.dp))
 
-        Text(
-            text = subText,
-            style = subTextStyle,
-            color = subTextColor
-        )
+        if (isTodayTopBar) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_today_msg_bubble),
+                contentDescription = "",
+                tint = Color.Unspecified,
+                modifier = Modifier
+                    .padding(bottom = 9.dp)
+            )
+        } else {
+            Text(
+                text = subText,
+                style = subTextStyle,
+                color = subTextColor
+            )
+        }
     }
 }
 
@@ -64,6 +78,7 @@ fun TopBar(
 fun PreviewTopBar() {
     TopBar(
         titleText = "09.28",
-        subText = "오늘도 하나씩 해보는 거야!"
+        subText = "오늘도 하나씩 해보는 거야!",
+        isTodayTopBar = true
     )
 }
