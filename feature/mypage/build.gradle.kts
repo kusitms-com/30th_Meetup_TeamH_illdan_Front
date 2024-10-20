@@ -16,4 +16,7 @@ dependencies {
     implementation(projects.domain)
     implementation(projects.core.ui)
     implementation(projects.designSystem)
+
+    // 웹뷰
+    implementation(libs.web.view)
 }
