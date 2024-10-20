@@ -54,7 +54,7 @@ class UserDataViewModel @Inject constructor(
     private fun setMappingToUserName(response: UserDataModel) {
         updateState(
             uiState.value.copy(
-                name = response.name
+                userDataModel = response
             )
         )
     }

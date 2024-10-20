@@ -1,8 +1,8 @@
 package com.poptato.setting.userdata
 
+import com.poptato.domain.model.response.mypage.UserDataModel
 import com.poptato.ui.base.PageState
 
 data class UserDataPageState (
-    val temp: String = "",
-    var name: String = ""
+    val userDataModel: UserDataModel = UserDataModel()
 ): PageState

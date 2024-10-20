@@ -106,10 +106,10 @@ fun EditUserDataContent(
         )
 
         UserDataDetailContent(
-            UserDataName, "내용"
+            UserDataName, uiState.userDataModel.name
         )
         UserDataDetailContent(
-            UserDataEmail, "내용",
+            UserDataEmail, uiState.userDataModel.email,
             topPadding = 24
         )
 
@@ -182,7 +182,7 @@ fun MyData(
 
             Column {
                 Text(
-                    text = "이름",
+                    text = uiState.userDataModel.name,
                     color = Gray00,
                     style = PoptatoTypo.lgSemiBold,
                     modifier = Modifier
@@ -190,7 +190,7 @@ fun MyData(
                 )
 
                 Text(
-                    text = "메일",
+                    text = uiState.userDataModel.email,
                     color = Gray40,
                     style = PoptatoTypo.smRegular,
                     modifier = Modifier
