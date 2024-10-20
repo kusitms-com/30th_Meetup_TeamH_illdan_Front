@@ -19,9 +19,17 @@ object Endpoints {
         const val DELETE = "$TODO/{todoId}"
         const val MODIFY = "$DELETE/content"
         const val DRAG_DROP = "/dragAndDrop"
+        const val DEADLINE = "$DELETE/deadline"
+        const val BOOKMARK = "$DELETE/bookmark"
+        const val SWIPE = "swipe"
+        const val COMPLETION = "$DELETE/achieve"
     }
 
     object MyPage {
         const val USER_DELETE = "/user"
+    }
+
+    object Today {
+        const val TODAYS = "/todays"
     }
 }
