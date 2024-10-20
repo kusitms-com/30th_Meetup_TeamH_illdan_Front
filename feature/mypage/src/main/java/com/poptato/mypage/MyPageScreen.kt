@@ -51,7 +51,6 @@ import com.poptato.design_system.SettingTitle
 import com.poptato.design_system.Version
 import com.poptato.design_system.VersionSetting
 import com.poptato.mypage.BuildConfig.VERSION_NAME
-import timber.log.Timber
 
 @Composable
 fun MyPageScreen(
@@ -74,7 +73,7 @@ fun MyPageScreen(
         uiState = uiState,
         onClickUserDataBtn = { goToUserDataPage() },
         interactionSource = interactionSource,
-        onClickServiceNotice = { viewModel.showWebView() }
+        onClickServiceNotice = { viewModel.updateWebViewState(true) }
     )
 
     if (uiState.webViewState) {
@@ -82,7 +81,8 @@ fun MyPageScreen(
             webViewState = webViewState,
             webViewClient = webviewClient,
             webChromeClient = webChromeClient,
-            webViewNavigator = webViewNavigator
+            webViewNavigator = webViewNavigator,
+            onClickBackBtn = { viewModel.updateWebViewState(false) }
         )
     }
 }
@@ -92,9 +92,9 @@ fun CreateWebView(
     webViewState: WebViewState,
     webViewClient: AccompanistWebViewClient,
     webChromeClient: AccompanistWebChromeClient,
-    webViewNavigator: WebViewNavigator
+    webViewNavigator: WebViewNavigator,
+    onClickBackBtn: () -> Unit = {}
 ) {
-    Timber.d("[테스트] create web view")
 
     WebView(
         state = webViewState,
@@ -116,7 +116,7 @@ fun CreateWebView(
         if (webViewNavigator.canGoBack) {
             webViewNavigator.navigateBack()
         } else {
-            Timber.d("[테스트] 뒤로가기 안됨")
+            onClickBackBtn()
         }
     }
 }

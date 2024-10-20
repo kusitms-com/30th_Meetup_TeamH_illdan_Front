@@ -41,10 +41,10 @@ class MyPageViewModel @Inject constructor(
         )
     }
 
-    fun showWebView() {
+    fun updateWebViewState(webViewState: Boolean) {
         updateState(
             uiState.value.copy(
-                webViewState = true
+                webViewState = webViewState
             )
         )
     }
