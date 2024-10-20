@@ -162,7 +162,7 @@ fun UserDataBtn() {
             color = Gray00,
             modifier = Modifier
                 .align(Alignment.Center)
-                .padding(vertical = 11.dp)
+                .padding(vertical = 12.dp)
         )
     }
 }
@@ -192,7 +192,7 @@ fun SettingServiceItem(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 16.dp)
+            .wrapContentHeight()
             .padding(start = 24.dp)
             .clickable(
                 indication = null,
@@ -203,7 +203,8 @@ fun SettingServiceItem(
         Text(
             text = title,
             color = color,
-            style = PoptatoTypo.mdMedium
+            style = PoptatoTypo.mdMedium,
+            modifier = Modifier.padding(vertical = 16.dp)
         )
 
         if (isVersion) {
