@@ -45,22 +45,33 @@ import com.poptato.domain.model.response.today.TodoItemModel
 @Composable
 fun TodoBottomSheet(
     item: TodoItemModel = TodoItemModel(),
-    setDeadline: (String) -> Unit = {},
+    setDeadline: (String?) -> Unit = {},
     onClickShowDatePicker: () -> Unit = {},
+    onClickBtnDelete: (Long) -> Unit = {},
+    onClickBtnModify: (Long) -> Unit = {},
+    onClickBtnBookmark: (Long) -> Unit = {}
 ) {
     var deadline by remember { mutableStateOf(item.deadline) }
+    var isBookmark by remember { mutableStateOf(item.isBookmark) }
 
     LaunchedEffect(item) {
         deadline = item.deadline
+        isBookmark = item.isBookmark
     }
 
     TodoBottomSheetContent(
-        item = item.copy(deadline = deadline),
+        item = item.copy(deadline = deadline, isBookmark = isBookmark),
         removeDeadline = {
             deadline = ""
-            setDeadline("")
+            setDeadline(null)
         },
-        onClickShowDatePicker = onClickShowDatePicker
+        onClickShowDatePicker = onClickShowDatePicker,
+        onClickBtnDelete = onClickBtnDelete,
+        onClickBtnModify = onClickBtnModify,
+        onClickBtnBookmark = {
+            onClickBtnBookmark(it)
+            isBookmark = !isBookmark
+        }
     )
 }
 
@@ -68,7 +79,10 @@ fun TodoBottomSheet(
 fun TodoBottomSheetContent(
     item: TodoItemModel = TodoItemModel(),
     removeDeadline: () -> Unit = {},
-    onClickShowDatePicker: () -> Unit = {}
+    onClickShowDatePicker: () -> Unit = {},
+    onClickBtnDelete: (Long) -> Unit = {},
+    onClickBtnModify: (Long) -> Unit = {},
+    onClickBtnBookmark: (Long) -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -83,6 +97,7 @@ fun TodoBottomSheetContent(
                 .padding(top = 24.dp)
                 .padding(horizontal = 24.dp)
         ) {
+
             Text(
                 text = item.content,
                 style = PoptatoTypo.xLMedium,
@@ -97,13 +112,15 @@ fun TodoBottomSheetContent(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_star_filled),
                     contentDescription = "",
-                    tint = Color.Unspecified
+                    tint = Color.Unspecified,
+                    modifier = Modifier.clickable { onClickBtnBookmark(item.todoId) }
                 )
             } else {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_star_empty),
                     contentDescription = "",
-                    tint = Color.Unspecified
+                    tint = Color.Unspecified,
+                    modifier = Modifier.clickable { onClickBtnBookmark(item.todoId) }
                 )
             }
         }
@@ -119,7 +136,8 @@ fun TodoBottomSheetContent(
                 text = modify,
                 buttonColor = Gray95,
                 textColor = Gray40,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                onClickBtn = { onClickBtnModify(item.todoId) }
             )
 
             Spacer(modifier = Modifier.width(16.dp))
@@ -128,7 +146,8 @@ fun TodoBottomSheetContent(
                 text = delete,
                 buttonColor = Gray100,
                 textColor = Danger50,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                onClickBtn = { onClickBtnDelete(item.todoId) }
             )
         }
 
@@ -203,14 +222,16 @@ fun BottomSheetButton(
     text: String = "",
     buttonColor: Color = Color.Unspecified,
     textColor: Color = Color.Unspecified,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClickBtn: () -> Unit = {}
 ) {
     Box(
         modifier = modifier
             .aspectRatio(148f / 40f)
             .clip(RoundedCornerShape(8.dp))
             .border(width = 1.dp, color = Gray95, shape = RoundedCornerShape(8.dp))
-            .background(buttonColor),
+            .background(buttonColor)
+            .clickable { onClickBtn() },
         contentAlignment = Alignment.Center
     ) {
         Text(

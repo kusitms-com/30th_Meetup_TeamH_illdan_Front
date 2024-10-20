@@ -8,5 +8,5 @@ data class TodoItemModel(
     val todoStatus: TodoStatus = TodoStatus.INCOMPLETE,
     val isBookmark: Boolean = false,
     val deadline: String = "",
-    val dDay: Int = -1
+    val dDay: Int? = null
 )
