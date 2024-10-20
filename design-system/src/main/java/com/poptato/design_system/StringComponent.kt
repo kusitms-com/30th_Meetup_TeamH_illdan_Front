@@ -17,6 +17,7 @@ const val Year = "년"
 const val Month = "월"
 const val Day = "일"
 const val BOOKMARK = "중요"
+const val TODO = "할 일"
 
 // KaKaoLogin
 const val BtnKaKaoLoginText = "카카오 로그인"
