@@ -66,6 +66,7 @@ import com.poptato.ui.common.PoptatoCheckBox
 import com.poptato.ui.common.TopBar
 import com.poptato.ui.util.toPx
 import kotlinx.coroutines.flow.filter
+import timber.log.Timber
 
 @Composable
 fun TodayScreen(
@@ -233,6 +234,7 @@ fun TodayTodoItem(
                     .padding(start = 16.dp, end = 18.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                Timber.i("id : ${item.todoId}, status: ${item.todoStatus}")
                 PoptatoCheckBox(
                     isChecked = item.todoStatus == TodoStatus.COMPLETED,
                     onCheckedChange = {
