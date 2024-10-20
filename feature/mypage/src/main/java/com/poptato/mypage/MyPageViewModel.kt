@@ -41,11 +41,17 @@ class MyPageViewModel @Inject constructor(
         )
     }
 
-    fun updateWebViewState(webViewState: Boolean) {
-        updateState(
-            uiState.value.copy(
-                webViewState = webViewState
-            )
-        )
+    fun updateState(state: Boolean, type: String) {
+        when (type) {
+            NOTICE_TYPE -> updateState(uiState.value.copy(noticeWebViewState = state))
+            FAQ_TYPE -> updateState(uiState.value.copy(faqWebViewState = state))
+            POLICY_TYPE -> updateState(uiState.value.copy(policyViewState = state))
+        }
+    }
+
+    companion object {
+        const val NOTICE_TYPE = "NOTICE"
+        const val FAQ_TYPE = "FAQ"
+        const val POLICY_TYPE = "POLICY"
     }
 }

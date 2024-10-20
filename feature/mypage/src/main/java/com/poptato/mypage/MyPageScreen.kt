@@ -23,11 +23,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.github.barteksc.pdfviewer.PDFView
 import com.google.accompanist.web.AccompanistWebChromeClient
 import com.google.accompanist.web.AccompanistWebViewClient
 import com.google.accompanist.web.WebView
@@ -51,6 +54,11 @@ import com.poptato.design_system.SettingTitle
 import com.poptato.design_system.Version
 import com.poptato.design_system.VersionSetting
 import com.poptato.mypage.BuildConfig.VERSION_NAME
+import com.poptato.mypage.MyPageViewModel.Companion.FAQ_TYPE
+import com.poptato.mypage.MyPageViewModel.Companion.NOTICE_TYPE
+import com.poptato.mypage.MyPageViewModel.Companion.POLICY_TYPE
+import timber.log.Timber
+import java.io.File
 
 @Composable
 fun MyPageScreen(
@@ -61,8 +69,12 @@ fun MyPageScreen(
     val uiState: MyPagePageState by viewModel.uiState.collectAsStateWithLifecycle()
     val interactionSource = remember { MutableInteractionSource() }
 
-    val webViewState = rememberWebViewState(
-        url = "https://www.notion.so/11fd60b563cc809aba34ecb769496b08?pvs=4",
+    val noticeWebView = rememberWebViewState(
+        url = "https://mountain-fang-96a.notion.site/124d60b563cc80e894e0d2f3ed82e2d0?pvs=4",
+        additionalHttpHeaders = emptyMap()
+    )
+    val faqWebView = rememberWebViewState(
+        url = "https://mountain-fang-96a.notion.site/FAQ-124d60b563cc801e8650edf2b64a445c?pvs=4",
         additionalHttpHeaders = emptyMap()
     )
     val webviewClient = AccompanistWebViewClient()
@@ -73,51 +85,35 @@ fun MyPageScreen(
         uiState = uiState,
         onClickUserDataBtn = { goToUserDataPage() },
         interactionSource = interactionSource,
-        onClickServiceNotice = { viewModel.updateWebViewState(true) }
+        onClickServiceNotice = { viewModel.updateState(true, NOTICE_TYPE) },
+        onClickServiceFAQ = { viewModel.updateState(true, FAQ_TYPE) },
+        onClickPolicyBtn = { viewModel.updateState(true, POLICY_TYPE) },
     )
 
-    if (uiState.webViewState) {
+    if (uiState.noticeWebViewState) {
         CreateWebView(
-            webViewState = webViewState,
+            webViewState = noticeWebView,
             webViewClient = webviewClient,
             webChromeClient = webChromeClient,
             webViewNavigator = webViewNavigator,
-            onClickBackBtn = { viewModel.updateWebViewState(false) }
+            onClickBackBtn = { viewModel.updateState(false, NOTICE_TYPE) }
         )
     }
-}
+    if (uiState.faqWebViewState) {
+        CreateWebView(
+            webViewState = faqWebView,
+            webViewClient = webviewClient,
+            webChromeClient = webChromeClient,
+            webViewNavigator = webViewNavigator,
+            onClickBackBtn = { viewModel.updateState(false, FAQ_TYPE) }
+        )
+    }
 
-@Composable
-fun CreateWebView(
-    webViewState: WebViewState,
-    webViewClient: AccompanistWebViewClient,
-    webChromeClient: AccompanistWebChromeClient,
-    webViewNavigator: WebViewNavigator,
-    onClickBackBtn: () -> Unit = {}
-) {
-
-    WebView(
-        state = webViewState,
-        navigator = webViewNavigator,
-        client = webViewClient,
-        chromeClient = webChromeClient,
-        onCreated = { webView ->
-            with (webView) {
-                settings.run {
-                    javaScriptEnabled = true
-                    domStorageEnabled = true
-                    javaScriptCanOpenWindowsAutomatically = false
-                }
-            }
-        }
-    )
-
-    BackHandler(enabled = true) {
-        if (webViewNavigator.canGoBack) {
-            webViewNavigator.navigateBack()
-        } else {
-            onClickBackBtn()
-        }
+    if (uiState.policyViewState) {
+        PolicyPDFView(
+            pdfResId = R.raw.policy,
+            onBack = { viewModel.updateState(false, POLICY_TYPE) }
+        )
     }
 }
 
@@ -126,6 +122,8 @@ fun MyPageContent(
     uiState: MyPagePageState = MyPagePageState(),
     onClickUserDataBtn: () -> Unit = {},
     onClickServiceNotice: () -> Unit = {},
+    onClickServiceFAQ: () -> Unit = {},
+    onClickPolicyBtn: () -> Unit = {},
     interactionSource: MutableInteractionSource = MutableInteractionSource()
 ) {
     Column(
@@ -154,11 +152,13 @@ fun MyPageContent(
         )
         SettingServiceItem(
             title = FAQ,
-            interactionSource = interactionSource
+            interactionSource = interactionSource,
+            onClickAction = { onClickServiceFAQ() }
         )
         SettingServiceItem(
             title = Policy,
-            interactionSource = interactionSource
+            interactionSource = interactionSource,
+            onClickAction = { onClickPolicyBtn() }
         )
         SettingServiceItem(
             title = Version,
@@ -283,8 +283,79 @@ fun SettingServiceItem(
     }
 }
 
+@Composable
+fun CreateWebView(
+    webViewState: WebViewState,
+    webViewClient: AccompanistWebViewClient,
+    webChromeClient: AccompanistWebChromeClient,
+    webViewNavigator: WebViewNavigator,
+    onClickBackBtn: () -> Unit = {}
+) {
+
+    Timber.d("[테스트] 웹뷰")
+
+    WebView(
+        state = webViewState,
+        navigator = webViewNavigator,
+        client = webViewClient,
+        chromeClient = webChromeClient,
+        onCreated = { webView ->
+            with (webView) {
+                settings.run {
+                    javaScriptEnabled = true
+                    domStorageEnabled = true
+                    javaScriptCanOpenWindowsAutomatically = false
+                }
+            }
+        }
+    )
+
+    BackHandler(enabled = true) {
+        if (webViewNavigator.canGoBack) {
+            webViewNavigator.navigateBack()
+        } else {
+            onClickBackBtn()
+        }
+    }
+}
+
+@Composable
+fun PolicyPDFView(
+    pdfResId: Int,
+    onBack: () -> Unit = {}
+) {
+    val context = LocalContext.current
+    val pdfFile = remember {
+        val inputStream = context.resources.openRawResource(pdfResId)
+        val outputFile = File(context.cacheDir, "policy_new.pdf")
+        inputStream.use { input ->
+            outputFile.outputStream().use { output ->
+                input.copyTo(output)
+            }
+        }
+        outputFile
+    }
+
+    BackHandler(enabled = true) {
+        onBack()
+    }
+
+    AndroidView(
+        factory = { ctx ->
+            PDFView(ctx, null).apply {
+                fromFile(pdfFile)
+                    .enableSwipe(true)
+                    .swipeHorizontal(false)
+                    .load()
+            }
+        },
+        modifier = Modifier.fillMaxSize()
+    )
+}
+
+
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun PreviewSetting() {
-    MyPageContent()
+//    MyPageContent()
 }
