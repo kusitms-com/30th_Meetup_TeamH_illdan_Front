@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -46,16 +45,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -64,34 +67,41 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.poptato.design_system.BACKLOG_YESTERDAY_TASK_GUIDE
 import com.poptato.design_system.Backlog
 import com.poptato.design_system.BacklogHint
-import com.poptato.design_system.BacklogTitle
+import com.poptato.design_system.Bookmark
 import com.poptato.design_system.CONFIRM_ACTION
+import com.poptato.design_system.DEADLINE
+import com.poptato.design_system.DEADLINE_DDAY
 import com.poptato.design_system.ERROR_CREATE_BACKLOG
 import com.poptato.design_system.EmptyBacklogTitle
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
+import com.poptato.design_system.Gray40
 import com.poptato.design_system.Gray70
 import com.poptato.design_system.Gray80
+import com.poptato.design_system.Gray90
 import com.poptato.design_system.Gray95
 import com.poptato.design_system.PoptatoTypo
-import com.poptato.design_system.Primary10
 import com.poptato.design_system.Primary60
-import com.poptato.design_system.Primary70
+import com.poptato.design_system.Primary80
 import com.poptato.design_system.R
+import com.poptato.domain.model.request.todo.ModifyTodoRequestModel
+import com.poptato.domain.model.request.todo.TodoContentModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.ui.common.TopBar
 import com.poptato.ui.util.DragDropListState
 import com.poptato.ui.util.rememberDragDropListState
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @Composable
 fun BacklogScreen(
     goToYesterdayList: () -> Unit = {},
     showBottomSheet: (TodoItemModel) -> Unit = {},
     todoBottomSheetClosedFlow: SharedFlow<Unit>,
-    updateDeadlineFlow: SharedFlow<String>,
+    updateDeadlineFlow: SharedFlow<String?>,
+    deleteTodoFlow: SharedFlow<Long>,
+    activateItemFlow: SharedFlow<Long>,
+    updateBookmarkFlow: SharedFlow<Long>
 ) {
     val viewModel: BacklogViewModel = hiltViewModel()
     val context = LocalContext.current
@@ -103,17 +113,24 @@ fun BacklogScreen(
             viewModel.moveItem(from, to)
         }
     )
+    var activeItemId by remember { mutableStateOf<Long?>(null) }
 
-    LaunchedEffect(todoBottomSheetClosedFlow) {
-        todoBottomSheetClosedFlow.collect {
-            // TODO: 데이터 갱신 함수 호출
+    LaunchedEffect(activateItemFlow) {
+        activateItemFlow.collect { id ->
+            activeItemId = id
+        }
+    }
+
+    LaunchedEffect(deleteTodoFlow) {
+        deleteTodoFlow.collect {
+            viewModel.deleteBacklog(it)
         }
     }
 
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collect { event ->
             when (event) {
-                is BacklogEvent.OnFailedCreateBacklog -> {
+                is BacklogEvent.OnFailedUpdateBacklogList -> {
                     Toast.makeText(context, ERROR_CREATE_BACKLOG, Toast.LENGTH_SHORT).show()
                 }
             }
@@ -126,18 +143,37 @@ fun BacklogScreen(
         }
     }
 
+    LaunchedEffect(updateBookmarkFlow) {
+        updateBookmarkFlow.collect {
+            viewModel.updateBookmark(it)
+        }
+    }
+
     BacklogContent(
         uiState = uiState,
         onValueChange = { newValue -> viewModel.onValueChange(newValue) },
         createBacklog = { newItem -> viewModel.createBacklog(newItem) },
-        onItemSwiped = { itemToRemove -> viewModel.removeBacklogItem(itemToRemove) },
+        onItemSwiped = { itemToRemove -> viewModel.swipeBacklogItem(itemToRemove) },
         onClickYesterdayList = { goToYesterdayList() },      // TODO 테스트용: "어제 리스트 체크하기" 스낵바 생성 후 변경 예정
         dragDropListState = dragDropListState,
         onClickBtnTodoSettings = {
             showBottomSheet(uiState.backlogList[it])
             viewModel.onSelectedItem(uiState.backlogList[it])
         },
-        interactionSource = interactionSource
+        interactionSource = interactionSource,
+        activeItemId = activeItemId,
+        onClearActiveItem = { activeItemId = null },
+        onTodoItemModified = { id: Long, content: String ->
+            viewModel.modifyTodo(
+                item = ModifyTodoRequestModel(
+                    todoId = id,
+                    content = TodoContentModel(
+                        content = content
+                    )
+                )
+            )
+        },
+        resetNewItemFlag = { viewModel.updateNewItemFlag(false) }
     )
 }
 
@@ -150,7 +186,11 @@ fun BacklogContent(
     onItemSwiped: (TodoItemModel) -> Unit = {},
     dragDropListState: DragDropListState? = null,
     onClickBtnTodoSettings: (Int) -> Unit = {},
-    interactionSource: MutableInteractionSource
+    interactionSource: MutableInteractionSource,
+    activeItemId: Long?,
+    onClearActiveItem: () -> Unit = {},
+    onTodoItemModified: (Long, String) -> Unit = {_,_ ->},
+    resetNewItemFlag: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -199,7 +239,12 @@ fun BacklogContent(
                         taskList = uiState.backlogList,
                         onItemSwiped = onItemSwiped,
                         dragDropListState = dragDropListState!!,
-                        onClickBtnTodoSettings = onClickBtnTodoSettings
+                        onClickBtnTodoSettings = onClickBtnTodoSettings,
+                        activeItemId = activeItemId,
+                        onClearActiveItem = onClearActiveItem,
+                        onTodoItemModified = onTodoItemModified,
+                        isNewItemCreated = uiState.isNewItemCreated,
+                        resetNewItemFlag = resetNewItemFlag
                     )
                 }
             }
@@ -294,9 +339,15 @@ fun BacklogTaskList(
     taskList: List<TodoItemModel> = emptyList(),
     onItemSwiped: (TodoItemModel) -> Unit = {},
     dragDropListState: DragDropListState,
-    onClickBtnTodoSettings: (Int) -> Unit = {}
+    onClickBtnTodoSettings: (Int) -> Unit = {},
+    activeItemId: Long?,
+    onClearActiveItem: () -> Unit = {},
+    onTodoItemModified: (Long, String) -> Unit = {_,_ ->},
+    isNewItemCreated: Boolean = false,
+    resetNewItemFlag: () -> Unit = {}
 ) {
     var draggedItem by remember { mutableStateOf<TodoItemModel?>(null) }
+    var isDragging by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     LazyColumn(
@@ -309,14 +360,17 @@ fun BacklogTaskList(
                         dragDropListState.onDragStart(offset)
                         draggedItem = taskList[dragDropListState.currentIndexOfDraggedItem
                             ?: return@detectDragGesturesAfterLongPress]
+                        isDragging = true
                     },
                     onDragEnd = {
                         dragDropListState.onDragInterrupted()
                         draggedItem = null
+                        isDragging = false
                     },
                     onDragCancel = {
                         dragDropListState.onDragInterrupted()
                         draggedItem = null
+                        isDragging = false
                     },
                     onDrag = { change, offset ->
                         change.consume()
@@ -326,8 +380,10 @@ fun BacklogTaskList(
                             .checkForOverScroll()
                             .takeIf { it != 0f }
                             ?.let {
-                                dragDropListState.overscrollJob =
-                                    scope.launch { dragDropListState.lazyListState.scrollBy(it) }
+                                dragDropListState.overscrollJob = scope.launch {
+                                    val adjustedScroll = it * 0.5f
+                                    dragDropListState.lazyListState.scrollBy(adjustedScroll)
+                                }
                             } ?: run { dragDropListState.overscrollJob?.cancel() }
                     }
                 )
@@ -337,6 +393,7 @@ fun BacklogTaskList(
         itemsIndexed(taskList, key = { _, item -> item.todoId }) { index, item ->
             var offsetX by remember { mutableFloatStateOf(0f) }
             val isDragged = index == dragDropListState.currentIndexOfDraggedItem
+            val isActive = activeItemId == item.todoId
 
             Box(
                 modifier = Modifier
@@ -366,12 +423,18 @@ fun BacklogTaskList(
                             }
                         )
                     }
-                    .animateItem(
-                        fadeInSpec = null,
-                        fadeOutSpec = null
+                    .then(
+                        if (!isDragging) {
+                            Modifier.animateItem(
+                                fadeInSpec = null,
+                                fadeOutSpec = null
+                            )
+                        } else {
+                            Modifier
+                        }
                     )
                     .border(
-                        if (isDragged) BorderStroke(2.dp, Color.White) else BorderStroke(
+                        if (isDragged) BorderStroke(1.dp, Color.White) else BorderStroke(
                             0.dp,
                             Color.Transparent
                         ),
@@ -386,17 +449,23 @@ fun BacklogTaskList(
                     BacklogItem(
                         item = item,
                         index = index,
-                        onClickBtnTodoSettings = onClickBtnTodoSettings
+                        isActive = isActive,
+                        onClickBtnTodoSettings = onClickBtnTodoSettings,
+                        onClearActiveItem = onClearActiveItem,
+                        onTodoItemModified = onTodoItemModified
                     )
                 }
             }
             Spacer(modifier = Modifier.height(12.dp))
         }
+
+        item { Spacer(modifier = Modifier.height(45.dp)) }
     }
 
-    LaunchedEffect(taskList.size) {
-        if (dragDropListState.lazyListState.firstVisibleItemIndex != 0) {
+    LaunchedEffect(taskList.size, isDragging) {
+        if (dragDropListState.lazyListState.firstVisibleItemIndex != 0 && !isDragging && isNewItemCreated) {
             dragDropListState.lazyListState.scrollToItem(0)
+            resetNewItemFlag()
         }
     }
 }
@@ -405,24 +474,95 @@ fun BacklogTaskList(
 fun BacklogItem(
     item: TodoItemModel,
     index: Int = -1,
-    onClickBtnTodoSettings: (Int) -> Unit = {}
+    isActive: Boolean = false,
+    onClickBtnTodoSettings: (Int) -> Unit = {},
+    onClearActiveItem: () -> Unit = {},
+    onTodoItemModified: (Long, String) -> Unit = {_,_ ->}
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
-            .background(Gray95)
+            .background(if (item.isBookmark) Bookmark else Gray95)
             .padding(vertical = 16.dp)
             .padding(start = 16.dp, end = 18.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = item.content,
-            color = Gray00,
-            style = PoptatoTypo.mdRegular,
-            modifier = Modifier
-                .weight(1f)
-        )
+        val focusRequester = remember { FocusRequester() }
+        val keyboardController = LocalSoftwareKeyboardController.current
+        var textFieldValue by remember {
+            mutableStateOf(
+                TextFieldValue(
+                    text = item.content,
+                    selection = TextRange(item.content.length)
+                )
+            )
+        }
+
+        if (isActive) {
+
+            LaunchedEffect(Unit) {
+                focusRequester.requestFocus()
+            }
+
+            BasicTextField(
+                value = textFieldValue,
+                onValueChange = { newTextFieldValue ->
+                    textFieldValue = newTextFieldValue
+                },
+                textStyle = PoptatoTypo.mdRegular.copy(color = Gray00),
+                modifier = Modifier
+                    .weight(1f)
+                    .focusRequester(focusRequester)
+                    .onFocusChanged { focusState ->
+                        if (focusState.isFocused) {
+                            textFieldValue = textFieldValue.copy(
+                                selection = TextRange(textFieldValue.text.length)
+                            )
+                        }
+                    },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        keyboardController?.hide()
+                        onClearActiveItem()
+                        if (item.content != textFieldValue.text) onTodoItemModified(item.todoId, textFieldValue.text)
+                    }
+                ),
+                cursorBrush = SolidColor(Gray00)
+            )
+        } else {
+            Row(
+                modifier = Modifier.weight(1f),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = item.content,
+                    style = PoptatoTypo.mdRegular,
+                    color = Gray00
+                )
+
+                if (item.dDay != null) {
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(if (item.isBookmark) Primary80 else Gray90)
+                            .padding(vertical = 1.dp, horizontal = 6.dp)
+                    ) {
+                        Text(
+                            text = if (item.dDay == 0) DEADLINE_DDAY else String.format(DEADLINE, item.dDay),
+                            style = PoptatoTypo.xsMedium,
+                            color = if (item.isBookmark) Gray00 else Gray40
+                        )
+                    }
+                }
+            }
+        }
 
         Spacer(modifier = Modifier.width(8.dp))
 

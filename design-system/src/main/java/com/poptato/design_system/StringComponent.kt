@@ -16,6 +16,7 @@ const val Complete = "완료"
 const val Year = "년"
 const val Month = "월"
 const val Day = "일"
+const val BOOKMARK = "중요"
 
 // KaKaoLogin
 const val BtnKaKaoLoginText = "카카오 로그인"
@@ -71,3 +72,5 @@ const val ERROR_CREATE_BACKLOG = "에러가 발생하였습니다"
 
 // Etc
 const val FINISH_APP_GUIDE = "뒤로가기를 한 번 더 누르면 종료돼요."
+const val DEADLINE = "D-%s"
+const val DEADLINE_DDAY = "D-day"
