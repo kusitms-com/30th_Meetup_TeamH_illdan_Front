@@ -8,9 +8,11 @@ import com.poptato.backlog.BacklogScreen
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.login.KaKaoLoginScreen
 import com.poptato.mypage.MyPageScreen
-import com.poptato.setting.SettingScreen
-import com.poptato.setting.editdata.EditUserDataScreen
+import com.poptato.mypage.viewer.NoticeViewerScreen
+import com.poptato.mypage.viewer.FAQViewerScreen
+import com.poptato.mypage.viewer.PolicyViewerScreen
 import com.poptato.setting.servicedelete.ServiceDeleteScreen
+import com.poptato.setting.userdata.UserDataScreen
 import com.poptato.splash.SplashScreen
 import com.poptato.today.TodayScreen
 import com.poptato.yesterdaylist.YesterdayListScreen
@@ -114,16 +116,34 @@ fun NavGraphBuilder.myPageNavGraph(navController: NavHostController) {
     ) {
         composable(NavRoutes.MyPageScreen.route) {
             MyPageScreen(
-                goToSettingPage = { navController.navigate(NavRoutes.SettingScreen.route) }
+                goToUserDataPage = { navController.navigate(NavRoutes.UserDataScreen.route) },
+                goToNoticeViewerPage = { navController.navigate(NavRoutes.NoticeViewScreen.route) },
+                goToFAQViewerPage = { navController.navigate(NavRoutes.FAQViewScreen.route) },
+                goToPolicyViewerPage = { navController.navigate(NavRoutes.PolicyViewScreen.route) }
             )
         }
 
-        composable(NavRoutes.SettingScreen.route) {
-            SettingScreen(
-                goBackToMyPage = { navController.popBackStack() },
-                goToEditUserData = { navController.navigate(NavRoutes.EditUserDataScreen.route) },
-                goToServiceDelete = { navController.navigate(NavRoutes.ServiceDeleteScreen.route) },
-                goBackToLogIn = { navController.navigate(NavRoutes.KaKaoLoginScreen.route) }
+        composable(NavRoutes.NoticeViewScreen.route) {
+            NoticeViewerScreen(
+                goBackToMyPage = { navController.navigate(NavRoutes.MyPageScreen.route) {
+                    popUpTo(NavRoutes.MyPageScreen.route) { inclusive = true }
+                } }
+            )
+        }
+
+        composable(NavRoutes.FAQViewScreen.route) {
+            FAQViewerScreen(
+                goBackToMyPage = { navController.navigate(NavRoutes.MyPageScreen.route) {
+                    popUpTo(NavRoutes.MyPageScreen.route) { inclusive = true }
+                } }
+            )
+        }
+
+        composable(NavRoutes.PolicyViewScreen.route) {
+            PolicyViewerScreen(
+                goBackToMyPage = { navController.navigate(NavRoutes.MyPageScreen.route) {
+                    popUpTo(NavRoutes.MyPageScreen.route) { inclusive = true }
+                } }
             )
         }
 
@@ -134,9 +154,11 @@ fun NavGraphBuilder.myPageNavGraph(navController: NavHostController) {
             )
         }
 
-        composable(NavRoutes.EditUserDataScreen.route) {
-            EditUserDataScreen(
-                goBackToSetting = { navController.popBackStack() },
+        composable(NavRoutes.UserDataScreen.route) {
+            UserDataScreen(
+                goBackToMyPage = { navController.popBackStack() },
+                goBackToLogIn = { navController.navigate(NavRoutes.KaKaoLoginScreen.route) },
+                goToServiceDelete = { navController.navigate(NavRoutes.ServiceDeleteScreen.route) },
             )
         }
     }
