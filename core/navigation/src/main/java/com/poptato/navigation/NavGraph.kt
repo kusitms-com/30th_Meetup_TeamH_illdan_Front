@@ -136,6 +136,7 @@ fun NavGraphBuilder.myPageNavGraph(navController: NavHostController) {
         composable(NavRoutes.UserDataScreen.route) {
             UserDataScreen(
                 goBackToMyPage = { navController.popBackStack() },
+                goBackToLogIn = { navController.navigate(NavRoutes.KaKaoLoginScreen.route) }
             )
         }
     }

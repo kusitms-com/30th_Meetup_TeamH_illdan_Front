@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -32,34 +33,44 @@ import com.poptato.design_system.Danger40
 import com.poptato.design_system.Danger50
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
-import com.poptato.design_system.Gray20
 import com.poptato.design_system.Gray40
 import com.poptato.design_system.Gray70
 import com.poptato.design_system.LogOut
 import com.poptato.design_system.PoptatoTypo
-import com.poptato.design_system.Primary60
 import com.poptato.design_system.ProfileDetail
 import com.poptato.design_system.R
 import com.poptato.design_system.UserDataEmail
 import com.poptato.design_system.UserDataName
-import com.poptato.design_system.UserDeleteBtn
-import com.poptato.design_system.VersionSetting
-import com.poptato.setting.BuildConfig.VERSION_NAME
 import com.poptato.design_system.UserDelete
+import com.poptato.setting.logout.LogOutDialog
+import com.poptato.setting.logout.LogOutDialogState
 
 @Composable
 fun UserDataScreen(
     goBackToMyPage: () -> Unit = {},
+    goBackToLogIn: () -> Unit = {}
 ) {
 
     val viewModel: UserDataViewModel = hiltViewModel()
     val uiState: UserDataPageState by viewModel.uiState.collectAsStateWithLifecycle()
     val interactionSource = remember { MutableInteractionSource() }
+    val logOutDialogState = viewModel.logOutDialogState.value
+
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collect { event ->
+            when (event) {
+                is UserDataEvent.GoBackToLogIn -> {
+                    goBackToLogIn()
+                }
+            }
+        }
+    }
 
     EditUserDataContent(
         uiState = uiState,
+        logOutDialogState = logOutDialogState,
         onClickBackBtn = { goBackToMyPage() },
-        onValueChange = { newValue -> viewModel.onValueChange(newValue) },
+        onClickLogOutBtn = { viewModel.showLogOutDialog() },
         interactionSource = interactionSource
     )
 }
@@ -67,8 +78,9 @@ fun UserDataScreen(
 @Composable
 fun EditUserDataContent(
     uiState: UserDataPageState = UserDataPageState(),
+    logOutDialogState: LogOutDialogState,
     onClickBackBtn: () -> Unit = {},
-    onValueChange: (String) -> Unit = {},
+    onClickLogOutBtn: () -> Unit = {},
     interactionSource: MutableInteractionSource = MutableInteractionSource()
 ) {
     Column(
@@ -78,14 +90,17 @@ fun EditUserDataContent(
     ) {
 
         SettingTitle(
-            onClickBackBtn = onClickBackBtn
+            onClickBackBtn = onClickBackBtn,
+            interactionSource = interactionSource
         )
 
         MyData(
             uiState = uiState
         )
 
-        LogOutBtn()
+        LogOutBtn(
+            onClickLogOutBtn = onClickLogOutBtn
+        )
 
         UserDataDetailContent(
             UserDataName, "내용"
@@ -99,11 +114,20 @@ fun EditUserDataContent(
             interactionSource = interactionSource
         )
     }
+
+    if (logOutDialogState.isShowDialog) {
+        LogOutDialog(
+            onDismiss = logOutDialogState.onDismissRequest,
+            onClickBack = logOutDialogState.onClickBackBtn,
+            onClickLogOut = logOutDialogState.onClickLogOutBtn
+        )
+    }
 }
 
 @Composable
 fun SettingTitle(
     onClickBackBtn: () -> Unit = {},
+    interactionSource: MutableInteractionSource
 ) {
     Box(
         modifier = Modifier
@@ -118,7 +142,11 @@ fun SettingTitle(
             modifier = Modifier
                 .align(Alignment.CenterStart)
                 .size(width = 24.dp, height = 24.dp)
-                .clickable { onClickBackBtn() }
+                .clickable(
+                    indication = null,
+                    interactionSource = interactionSource,
+                    onClick = { onClickBackBtn() }
+                )
         )
 
         Text(
@@ -170,7 +198,9 @@ fun MyData(
 }
 
 @Composable
-fun LogOutBtn() {
+fun LogOutBtn(
+    onClickLogOutBtn: () -> Unit = {}
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -178,6 +208,7 @@ fun LogOutBtn() {
             .clip(RoundedCornerShape(8.dp))
             .background(Danger50.copy(alpha = 0.1f))
             .wrapContentHeight()
+            .clickable { onClickLogOutBtn() }
     ) {
         Text(
             text = LogOut,
@@ -213,7 +244,9 @@ fun UserDataDetailContent(
             text = content,
             color = Gray00,
             style = PoptatoTypo.mdMedium,
-            modifier = Modifier.padding(horizontal = 8.dp).padding(top = 2.dp)
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .padding(top = 2.dp)
         )
     }
 }
@@ -247,5 +280,5 @@ fun UserDelete(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun PreviewSetting() {
-    EditUserDataContent()
+    EditUserDataContent(logOutDialogState = LogOutDialogState())
 }
