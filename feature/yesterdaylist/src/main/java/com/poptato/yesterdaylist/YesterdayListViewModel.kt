@@ -63,6 +63,18 @@ class YesterdayListViewModel @Inject constructor(
             uiState.value.copy(yesterdayList = updatedList)
         )
 
+        updateTodoApi(id)
+    }
+
+    fun onCheckAllTodoList() {
+        val yesterdayList = uiState.value.yesterdayList
+
+        yesterdayList.forEach { item ->
+            updateTodoApi(item.todoId)
+        }
+    }
+
+    private fun updateTodoApi(id: Long) {
         viewModelScope.launch {
             updateTodoCompletionUseCase(id).collect {
                 resultResponse(it, {
