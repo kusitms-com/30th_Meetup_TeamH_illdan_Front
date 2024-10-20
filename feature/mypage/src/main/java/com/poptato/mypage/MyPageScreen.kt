@@ -63,7 +63,8 @@ import java.io.File
 @Composable
 fun MyPageScreen(
     goToUserDataPage: () -> Unit = {},
-    goToViewerPage: () -> Unit = {}
+    goToNoticeViewerPage: () -> Unit = {},
+    goToFAQViewerPage: () -> Unit = {}
 ) {
 
     val viewModel: MyPageViewModel = hiltViewModel()
@@ -92,17 +93,11 @@ fun MyPageScreen(
     )
 
     if (uiState.noticeWebViewState) {
-        goToViewerPage()
+        goToNoticeViewerPage()
     }
 
     if (uiState.faqWebViewState) {
-        CreateWebView(
-            webViewState = faqWebView,
-            webViewClient = webviewClient,
-            webChromeClient = webChromeClient,
-            webViewNavigator = webViewNavigator,
-            onClickBackBtn = { viewModel.updateState(false, FAQ_TYPE) }
-        )
+        goToFAQViewerPage()
     }
 
     if (uiState.policyViewState) {

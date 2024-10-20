@@ -24,7 +24,8 @@ sealed class NavRoutes(val route: String) {
     data object SettingScreen: NavRoutes("setting")
     data object ServiceDeleteScreen: NavRoutes("service_delete")
     data object UserDataScreen: NavRoutes("user_data")
-    data object NoticeViewScreen: NavRoutes("viewer")
+    data object NoticeViewScreen: NavRoutes("notice_viewer")
+    data object FAQViewScreen: NavRoutes("faq_viewer")
 
     // Today Graph
     data object TodayGraph: NavRoutes("today_graph")

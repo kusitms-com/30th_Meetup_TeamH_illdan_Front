@@ -9,6 +9,7 @@ import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.login.KaKaoLoginScreen
 import com.poptato.mypage.MyPageScreen
 import com.poptato.mypage.NoticeViewerScreen
+import com.poptato.mypage.viewer.FAQViewerScreen
 import com.poptato.setting.servicedelete.ServiceDeleteScreen
 import com.poptato.setting.userdata.UserDataScreen
 import com.poptato.splash.SplashScreen
@@ -115,12 +116,21 @@ fun NavGraphBuilder.myPageNavGraph(navController: NavHostController) {
         composable(NavRoutes.MyPageScreen.route) {
             MyPageScreen(
                 goToUserDataPage = { navController.navigate(NavRoutes.UserDataScreen.route) },
-                goToViewerPage = { navController.navigate(NavRoutes.NoticeViewScreen.route) }
+                goToNoticeViewerPage = { navController.navigate(NavRoutes.NoticeViewScreen.route) },
+                goToFAQViewerPage = { navController.navigate(NavRoutes.FAQViewScreen.route) }
             )
         }
 
         composable(NavRoutes.NoticeViewScreen.route) {
             NoticeViewerScreen(
+                goBackToMyPage = { navController.navigate(NavRoutes.MyPageScreen.route) {
+                    popUpTo(NavRoutes.MyPageScreen.route) { inclusive = true }
+                } }
+            )
+        }
+
+        composable(NavRoutes.FAQViewScreen.route) {
+            FAQViewerScreen(
                 goBackToMyPage = { navController.navigate(NavRoutes.MyPageScreen.route) {
                     popUpTo(NavRoutes.MyPageScreen.route) { inclusive = true }
                 } }
