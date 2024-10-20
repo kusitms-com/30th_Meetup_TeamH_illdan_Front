@@ -10,6 +10,7 @@ import com.poptato.login.KaKaoLoginScreen
 import com.poptato.mypage.MyPageScreen
 import com.poptato.mypage.viewer.NoticeViewerScreen
 import com.poptato.mypage.viewer.FAQViewerScreen
+import com.poptato.mypage.viewer.PolicyViewerScreen
 import com.poptato.setting.servicedelete.ServiceDeleteScreen
 import com.poptato.setting.userdata.UserDataScreen
 import com.poptato.splash.SplashScreen
@@ -117,7 +118,8 @@ fun NavGraphBuilder.myPageNavGraph(navController: NavHostController) {
             MyPageScreen(
                 goToUserDataPage = { navController.navigate(NavRoutes.UserDataScreen.route) },
                 goToNoticeViewerPage = { navController.navigate(NavRoutes.NoticeViewScreen.route) },
-                goToFAQViewerPage = { navController.navigate(NavRoutes.FAQViewScreen.route) }
+                goToFAQViewerPage = { navController.navigate(NavRoutes.FAQViewScreen.route) },
+                goToPolicyViewerPage = { navController.navigate(NavRoutes.PolicyViewScreen.route) }
             )
         }
 
@@ -131,6 +133,14 @@ fun NavGraphBuilder.myPageNavGraph(navController: NavHostController) {
 
         composable(NavRoutes.FAQViewScreen.route) {
             FAQViewerScreen(
+                goBackToMyPage = { navController.navigate(NavRoutes.MyPageScreen.route) {
+                    popUpTo(NavRoutes.MyPageScreen.route) { inclusive = true }
+                } }
+            )
+        }
+
+        composable(NavRoutes.PolicyViewScreen.route) {
+            PolicyViewerScreen(
                 goBackToMyPage = { navController.navigate(NavRoutes.MyPageScreen.route) {
                     popUpTo(NavRoutes.MyPageScreen.route) { inclusive = true }
                 } }

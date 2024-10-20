@@ -1,6 +1,5 @@
 package com.poptato.mypage
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,21 +22,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.github.barteksc.pdfviewer.PDFView
-import com.google.accompanist.web.AccompanistWebChromeClient
-import com.google.accompanist.web.AccompanistWebViewClient
-import com.google.accompanist.web.WebView
-import com.google.accompanist.web.WebViewNavigator
-import com.google.accompanist.web.WebViewState
-import com.google.accompanist.web.rememberWebViewNavigator
-import com.google.accompanist.web.rememberWebViewState
 import com.poptato.design_system.FAQ
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
@@ -57,14 +46,13 @@ import com.poptato.mypage.BuildConfig.VERSION_NAME
 import com.poptato.mypage.MyPageViewModel.Companion.FAQ_TYPE
 import com.poptato.mypage.MyPageViewModel.Companion.NOTICE_TYPE
 import com.poptato.mypage.MyPageViewModel.Companion.POLICY_TYPE
-import timber.log.Timber
-import java.io.File
 
 @Composable
 fun MyPageScreen(
     goToUserDataPage: () -> Unit = {},
     goToNoticeViewerPage: () -> Unit = {},
-    goToFAQViewerPage: () -> Unit = {}
+    goToFAQViewerPage: () -> Unit = {},
+    goToPolicyViewerPage: () -> Unit = {}
 ) {
 
     val viewModel: MyPageViewModel = hiltViewModel()
@@ -89,10 +77,7 @@ fun MyPageScreen(
     }
 
     if (uiState.policyViewState) {
-        PolicyPDFView(
-            pdfResId = R.raw.policy,
-            onBack = { viewModel.updateState(false, POLICY_TYPE) }
-        )
+        goToPolicyViewerPage()
     }
 }
 
@@ -262,43 +247,8 @@ fun SettingServiceItem(
     }
 }
 
-@Composable
-fun PolicyPDFView(
-    pdfResId: Int,
-    onBack: () -> Unit = {}
-) {
-    val context = LocalContext.current
-    val pdfFile = remember {
-        val inputStream = context.resources.openRawResource(pdfResId)
-        val outputFile = File(context.cacheDir, "policy_new.pdf")
-        inputStream.use { input ->
-            outputFile.outputStream().use { output ->
-                input.copyTo(output)
-            }
-        }
-        outputFile
-    }
-
-    BackHandler(enabled = true) {
-        onBack()
-    }
-
-    AndroidView(
-        factory = { ctx ->
-            PDFView(ctx, null).apply {
-                fromFile(pdfFile)
-                    .enableSwipe(true)
-                    .swipeHorizontal(false)
-                    .load()
-            }
-        },
-        modifier = Modifier.fillMaxSize()
-    )
-}
-
-
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun PreviewSetting() {
-//    MyPageContent()
+    MyPageContent()
 }
