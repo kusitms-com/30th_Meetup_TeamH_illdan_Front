@@ -45,6 +45,7 @@ coil = "2.7.0"
 kotlin-serialization-converter = "0.8.0"
 kakao-auth = "2.20.1"
 web-view = "0.24.13-rc"
+pdf-viewer = "master-SNAPSHOT"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -141,6 +142,9 @@ kakao-auth = { module = "com.kakao.sdk:v2-user", version.ref = "kakao-auth" }
 
 # WebView
 web-view = { module = "com.google.accompanist:accompanist-webview", version.ref = "web-view" }
+
+# pdf viewer
+pdf-viewer = { module = "com.github.barteksc:AndroidPdfViewer", version.ref = "pdf-viewer" }
 
 [bundles]
 compose = [

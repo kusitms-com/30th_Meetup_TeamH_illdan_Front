@@ -19,4 +19,7 @@ dependencies {
 
     // 웹뷰
     implementation(libs.web.view)
+
+    // pdf viewer
+    implementation(libs.pdf.viewer)
 }
