@@ -5,6 +5,7 @@ import com.poptato.data.service.BacklogService
 import com.poptato.data.service.HistoryService
 import com.poptato.data.service.TodoService
 import com.poptato.data.service.MyPageService
+import com.poptato.data.service.YesterdayService
 import com.poptato.data.service.TodayService
 import dagger.Module
 import dagger.Provides
@@ -24,6 +25,11 @@ object ServiceModule {
     @Provides
     fun provideBacklogService(retrofit: Retrofit): BacklogService {
         return retrofit.create(BacklogService::class.java)
+    }
+
+    @Provides
+    fun provideYesterdayService(retrofit: Retrofit): YesterdayService {
+        return retrofit.create(YesterdayService::class.java)
     }
 
     @Provides
