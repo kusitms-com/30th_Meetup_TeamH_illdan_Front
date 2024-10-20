@@ -1,4 +1,4 @@
-package com.poptato.mypage
+package com.poptato.setting.editdata
 
 import androidx.lifecycle.viewModelScope
 import com.poptato.domain.model.response.mypage.UserDataModel
@@ -10,10 +10,10 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
-class MyPageViewModel @Inject constructor(
+class EditUserDataViewModel @Inject constructor(
     private val getUserDataUseCase: GetUserDataUseCase
-) : BaseViewModel<MyPagePageState>(
-    MyPagePageState()
+) : BaseViewModel<EditUserDataPageState>(
+    EditUserDataPageState()
 ) {
 
     init {
@@ -23,21 +23,25 @@ class MyPageViewModel @Inject constructor(
     private fun getUserData() {
         viewModelScope.launch {
             getUserDataUseCase(request = Unit).collect {
-                resultResponse(it, { data ->
-                    setMappingToUserData(data)
-                    Timber.d("[마이페이지] 유저 정보 서버통신 성공 -> $data")
-                }, { error ->
-                    Timber.d("[마이페이지] 유저 정보 서버통신 실패 -> $error")
-                })
+                resultResponse(it, ::setMappingToUserName)
             }
         }
     }
 
-    private fun setMappingToUserData(response: UserDataModel) {
+    private fun setMappingToUserName(response: UserDataModel) {
         updateState(
             uiState.value.copy(
-                userDataModel = response
+                name = response.name
             )
         )
+    }
+
+    fun onValueChange(newValue: String) {
+        updateState(
+            uiState.value.copy(
+                name = newValue
+            )
+        )
+        Timber.d("[테스트] 닉네입 편집 -> ${uiState.value.name}")
     }
 }

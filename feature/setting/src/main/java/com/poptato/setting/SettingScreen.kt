@@ -48,6 +48,7 @@ import com.poptato.setting.logout.LogOutDialogState
 @Composable
 fun SettingScreen(
     goBackToMyPage: () -> Unit = {},
+    goToEditUserData: () -> Unit = {},
     goToServiceDelete: () -> Unit = {},
     goBackToLogIn: () -> Unit = {}
 ) {
@@ -70,6 +71,7 @@ fun SettingScreen(
     SettingContent(
         logOutDialogState = logOutDialogState,
         onClickCloseBtn = { goBackToMyPage() },
+        onClickEditUserDataBtn = { goToEditUserData() },
         onClickServiceDeleteBtn = { goToServiceDelete() },
         onClickLogOutBtn = { viewModel.showLogOutDialog() },
         interactionSource = interactionSource
@@ -80,6 +82,7 @@ fun SettingScreen(
 fun SettingContent(
     logOutDialogState: LogOutDialogState,
     onClickCloseBtn: () -> Unit = {},
+    onClickEditUserDataBtn: () -> Unit = {},
     onClickServiceDeleteBtn: () -> Unit = {},
     onClickLogOutBtn: () -> Unit = {},
     interactionSource: MutableInteractionSource = MutableInteractionSource()
@@ -99,6 +102,7 @@ fun SettingContent(
         )
         SettingServiceItem(
             title = EditProfile,
+            onClickAction = onClickEditUserDataBtn,
             interactionSource = interactionSource
         )
         SettingServiceItem(

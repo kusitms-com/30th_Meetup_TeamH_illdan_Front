@@ -14,6 +14,14 @@ object Endpoints {
         const val BACKLOGS = "/backlogs"
     }
 
+    object Yesterday {
+        const val YESTERDAY = "/yesterdays"
+    }
+
+    object History {
+        const val HISTORIES = "/histories"
+    }
+
     object Todo {
         private const val TODO = "/todo"
         const val DELETE = "$TODO/{todoId}"
@@ -26,7 +34,9 @@ object Endpoints {
     }
 
     object MyPage {
-        const val USER_DELETE = "/user"
+        private const val USER = "/user"
+        const val USER_DELETE = USER
+        const val USER_DATA = "$USER/mypage"
     }
 
     object Today {
