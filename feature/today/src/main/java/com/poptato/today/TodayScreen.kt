@@ -105,7 +105,8 @@ fun TodayContent(
             titleTextColor = Gray00,
             subText = TodayTopBarSub,
             subTextStyle = PoptatoTypo.mdMedium,
-            subTextColor = Gray40
+            subTextColor = Gray40,
+            isTodayTopBar = true
         )
 
         Spacer(modifier = Modifier.height(8.dp))
