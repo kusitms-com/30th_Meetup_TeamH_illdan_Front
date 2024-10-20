@@ -34,8 +34,9 @@ object Endpoints {
     }
 
     object MyPage {
-        const val USER_DELETE = "/user"
-
+        private const val USER = "/user"
+        const val USER_DELETE = USER
+        const val USER_DATA = "$USER/mypage"
     }
 
     object Today {
