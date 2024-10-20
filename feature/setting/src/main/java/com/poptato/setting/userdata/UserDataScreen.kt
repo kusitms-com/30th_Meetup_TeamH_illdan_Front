@@ -48,7 +48,8 @@ import com.poptato.setting.logout.LogOutDialogState
 @Composable
 fun UserDataScreen(
     goBackToMyPage: () -> Unit = {},
-    goBackToLogIn: () -> Unit = {}
+    goBackToLogIn: () -> Unit = {},
+    goToServiceDelete: () -> Unit = {},
 ) {
 
     val viewModel: UserDataViewModel = hiltViewModel()
@@ -71,6 +72,7 @@ fun UserDataScreen(
         logOutDialogState = logOutDialogState,
         onClickBackBtn = { goBackToMyPage() },
         onClickLogOutBtn = { viewModel.showLogOutDialog() },
+        onClickServiceDeleteBtn = { goToServiceDelete() },
         interactionSource = interactionSource
     )
 }
@@ -81,6 +83,7 @@ fun EditUserDataContent(
     logOutDialogState: LogOutDialogState,
     onClickBackBtn: () -> Unit = {},
     onClickLogOutBtn: () -> Unit = {},
+    onClickServiceDeleteBtn: () -> Unit = {},
     interactionSource: MutableInteractionSource = MutableInteractionSource()
 ) {
     Column(
@@ -111,7 +114,8 @@ fun EditUserDataContent(
         )
 
         UserDelete(
-            interactionSource = interactionSource
+            interactionSource = interactionSource,
+            onClickAction = onClickServiceDeleteBtn
         )
     }
 
