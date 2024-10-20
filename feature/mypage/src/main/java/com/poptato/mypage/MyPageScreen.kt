@@ -1,5 +1,6 @@
 package com.poptato.mypage
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -9,13 +10,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,12 +23,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.accompanist.web.AccompanistWebChromeClient
+import com.google.accompanist.web.AccompanistWebViewClient
+import com.google.accompanist.web.WebView
+import com.google.accompanist.web.WebViewNavigator
+import com.google.accompanist.web.WebViewState
+import com.google.accompanist.web.rememberWebViewNavigator
+import com.google.accompanist.web.rememberWebViewState
 import com.poptato.design_system.FAQ
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
@@ -41,13 +46,12 @@ import com.poptato.design_system.Policy
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.Primary60
 import com.poptato.design_system.ProfileDetail
-import com.poptato.design_system.ProfileTitle
 import com.poptato.design_system.R
-import com.poptato.design_system.ServiceTitle
 import com.poptato.design_system.SettingTitle
 import com.poptato.design_system.Version
 import com.poptato.design_system.VersionSetting
 import com.poptato.mypage.BuildConfig.VERSION_NAME
+import timber.log.Timber
 
 @Composable
 fun MyPageScreen(
@@ -58,17 +62,70 @@ fun MyPageScreen(
     val uiState: MyPagePageState by viewModel.uiState.collectAsStateWithLifecycle()
     val interactionSource = remember { MutableInteractionSource() }
 
+    val webViewState = rememberWebViewState(
+        url = "https://www.notion.so/11fd60b563cc809aba34ecb769496b08?pvs=4",
+        additionalHttpHeaders = emptyMap()
+    )
+    val webviewClient = AccompanistWebViewClient()
+    val webChromeClient = AccompanistWebChromeClient()
+    val webViewNavigator = rememberWebViewNavigator()
+
     MyPageContent(
         uiState = uiState,
         onClickUserDataBtn = { goToUserDataPage() },
-        interactionSource = interactionSource
+        interactionSource = interactionSource,
+        onClickServiceNotice = { viewModel.showWebView() }
     )
+
+    if (uiState.webViewState) {
+        CreateWebView(
+            webViewState = webViewState,
+            webViewClient = webviewClient,
+            webChromeClient = webChromeClient,
+            webViewNavigator = webViewNavigator
+        )
+    }
+}
+
+@Composable
+fun CreateWebView(
+    webViewState: WebViewState,
+    webViewClient: AccompanistWebViewClient,
+    webChromeClient: AccompanistWebChromeClient,
+    webViewNavigator: WebViewNavigator
+) {
+    Timber.d("[테스트] create web view")
+
+    WebView(
+        state = webViewState,
+        navigator = webViewNavigator,
+        client = webViewClient,
+        chromeClient = webChromeClient,
+        onCreated = { webView ->
+            with (webView) {
+                settings.run {
+                    javaScriptEnabled = true
+                    domStorageEnabled = true
+                    javaScriptCanOpenWindowsAutomatically = false
+                }
+            }
+        }
+    )
+
+    BackHandler(enabled = true) {
+        if (webViewNavigator.canGoBack) {
+            webViewNavigator.navigateBack()
+        } else {
+            Timber.d("[테스트] 뒤로가기 안됨")
+        }
+    }
 }
 
 @Composable
 fun MyPageContent(
     uiState: MyPagePageState = MyPagePageState(),
     onClickUserDataBtn: () -> Unit = {},
+    onClickServiceNotice: () -> Unit = {},
     interactionSource: MutableInteractionSource = MutableInteractionSource()
 ) {
     Column(
@@ -92,7 +149,8 @@ fun MyPageContent(
 
         SettingServiceItem(
             title = Notice,
-            interactionSource = interactionSource
+            interactionSource = interactionSource,
+            onClickAction = { onClickServiceNotice() }
         )
         SettingServiceItem(
             title = FAQ,

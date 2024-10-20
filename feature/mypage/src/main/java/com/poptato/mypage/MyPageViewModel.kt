@@ -40,4 +40,12 @@ class MyPageViewModel @Inject constructor(
             )
         )
     }
+
+    fun showWebView() {
+        updateState(
+            uiState.value.copy(
+                webViewState = true
+            )
+        )
+    }
 }
