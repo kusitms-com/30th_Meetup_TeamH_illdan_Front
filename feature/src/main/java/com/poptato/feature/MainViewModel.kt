@@ -23,7 +23,7 @@ class MainViewModel @Inject constructor(
             NavRoutes.TodayScreen.route -> {
                 BottomNavType.TODAY
             }
-            NavRoutes.MyPageScreen.route, NavRoutes.SettingScreen.route -> {
+            NavRoutes.MyPageScreen.route, NavRoutes.SettingScreen.route, NavRoutes.UserDataScreen.route -> {
                 BottomNavType.SETTINGS
             }
             NavRoutes.HistoryScreen.route -> {

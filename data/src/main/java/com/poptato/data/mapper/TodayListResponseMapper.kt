@@ -2,6 +2,7 @@ package com.poptato.data.mapper
 
 import com.poptato.data.base.Mapper
 import com.poptato.data.model.response.today.TodayListResponse
+import com.poptato.domain.model.enums.TodoStatus
 import com.poptato.domain.model.response.today.TodayListModel
 import com.poptato.domain.model.response.today.TodoItemModel
 
@@ -14,7 +15,7 @@ object TodayListResponseMapper: Mapper<TodayListResponse, TodayListModel> {
                     TodoItemModel(
                         todoId = item.todoId,
                         content = item.content,
-                        todoStatus = item.todoStatus,
+                        todoStatus = if (item.todoStatus == "COMPLETED") TodoStatus.COMPLETED else TodoStatus.INCOMPLETE,
                         isBookmark = item.isBookmark,
                         deadline = item.deadline ?: "",
                         dDay = item.dDay

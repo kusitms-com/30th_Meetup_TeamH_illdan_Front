@@ -11,7 +11,11 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.poptato.design_system.Gray100
 import com.poptato.design_system.Gray80
 import com.poptato.design_system.Primary60
 import com.poptato.ui.util.LoadingManager
@@ -24,6 +28,12 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val isLoading by LoadingManager.isLoading.collectAsStateWithLifecycle()
+            val statusBarColor = Gray100.toArgb()
+            val isLightIcons = false
+
+            WindowCompat.setDecorFitsSystemWindows(window, false)
+            window.statusBarColor = statusBarColor
+            WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = isLightIcons
 
             if (isLoading) {
                 Box(

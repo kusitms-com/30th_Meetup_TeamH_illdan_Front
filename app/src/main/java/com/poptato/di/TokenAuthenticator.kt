@@ -23,34 +23,33 @@ class TokenAuthenticator @Inject constructor(
         val refreshToken = runBlocking { dataStore.refreshToken.firstOrNull() }
 
         return if (accessToken != null && refreshToken != null) {
-            var newTokens: TokenModel? = null
-
             runBlocking {
-                authRepository.get().reissueToken(
-                    request = ReissueRequestModel(
-                        accessToken = accessToken,
-                        refreshToken = refreshToken
-                    )
-                ).collect { result ->
-                    result.onSuccess { token ->
-                        newTokens = token
-                    }.onFailure { throwable ->
-                        Timber.e("Token reissue failed: ${throwable.message}")
+                try {
+                    val newTokens = authRepository.get().reissueToken(
+                        request = ReissueRequestModel(
+                            accessToken = accessToken,
+                            refreshToken = refreshToken
+                        )
+                    ).firstOrNull()
+
+                    newTokens?.getOrNull()?.let { token ->
+                        dataStore.saveAccessToken(token.accessToken)
+                        dataStore.saveRefreshToken(token.refreshToken)
+
+                        response.request.newBuilder()
+                            .header("Authorization", "Bearer ${token.accessToken}")
+                            .build()
+                    } ?: run {
+                        Timber.e("Token reissue failed: 새로운 토큰 없음")
+                        null
                     }
+                } catch (e: Exception) {
+                    Timber.e("Token reissue failed: ${e.message}")
+                    null
                 }
-            }
-
-            newTokens?.let { token ->
-                runBlocking {
-                    dataStore.saveAccessToken(token.accessToken)
-                    dataStore.saveRefreshToken(token.refreshToken)
-                }
-
-                response.request.newBuilder()
-                    .header("Authorization", "Bearer ${token.accessToken}")
-                    .build()
             }
         } else {
+            Timber.e("유효한 토큰 없음")
             null
         }
     }

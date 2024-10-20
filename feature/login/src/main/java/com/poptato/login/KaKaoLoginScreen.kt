@@ -71,8 +71,9 @@ fun KaKaoLoginContent(
         contentAlignment = Alignment.Center
     ) {
         Image(
-            painter = painterResource(id = R.drawable.ic_app),
-            contentDescription = "ic_temp"
+            painter = painterResource(id = R.drawable.ic_splash),
+            contentDescription = "ic_temp",
+            modifier = Modifier.padding(bottom = 100.dp)
         )
 
         Column(

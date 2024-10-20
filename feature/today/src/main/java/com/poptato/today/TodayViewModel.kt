@@ -23,7 +23,7 @@ class TodayViewModel @Inject constructor(
     private var snapshotList: List<TodoItemModel> = emptyList()
 
     init {
-        getTodayList(0, 8)
+        getTodayList(0, 50)
     }
 
     fun onCheckedTodo(status: TodoStatus, id: Long) {

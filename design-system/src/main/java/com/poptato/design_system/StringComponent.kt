@@ -17,6 +17,7 @@ const val Year = "년"
 const val Month = "월"
 const val Day = "일"
 const val BOOKMARK = "중요"
+const val TODO = "할 일"
 
 // KaKaoLogin
 const val BtnKaKaoLoginText = "카카오 로그인"
@@ -47,7 +48,7 @@ const val LogOutDialogDoBtn = "로그아웃"
 const val ServiceTitle = "서비스"
 const val Notice = "공지사항"
 const val FAQ = "문의 & FAQ"
-const val Policy = "개인정보처리 방침 및 서비스 이용약관"
+const val Policy = "개인정보처리 방침"
 const val Version = "버전"
 const val VersionSetting = "v %s"
 const val UserDelete = "서비스 탈퇴하기"
@@ -57,6 +58,9 @@ const val FirstNoticeTitle = "회원님의 계정이 즉시 삭제돼요"
 const val FirstNoticeContent = "탈퇴한 회원의 정보는 즉시 삭제되며, 재가입은 14일이 지나야 가능해요."
 const val SecondNoticeTitle = "회원님의 데이터가 모두 삭제돼요"
 const val SecondNoticeContent = "오늘, 할 일, 기록에 저장된 모든 데이터가 삭제돼요."
+const val UserDataName = "이름"
+const val UserDataEmail = "카카오 로그인"
+
 
 // Today
 const val TodayTopBarSub = "오늘도 하나씩 해보는 거야!"
