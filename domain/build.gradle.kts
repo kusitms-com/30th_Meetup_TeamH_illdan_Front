@@ -12,4 +12,5 @@ dependencies {
 
     implementation(libs.coroutines.core)
     implementation(libs.hilt.core)
+    implementation(project(":core"))
 }

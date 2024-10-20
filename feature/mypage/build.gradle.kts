@@ -5,6 +5,10 @@ plugins {
 
 android {
     namespace = "com.poptato.mypage"
+
+    defaultConfig {
+        buildConfigField(type = "String", name = "VERSION_NAME", value = "\"${project.version}\"")
+    }
 }
 
 dependencies {
