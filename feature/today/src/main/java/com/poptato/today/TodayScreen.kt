@@ -62,6 +62,7 @@ import com.poptato.design_system.R
 import com.poptato.design_system.TodayTopBarSub
 import com.poptato.domain.model.enums.TodoStatus
 import com.poptato.domain.model.response.today.TodoItemModel
+import com.poptato.ui.common.BookmarkItem
 import com.poptato.ui.common.PoptatoCheckBox
 import com.poptato.ui.common.TopBar
 import com.poptato.ui.util.toPx
@@ -254,28 +255,6 @@ fun TodayTodoItem(
                 Spacer(modifier = Modifier.width(8.dp))
             }
         }
-    }
-}
-
-@Composable
-fun BookmarkItem() {
-    Row(
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            painter = painterResource(id = R.drawable.ic_star_filled),
-            contentDescription = "",
-            modifier = Modifier.size(12.dp),
-            tint = Primary60
-        )
-
-        Spacer(modifier = Modifier.width(2.dp))
-
-        Text(
-            text = BOOKMARK,
-            style = PoptatoTypo.xsSemiBold,
-            color = Primary60
-        )
     }
 }
 
