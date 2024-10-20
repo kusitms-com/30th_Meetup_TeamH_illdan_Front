@@ -18,6 +18,10 @@ object Endpoints {
         const val YESTERDAY = "/yesterdays"
     }
 
+    object History {
+        const val HISTORIES = "/histories"
+    }
+
     object Todo {
         private const val TODO = "/todo"
         const val DELETE = "$TODO/{todoId}"

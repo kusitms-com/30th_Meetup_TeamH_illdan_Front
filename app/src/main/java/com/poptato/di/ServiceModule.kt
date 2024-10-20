@@ -2,6 +2,7 @@ package com.poptato.di
 
 import com.poptato.data.service.AuthService
 import com.poptato.data.service.BacklogService
+import com.poptato.data.service.HistoryService
 import com.poptato.data.service.TodoService
 import com.poptato.data.service.MyPageService
 import com.poptato.data.service.YesterdayService
@@ -29,6 +30,11 @@ object ServiceModule {
     @Provides
     fun provideYesterdayService(retrofit: Retrofit): YesterdayService {
         return retrofit.create(YesterdayService::class.java)
+    }
+
+    @Provides
+    fun provideHistoryService(retrofit: Retrofit): HistoryService {
+        return retrofit.create(HistoryService::class.java)
     }
 
     @Provides

@@ -2,12 +2,14 @@ package com.poptato.di
 
 import com.poptato.data.repository.AuthRepositoryImpl
 import com.poptato.data.repository.BacklogRepositoryImpl
+import com.poptato.data.repository.HistoryRepositoryImpl
 import com.poptato.data.repository.TodoRepositoryImpl
 import com.poptato.data.repository.MyPageRepositoryImpl
 import com.poptato.data.repository.YesterdayRepositoryImpl
 import com.poptato.data.repository.TodayRepositoryImpl
 import com.poptato.domain.repository.AuthRepository
 import com.poptato.domain.repository.BacklogRepository
+import com.poptato.domain.repository.HistoryRepository
 import com.poptato.domain.repository.TodoRepository
 import com.poptato.domain.repository.MyPageRepository
 import com.poptato.domain.repository.YesterdayRepository
@@ -33,6 +35,10 @@ abstract class RepositoryModule {
     @Singleton
     @Binds
     abstract fun providesYesterdayRepository(repositoryImpl: YesterdayRepositoryImpl): YesterdayRepository
+
+    @Singleton
+    @Binds
+    abstract fun providesHistoryRepository(repositoryImpl: HistoryRepositoryImpl): HistoryRepository
 
     @Singleton
     @Binds
