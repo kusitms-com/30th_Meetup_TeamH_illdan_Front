@@ -1,4 +1,4 @@
-package com.poptato.setting.editdata
+package com.poptato.setting.userdata
 
 import androidx.lifecycle.viewModelScope
 import com.poptato.domain.model.response.mypage.UserDataModel
@@ -10,10 +10,10 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
-class EditUserDataViewModel @Inject constructor(
+class UserDataViewModel @Inject constructor(
     private val getUserDataUseCase: GetUserDataUseCase
-) : BaseViewModel<EditUserDataPageState>(
-    EditUserDataPageState()
+) : BaseViewModel<UserDataPageState>(
+    UserDataPageState()
 ) {
 
     init {

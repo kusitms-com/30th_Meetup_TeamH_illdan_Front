@@ -1,8 +1,8 @@
-package com.poptato.setting.editdata
+package com.poptato.setting.userdata
 
 import com.poptato.ui.base.PageState
 
-data class EditUserDataPageState (
+data class UserDataPageState (
     val temp: String = "",
     var name: String = ""
 ): PageState

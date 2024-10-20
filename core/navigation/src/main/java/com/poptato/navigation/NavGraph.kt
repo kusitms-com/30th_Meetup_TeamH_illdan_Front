@@ -9,7 +9,7 @@ import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.login.KaKaoLoginScreen
 import com.poptato.mypage.MyPageScreen
 import com.poptato.setting.SettingScreen
-import com.poptato.setting.editdata.EditUserDataScreen
+import com.poptato.setting.userdata.EditUserDataScreen
 import com.poptato.setting.servicedelete.ServiceDeleteScreen
 import com.poptato.splash.SplashScreen
 import com.poptato.today.TodayScreen

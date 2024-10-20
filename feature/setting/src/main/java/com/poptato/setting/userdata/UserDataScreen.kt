@@ -1,4 +1,4 @@
-package com.poptato.setting.editdata
+package com.poptato.setting.userdata
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -46,8 +46,8 @@ fun EditUserDataScreen(
     goBackToSetting: () -> Unit = {},
 ) {
 
-    val viewModel: EditUserDataViewModel = hiltViewModel()
-    val uiState: EditUserDataPageState by viewModel.uiState.collectAsStateWithLifecycle()
+    val viewModel: UserDataViewModel = hiltViewModel()
+    val uiState: UserDataPageState by viewModel.uiState.collectAsStateWithLifecycle()
 
     EditUserDataContent(
         uiState = uiState,
@@ -58,7 +58,7 @@ fun EditUserDataScreen(
 
 @Composable
 fun EditUserDataContent(
-    uiState: EditUserDataPageState = EditUserDataPageState(),
+    uiState: UserDataPageState = UserDataPageState(),
     onClickCloseBtn: () -> Unit = {},
     onValueChange: (String) -> Unit = {},
 ) {
