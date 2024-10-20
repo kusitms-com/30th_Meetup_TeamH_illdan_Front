@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.poptato.domain.model.enums.TodoStatus
 import com.poptato.domain.model.request.ListRequestModel
 import com.poptato.domain.model.response.yesterday.YesterdayListModel
+import com.poptato.domain.usecase.todo.UpdateTodoCompletionUseCase
 import com.poptato.domain.usecase.yesterday.GetYesterdayListUseCase
 import com.poptato.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,7 +14,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class YesterdayListViewModel @Inject constructor(
-    private val getYesterdayListUseCase: GetYesterdayListUseCase
+    private val getYesterdayListUseCase: GetYesterdayListUseCase,
+    private val updateTodoCompletionUseCase: UpdateTodoCompletionUseCase
 ): BaseViewModel<YesterdayListPageState>(
     YesterdayListPageState()
 ) {
@@ -60,5 +62,15 @@ class YesterdayListViewModel @Inject constructor(
         updateState(
             uiState.value.copy(yesterdayList = updatedList)
         )
+
+        viewModelScope.launch {
+            updateTodoCompletionUseCase(id).collect {
+                resultResponse(it, {
+                    getYesterdayList(0, 8)
+                }, { error ->
+                    Timber.d("[어제 한 일] 달성 여부 수정 서버통신 실패 -> ${error.message}")
+                })
+            }
+        }
     }
 }
