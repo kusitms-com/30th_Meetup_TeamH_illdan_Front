@@ -58,7 +58,10 @@ fun YesterdayListScreen(
         onCheckedChange = { id, status ->
             viewModel.onCheckedTodo(id, status)
         },
-        onClickAllCheckBtn = { showAllCheckPage() }
+        onClickAllCheckBtn = {
+            viewModel.onCheckAllTodoList()
+            showAllCheckPage()
+        }
     )
 }
 
