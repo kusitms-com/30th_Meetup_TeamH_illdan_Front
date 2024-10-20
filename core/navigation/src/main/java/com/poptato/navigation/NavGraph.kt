@@ -8,9 +8,8 @@ import com.poptato.backlog.BacklogScreen
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.login.KaKaoLoginScreen
 import com.poptato.mypage.MyPageScreen
-import com.poptato.setting.SettingScreen
-import com.poptato.setting.userdata.EditUserDataScreen
 import com.poptato.setting.servicedelete.ServiceDeleteScreen
+import com.poptato.setting.userdata.UserDataScreen
 import com.poptato.splash.SplashScreen
 import com.poptato.today.TodayScreen
 import com.poptato.yesterdaylist.YesterdayListScreen
@@ -114,18 +113,18 @@ fun NavGraphBuilder.myPageNavGraph(navController: NavHostController) {
     ) {
         composable(NavRoutes.MyPageScreen.route) {
             MyPageScreen(
-                goToSettingPage = { navController.navigate(NavRoutes.SettingScreen.route) }
+                goToUserDataPage = { navController.navigate(NavRoutes.UserDataScreen.route) }
             )
         }
 
-        composable(NavRoutes.SettingScreen.route) {
-            SettingScreen(
-                goBackToMyPage = { navController.popBackStack() },
-                goToEditUserData = { navController.navigate(NavRoutes.EditUserDataScreen.route) },
-                goToServiceDelete = { navController.navigate(NavRoutes.ServiceDeleteScreen.route) },
-                goBackToLogIn = { navController.navigate(NavRoutes.KaKaoLoginScreen.route) }
-            )
-        }
+//        composable(NavRoutes.SettingScreen.route) {
+//            SettingScreen(
+//                goBackToMyPage = { navController.popBackStack() },
+//                goToEditUserData = { navController.navigate(NavRoutes.EditUserDataScreen.route) },
+//                goToServiceDelete = { navController.navigate(NavRoutes.ServiceDeleteScreen.route) },
+//                goBackToLogIn = { navController.navigate(NavRoutes.KaKaoLoginScreen.route) }
+//            )
+//        }
 
         composable(NavRoutes.ServiceDeleteScreen.route) {
             ServiceDeleteScreen(
@@ -134,9 +133,9 @@ fun NavGraphBuilder.myPageNavGraph(navController: NavHostController) {
             )
         }
 
-        composable(NavRoutes.EditUserDataScreen.route) {
-            EditUserDataScreen(
-                goBackToSetting = { navController.popBackStack() },
+        composable(NavRoutes.UserDataScreen.route) {
+            UserDataScreen(
+                goBackToMyPage = { navController.popBackStack() },
             )
         }
     }

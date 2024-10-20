@@ -48,8 +48,8 @@ import com.poptato.setting.BuildConfig.VERSION_NAME
 import com.poptato.design_system.UserDelete
 
 @Composable
-fun EditUserDataScreen(
-    goBackToSetting: () -> Unit = {},
+fun UserDataScreen(
+    goBackToMyPage: () -> Unit = {},
 ) {
 
     val viewModel: UserDataViewModel = hiltViewModel()
@@ -58,7 +58,7 @@ fun EditUserDataScreen(
 
     EditUserDataContent(
         uiState = uiState,
-        onClickCloseBtn = { goBackToSetting() },
+        onClickBackBtn = { goBackToMyPage() },
         onValueChange = { newValue -> viewModel.onValueChange(newValue) },
         interactionSource = interactionSource
     )
@@ -67,7 +67,7 @@ fun EditUserDataScreen(
 @Composable
 fun EditUserDataContent(
     uiState: UserDataPageState = UserDataPageState(),
-    onClickCloseBtn: () -> Unit = {},
+    onClickBackBtn: () -> Unit = {},
     onValueChange: (String) -> Unit = {},
     interactionSource: MutableInteractionSource = MutableInteractionSource()
 ) {
@@ -78,7 +78,7 @@ fun EditUserDataContent(
     ) {
 
         SettingTitle(
-            onClickCloseBtn = onClickCloseBtn
+            onClickBackBtn = onClickBackBtn
         )
 
         MyData(
@@ -103,7 +103,7 @@ fun EditUserDataContent(
 
 @Composable
 fun SettingTitle(
-    onClickCloseBtn: () -> Unit = {}
+    onClickBackBtn: () -> Unit = {},
 ) {
     Box(
         modifier = Modifier
@@ -118,7 +118,7 @@ fun SettingTitle(
             modifier = Modifier
                 .align(Alignment.CenterStart)
                 .size(width = 24.dp, height = 24.dp)
-                .clickable { onClickCloseBtn() }
+                .clickable { onClickBackBtn() }
         )
 
         Text(

@@ -51,7 +51,7 @@ import com.poptato.mypage.BuildConfig.VERSION_NAME
 
 @Composable
 fun MyPageScreen(
-    goToSettingPage: () -> Unit = {}
+    goToUserDataPage: () -> Unit = {}
 ) {
 
     val viewModel: MyPageViewModel = hiltViewModel()
@@ -60,7 +60,7 @@ fun MyPageScreen(
 
     MyPageContent(
         uiState = uiState,
-        onClickSettingBtn = { goToSettingPage() },
+        onClickUserDataBtn = { goToUserDataPage() },
         interactionSource = interactionSource
     )
 }
@@ -68,7 +68,7 @@ fun MyPageScreen(
 @Composable
 fun MyPageContent(
     uiState: MyPagePageState = MyPagePageState(),
-    onClickSettingBtn: () -> Unit = {},
+    onClickUserDataBtn: () -> Unit = {},
     interactionSource: MutableInteractionSource = MutableInteractionSource()
 ) {
     Column(
@@ -81,7 +81,9 @@ fun MyPageContent(
             uiState = uiState
         )
 
-        UserDataBtn()
+        UserDataBtn(
+            onClickUserDataBtn = onClickUserDataBtn
+        )
 
         SettingSubTitle(
             title = SettingTitle,
@@ -147,7 +149,9 @@ fun MyData(
 }
 
 @Composable
-fun UserDataBtn() {
+fun UserDataBtn(
+    onClickUserDataBtn: () -> Unit = {},
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -155,6 +159,7 @@ fun UserDataBtn() {
             .clip(RoundedCornerShape(8.dp))
             .background(Gray95)
             .wrapContentHeight()
+            .clickable { onClickUserDataBtn() }
     ) {
         Text(
             text = ProfileDetail,
