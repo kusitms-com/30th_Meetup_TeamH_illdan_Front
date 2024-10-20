@@ -9,6 +9,7 @@ import com.poptato.domain.model.request.todo.UpdateDeadlineRequestModel
 import com.poptato.domain.model.response.today.TodayListModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.domain.usecase.today.GetTodayListUseCase
+import com.poptato.domain.usecase.todo.UpdateTodoCompletionUseCase
 import com.poptato.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -16,7 +17,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TodayViewModel @Inject constructor(
-    private val getTodayListUseCase: GetTodayListUseCase
+    private val getTodayListUseCase: GetTodayListUseCase,
+    private val updateTodoCompletionUseCase: UpdateTodoCompletionUseCase
 ) : BaseViewModel<TodayPageState>(TodayPageState()) {
     private var snapshotList: List<TodoItemModel> = emptyList()
 
@@ -44,6 +46,12 @@ class TodayViewModel @Inject constructor(
         }
 
         updateList(newTodays)
+
+        viewModelScope.launch {
+            updateTodoCompletionUseCase.invoke(id).collect {
+                resultResponse(it, { onSuccessUpdateBacklogList() }, { onFailedUpdateBacklogList() })
+            }
+        }
     }
 
     private fun getTodayList(page: Int, size: Int) {
