@@ -11,4 +11,5 @@ dependencies {
     implementation(libs.kotlin.stdlib)
     implementation(libs.coroutines.core)
     implementation(libs.threeten)
+    implementation(libs.androidx.foundation)
 }

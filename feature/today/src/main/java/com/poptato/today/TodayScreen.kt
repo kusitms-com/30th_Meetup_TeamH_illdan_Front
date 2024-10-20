@@ -45,11 +45,15 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.poptato.core.util.TimeFormatter
+import com.poptato.design_system.BOOKMARK
 import com.poptato.design_system.BtnGetTodoText
+import com.poptato.design_system.DEADLINE
+import com.poptato.design_system.DEADLINE_DDAY
 import com.poptato.design_system.EmptyTodoTitle
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
 import com.poptato.design_system.Gray40
+import com.poptato.design_system.Gray70
 import com.poptato.design_system.Gray95
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.Primary100
@@ -109,11 +113,11 @@ fun TodayContent(
                 .fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            if (uiState.todayList.todays.isEmpty()) EmptyTodoView(
+            if (uiState.todayList.isEmpty()) EmptyTodoView(
                 onClickBtnGetTodo = onClickBtnGetTodo
             )
             else TodayTodoList(
-                list = uiState.todayList.todays,
+                list = uiState.todayList,
                 onCheckedChange = onCheckedChange
             )
         }
@@ -195,39 +199,81 @@ fun TodayTodoItem(
                 shadowElevation = elevation.toPx()
             )
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(8.dp))
                 .background(Gray95)
-                .padding(vertical = 16.dp)
-                .padding(start = 16.dp, end = 18.dp),
-            verticalAlignment = Alignment.CenterVertically
         ) {
-            PoptatoCheckBox(
-                isChecked = item.todoStatus == TodoStatus.COMPLETED,
-                onCheckedChange = {
-                    onCheckedChange(item.todoStatus, item.todoId)
+
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .padding(top = if (item.isBookmark || item.dDay != null) 8.dp else 0.dp),
+                horizontalArrangement = Arrangement.Start
+            ) {
+                if (item.isBookmark) {
+                    BookmarkItem()
+                    Spacer(modifier = Modifier.width(6.dp))
                 }
-            )
+                if (item.dDay != null) Text(
+                    text = String.format(DEADLINE, item.dDay),
+                    style = PoptatoTypo.xsSemiBold,
+                    color = Gray70
+                )
+            }
 
-            Spacer(modifier = Modifier.width(12.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        bottom = 16.dp,
+                        top = if (item.isBookmark || item.dDay != null) 4.dp else 16.dp
+                    )
+                    .padding(start = 16.dp, end = 18.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                PoptatoCheckBox(
+                    isChecked = item.todoStatus == TodoStatus.COMPLETED,
+                    onCheckedChange = {
+                        onCheckedChange(item.todoStatus, item.todoId)
+                    }
+                )
 
-            Text(
-                text = item.content,
-                color = Gray00,
-                style = PoptatoTypo.mdRegular,
-                modifier = Modifier.weight(1f)
-            )
+                Spacer(modifier = Modifier.width(12.dp))
 
-            Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = item.content,
+                    color = Gray00,
+                    style = PoptatoTypo.mdRegular,
+                    modifier = Modifier.weight(1f)
+                )
 
-            Icon(
-                painter = painterResource(id = R.drawable.ic_three_dot),
-                contentDescription = "",
-                tint = Color.Unspecified
-            )
+                Spacer(modifier = Modifier.width(8.dp))
+            }
         }
+    }
+}
+
+@Composable
+fun BookmarkItem() {
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_star_filled),
+            contentDescription = "",
+            modifier = Modifier.size(12.dp),
+            tint = Primary60
+        )
+
+        Spacer(modifier = Modifier.width(2.dp))
+
+        Text(
+            text = BOOKMARK,
+            style = PoptatoTypo.xsSemiBold,
+            color = Primary60
+        )
     }
 }
 
