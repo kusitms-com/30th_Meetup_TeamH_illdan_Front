@@ -8,8 +8,8 @@ data class TodayItemResponse(
     val todoId: Long = -1,
     @SerializedName("content")
     val content: String = "",
-    @SerializedName("todoStatus")
-    val todoStatus: TodoStatus = TodoStatus.INCOMPLETE,
+    @SerializedName("todayStatus")
+    val todoStatus: String = "",
     @SerializedName("bookmark")
     val isBookmark: Boolean = false,
     @SerializedName("deadline")
