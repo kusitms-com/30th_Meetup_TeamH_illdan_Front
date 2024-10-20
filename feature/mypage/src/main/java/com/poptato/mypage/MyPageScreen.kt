@@ -71,18 +71,6 @@ fun MyPageScreen(
     val uiState: MyPagePageState by viewModel.uiState.collectAsStateWithLifecycle()
     val interactionSource = remember { MutableInteractionSource() }
 
-    val noticeWebView = rememberWebViewState(
-        url = "https://mountain-fang-96a.notion.site/124d60b563cc80e894e0d2f3ed82e2d0?pvs=4",
-        additionalHttpHeaders = emptyMap()
-    )
-    val faqWebView = rememberWebViewState(
-        url = "https://mountain-fang-96a.notion.site/FAQ-124d60b563cc801e8650edf2b64a445c?pvs=4",
-        additionalHttpHeaders = emptyMap()
-    )
-    val webviewClient = AccompanistWebViewClient()
-    val webChromeClient = AccompanistWebChromeClient()
-    val webViewNavigator = rememberWebViewNavigator()
-
     MyPageContent(
         uiState = uiState,
         onClickUserDataBtn = { goToUserDataPage() },
@@ -270,42 +258,6 @@ fun SettingServiceItem(
                     .align(Alignment.CenterEnd)
                     .padding(end = 24.dp)
             )
-        }
-    }
-}
-
-@Composable
-fun CreateWebView(
-    webViewState: WebViewState,
-    webViewClient: AccompanistWebViewClient,
-    webChromeClient: AccompanistWebChromeClient,
-    webViewNavigator: WebViewNavigator,
-    onClickBackBtn: () -> Unit = {}
-) {
-
-    Timber.d("[테스트] 웹뷰")
-
-    WebView(
-        state = webViewState,
-        navigator = webViewNavigator,
-        client = webViewClient,
-        chromeClient = webChromeClient,
-        onCreated = { webView ->
-            with (webView) {
-                settings.run {
-                    javaScriptEnabled = true
-                    domStorageEnabled = true
-                    javaScriptCanOpenWindowsAutomatically = false
-                }
-            }
-        }
-    )
-
-    BackHandler(enabled = true) {
-        if (webViewNavigator.canGoBack) {
-            webViewNavigator.navigateBack()
-        } else {
-            onClickBackBtn()
         }
     }
 }

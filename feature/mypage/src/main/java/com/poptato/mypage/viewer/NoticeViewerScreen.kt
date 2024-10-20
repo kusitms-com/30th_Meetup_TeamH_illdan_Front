@@ -1,4 +1,4 @@
-package com.poptato.mypage
+package com.poptato.mypage.viewer
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable

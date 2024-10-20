@@ -8,7 +8,7 @@ import com.poptato.backlog.BacklogScreen
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.login.KaKaoLoginScreen
 import com.poptato.mypage.MyPageScreen
-import com.poptato.mypage.NoticeViewerScreen
+import com.poptato.mypage.viewer.NoticeViewerScreen
 import com.poptato.mypage.viewer.FAQViewerScreen
 import com.poptato.setting.servicedelete.ServiceDeleteScreen
 import com.poptato.setting.userdata.UserDataScreen
