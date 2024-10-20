@@ -3,8 +3,10 @@ package com.poptato.data.repository
 import com.poptato.data.base.BaseRepository
 import com.poptato.data.mapper.UnitResponseMapper
 import com.poptato.data.service.TodoService
+import com.poptato.domain.model.request.todo.TodoIdModel
 import com.poptato.domain.model.request.todo.DragDropRequestModel
 import com.poptato.domain.model.request.todo.ModifyTodoRequestModel
+import com.poptato.domain.model.request.todo.UpdateDeadlineRequestModel
 import com.poptato.domain.repository.TodoRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -22,5 +24,21 @@ class TodoRepositoryImpl @Inject constructor(
 
     override suspend fun dragDrop(request: DragDropRequestModel): Flow<Result<Unit>> {
         return apiLaunch(apiCall = { todoService.dragDrop(request) }, UnitResponseMapper)
+    }
+
+    override suspend fun updateDeadline(request: UpdateDeadlineRequestModel): Flow<Result<Unit>> {
+        return apiLaunch(apiCall = { todoService.updateDeadline(todoId = request.todoId, request = request.deadline) }, UnitResponseMapper)
+    }
+
+    override suspend fun updateBookmark(todoId: Long): Flow<Result<Unit>> {
+        return apiLaunch(apiCall = { todoService.updateBookmark(todoId) }, UnitResponseMapper)
+    }
+
+    override suspend fun swipeTodo(request: TodoIdModel): Flow<Result<Unit>> {
+        return apiLaunch(apiCall = { todoService.swipeTodo(request) }, UnitResponseMapper)
+    }
+
+    override suspend fun updateTodoCompletion(todoId: Long): Flow<Result<Unit>> {
+        return apiLaunch(apiCall = { todoService.updateTodoCompletion(todoId) }, UnitResponseMapper)
     }
 }

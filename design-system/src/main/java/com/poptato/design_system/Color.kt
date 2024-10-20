@@ -49,3 +49,6 @@ val warning70 = Color(0xFFC79F00)
 
 // KaKao
 val KaKaoMain = Color(0xFFFEE500)
+
+// ETC
+val Bookmark = Color(0xFF294746)

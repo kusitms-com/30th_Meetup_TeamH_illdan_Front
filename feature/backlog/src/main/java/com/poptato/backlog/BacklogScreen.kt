@@ -34,7 +34,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -54,7 +53,6 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextRange
@@ -69,16 +67,22 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.poptato.design_system.BACKLOG_YESTERDAY_TASK_GUIDE
 import com.poptato.design_system.Backlog
 import com.poptato.design_system.BacklogHint
+import com.poptato.design_system.Bookmark
 import com.poptato.design_system.CONFIRM_ACTION
+import com.poptato.design_system.DEADLINE
+import com.poptato.design_system.DEADLINE_DDAY
 import com.poptato.design_system.ERROR_CREATE_BACKLOG
 import com.poptato.design_system.EmptyBacklogTitle
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
+import com.poptato.design_system.Gray40
 import com.poptato.design_system.Gray70
 import com.poptato.design_system.Gray80
+import com.poptato.design_system.Gray90
 import com.poptato.design_system.Gray95
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.Primary60
+import com.poptato.design_system.Primary80
 import com.poptato.design_system.R
 import com.poptato.domain.model.request.todo.ModifyTodoRequestModel
 import com.poptato.domain.model.request.todo.TodoContentModel
@@ -86,9 +90,7 @@ import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.ui.common.TopBar
 import com.poptato.ui.util.DragDropListState
 import com.poptato.ui.util.rememberDragDropListState
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @Composable
@@ -96,9 +98,10 @@ fun BacklogScreen(
     goToYesterdayList: () -> Unit = {},
     showBottomSheet: (TodoItemModel) -> Unit = {},
     todoBottomSheetClosedFlow: SharedFlow<Unit>,
-    updateDeadlineFlow: SharedFlow<String>,
+    updateDeadlineFlow: SharedFlow<String?>,
     deleteTodoFlow: SharedFlow<Long>,
-    activateItemFlow: SharedFlow<Long>
+    activateItemFlow: SharedFlow<Long>,
+    updateBookmarkFlow: SharedFlow<Long>
 ) {
     val viewModel: BacklogViewModel = hiltViewModel()
     val context = LocalContext.current
@@ -115,12 +118,6 @@ fun BacklogScreen(
     LaunchedEffect(activateItemFlow) {
         activateItemFlow.collect { id ->
             activeItemId = id
-        }
-    }
-
-    LaunchedEffect(todoBottomSheetClosedFlow) {
-        todoBottomSheetClosedFlow.collect {
-            // TODO: 데이터 갱신 함수 호출
         }
     }
 
@@ -146,11 +143,17 @@ fun BacklogScreen(
         }
     }
 
+    LaunchedEffect(updateBookmarkFlow) {
+        updateBookmarkFlow.collect {
+            viewModel.updateBookmark(it)
+        }
+    }
+
     BacklogContent(
         uiState = uiState,
         onValueChange = { newValue -> viewModel.onValueChange(newValue) },
         createBacklog = { newItem -> viewModel.createBacklog(newItem) },
-        onItemSwiped = { itemToRemove -> viewModel.removeBacklogItem(itemToRemove) },
+        onItemSwiped = { itemToRemove -> viewModel.swipeBacklogItem(itemToRemove) },
         onClickYesterdayList = { goToYesterdayList() },      // TODO 테스트용: "어제 리스트 체크하기" 스낵바 생성 후 변경 예정
         dragDropListState = dragDropListState,
         onClickBtnTodoSettings = {
@@ -478,7 +481,7 @@ fun BacklogItem(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
-            .background(Gray95)
+            .background(if (item.isBookmark) Bookmark else Gray95)
             .padding(vertical = 16.dp)
             .padding(start = 16.dp, end = 18.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -530,13 +533,33 @@ fun BacklogItem(
                 cursorBrush = SolidColor(Gray00)
             )
         } else {
-            Text(
-                text = item.content,
-                color = Gray00,
-                style = PoptatoTypo.mdRegular,
-                modifier = Modifier
-                    .weight(1f)
-            )
+            Row(
+                modifier = Modifier.weight(1f),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = item.content,
+                    style = PoptatoTypo.mdRegular,
+                    color = Gray00
+                )
+
+                if (item.dDay != null) {
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(if (item.isBookmark) Primary80 else Gray90)
+                            .padding(vertical = 1.dp, horizontal = 6.dp)
+                    ) {
+                        Text(
+                            text = if (item.dDay == 0) DEADLINE_DDAY else String.format(DEADLINE, item.dDay),
+                            style = PoptatoTypo.xsMedium,
+                            color = if (item.isBookmark) Gray00 else Gray40
+                        )
+                    }
+                }
+            }
         }
 
         Spacer(modifier = Modifier.width(8.dp))
