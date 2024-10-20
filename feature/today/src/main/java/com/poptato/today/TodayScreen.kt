@@ -212,7 +212,7 @@ fun TodayTodoItem(
             Row(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
-                    .padding(top = if (item.isBookmark || item.dDay != null) 8.dp else 0.dp),
+                    .padding(top = if (item.isBookmark || item.dDay != null) 16.dp else 0.dp),
                 horizontalArrangement = Arrangement.Start
             ) {
                 if (item.isBookmark) {
@@ -231,12 +231,11 @@ fun TodayTodoItem(
                     .fillMaxWidth()
                     .padding(
                         bottom = 16.dp,
-                        top = if (item.isBookmark || item.dDay != null) 4.dp else 16.dp
+                        top = if (item.isBookmark || item.dDay != null) 8.dp else 16.dp
                     )
                     .padding(start = 16.dp, end = 18.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Timber.i("id : ${item.todoId}, status: ${item.todoStatus}")
                 PoptatoCheckBox(
                     isChecked = item.todoStatus == TodoStatus.COMPLETED,
                     onCheckedChange = {
@@ -252,8 +251,6 @@ fun TodayTodoItem(
                     style = PoptatoTypo.mdRegular,
                     modifier = Modifier.weight(1f)
                 )
-
-                Spacer(modifier = Modifier.width(8.dp))
             }
         }
     }

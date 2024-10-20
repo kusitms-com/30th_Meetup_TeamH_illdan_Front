@@ -43,6 +43,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -201,7 +202,7 @@ fun BacklogContent(
     ) {
         TopBar(
             titleText = com.poptato.design_system.TODO,
-            subText = uiState.backlogList.size.toString(),
+            subText = uiState.totalItemCount.toString(),
             subTextStyle = PoptatoTypo.xLSemiBold,
             subTextColor = Primary60
         )
@@ -508,7 +509,7 @@ fun BacklogItem(
         ) {
             Row(
                 modifier = Modifier
-                    .padding(top = if (item.isBookmark || item.dDay != null) 8.dp else 0.dp),
+                    .padding(top = if (item.isBookmark || item.dDay != null) 16.dp else 0.dp),
                 horizontalArrangement = Arrangement.Start
             ) {
                 if (item.isBookmark) {
@@ -522,7 +523,7 @@ fun BacklogItem(
                 )
             }
 
-            if (!item.isBookmark && item.dDay == null) Spacer(modifier = Modifier.height(16.dp)) else Spacer(modifier = Modifier.height(4.dp))
+            if (!item.isBookmark && item.dDay == null) Spacer(modifier = Modifier.height(16.dp)) else Spacer(modifier = Modifier.height(8.dp))
 
             if (isActive) {
 
@@ -579,7 +580,7 @@ fun BacklogItem(
             tint = Color.Unspecified,
             modifier = Modifier
                 .align(if (item.isBookmark || item.dDay != null) Alignment.Top else Alignment.CenterVertically)
-                .padding(top = if (item.isBookmark || item.dDay != null) 8.dp else 16.dp)
+                .padding(top = 16.dp)
                 .clickable {
                     onClickBtnTodoSettings(index)
                 }
