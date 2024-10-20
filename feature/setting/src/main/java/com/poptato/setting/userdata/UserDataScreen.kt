@@ -11,21 +11,30 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.poptato.design_system.Danger40
+import com.poptato.design_system.Danger50
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
 import com.poptato.design_system.Gray40
+import com.poptato.design_system.Gray95
+import com.poptato.design_system.LogOut
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.ProfileDetail
 import com.poptato.design_system.R
@@ -64,6 +73,8 @@ fun EditUserDataContent(
         MyData(
             uiState = uiState
         )
+
+        LogOutBtn()
     }
 }
 
@@ -82,7 +93,7 @@ fun SettingTitle(
             contentDescription = "",
             tint = Color.Unspecified,
             modifier = Modifier
-                .align(Alignment.CenterEnd)
+                .align(Alignment.CenterStart)
                 .size(width = 24.dp, height = 24.dp)
                 .clickable { onClickCloseBtn() }
         )
@@ -132,6 +143,27 @@ fun MyData(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun LogOutBtn() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 16.dp, horizontal = 16.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(Danger50.copy(alpha = 0.1f))
+            .wrapContentHeight()
+    ) {
+        Text(
+            text = LogOut,
+            style = PoptatoTypo.smSemiBold,
+            color = Danger40,
+            modifier = Modifier
+                .align(Alignment.Center)
+                .padding(vertical = 11.dp)
+        )
     }
 }
 
