@@ -200,7 +200,7 @@ fun BacklogContent(
     ) {
         TopBar(
             titleText = com.poptato.design_system.TODO,
-            subText = uiState.totalItemCount.toString(),
+            subText = uiState.backlogList.size.toString(),
             subTextStyle = PoptatoTypo.xLSemiBold,
             subTextColor = Primary60
         )

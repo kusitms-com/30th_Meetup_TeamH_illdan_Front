@@ -112,7 +112,7 @@ fun TodayScreen(
 
 @Composable
 fun TodayContent(
-    date: String = "09.28",
+    date: String = "",
     uiState: TodayPageState = TodayPageState(),
     onCheckedChange: (TodoStatus, Long) -> Unit = {_, _ ->},
     onClickBtnGetTodo: () -> Unit = {},
