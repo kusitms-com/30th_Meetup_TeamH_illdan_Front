@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -273,7 +274,11 @@ fun CreateBacklogTextFiled(
         modifier = Modifier
             .padding(horizontal = 16.dp)
             .clip(RoundedCornerShape(8.dp))
-            .border(width = 1.dp, color = Gray70, shape = RoundedCornerShape(8.dp))
+            .border(
+                width = 1.dp,
+                color = if (isFocused) Gray00 else Gray70,
+                shape = RoundedCornerShape(8.dp)
+            )
     ) {
         BasicTextField(
             value = taskInput,
