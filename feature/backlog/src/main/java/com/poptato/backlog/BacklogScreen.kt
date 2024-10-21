@@ -1,7 +1,6 @@
 package com.poptato.backlog
 
 import android.annotation.SuppressLint
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -43,7 +42,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -67,24 +65,20 @@ import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.poptato.design_system.BACKLOG_YESTERDAY_TASK_GUIDE
-import com.poptato.design_system.Backlog
 import com.poptato.design_system.BacklogHint
-import com.poptato.design_system.Bookmark
+import com.poptato.design_system.COMPLETE_DELETE_TODO
 import com.poptato.design_system.CONFIRM_ACTION
 import com.poptato.design_system.DEADLINE
 import com.poptato.design_system.DEADLINE_DDAY
-import com.poptato.design_system.ERROR_CREATE_BACKLOG
+import com.poptato.design_system.ERROR_GENERIC_MESSAGE
 import com.poptato.design_system.EmptyBacklogTitle
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
-import com.poptato.design_system.Gray40
 import com.poptato.design_system.Gray70
 import com.poptato.design_system.Gray80
-import com.poptato.design_system.Gray90
 import com.poptato.design_system.Gray95
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.Primary60
-import com.poptato.design_system.Primary80
 import com.poptato.design_system.R
 import com.poptato.domain.model.request.todo.ModifyTodoRequestModel
 import com.poptato.domain.model.request.todo.TodoContentModel
@@ -100,11 +94,11 @@ import kotlinx.coroutines.launch
 fun BacklogScreen(
     goToYesterdayList: () -> Unit = {},
     showBottomSheet: (TodoItemModel) -> Unit = {},
-    todoBottomSheetClosedFlow: SharedFlow<Unit>,
     updateDeadlineFlow: SharedFlow<String?>,
     deleteTodoFlow: SharedFlow<Long>,
     activateItemFlow: SharedFlow<Long>,
-    updateBookmarkFlow: SharedFlow<Long>
+    updateBookmarkFlow: SharedFlow<Long>,
+    showSnackBar: (String) -> Unit
 ) {
     val viewModel: BacklogViewModel = hiltViewModel()
     val context = LocalContext.current
@@ -134,7 +128,10 @@ fun BacklogScreen(
         viewModel.eventFlow.collect { event ->
             when (event) {
                 is BacklogEvent.OnFailedUpdateBacklogList -> {
-                    Toast.makeText(context, ERROR_CREATE_BACKLOG, Toast.LENGTH_SHORT).show()
+                    showSnackBar(ERROR_GENERIC_MESSAGE)
+                }
+                is BacklogEvent.OnSuccessDeleteBacklog -> {
+                    showSnackBar(COMPLETE_DELETE_TODO)
                 }
             }
         }
