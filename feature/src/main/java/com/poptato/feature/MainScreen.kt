@@ -62,6 +62,7 @@ import com.poptato.navigation.backlogNavGraph
 import com.poptato.navigation.splashNavGraph
 import com.poptato.navigation.todayNavGraph
 import com.poptato.navigation.yesterdayListNavGraph
+import com.poptato.ui.common.CommonSnackBar
 import com.poptato.ui.common.DatePickerBottomSheet
 import com.poptato.ui.common.TodoBottomSheet
 import com.poptato.ui.util.DismissKeyboardOnClick
@@ -286,29 +287,4 @@ fun MainScreen() {
             }
         }
     }
-}
-
-@Composable
-fun CommonSnackBar(
-    hostState: SnackbarHostState
-) {
-    SnackbarHost(
-        hostState = hostState,
-        snackbar = { snackBarData ->
-            Snackbar(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp)
-                    .clip(RoundedCornerShape(8.dp)),
-                backgroundColor = BgSnackBar,
-                contentColor = Gray00,
-            ) {
-                Text(
-                    text = snackBarData.visuals.message,
-                    style = PoptatoTypo.smMedium,
-                    color = Gray00
-                )
-            }
-        }
-    )
 }
