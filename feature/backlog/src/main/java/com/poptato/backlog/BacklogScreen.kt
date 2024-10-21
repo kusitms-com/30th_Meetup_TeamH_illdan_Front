@@ -517,7 +517,7 @@ fun BacklogItem(
                     Spacer(modifier = Modifier.width(6.dp))
                 }
                 if (item.dDay != null) Text(
-                    text = String.format(DEADLINE, item.dDay),
+                    text = if(item.dDay != 0) String.format(DEADLINE, item.dDay) else DEADLINE_DDAY,
                     style = PoptatoTypo.xsSemiBold,
                     color = Gray70
                 )

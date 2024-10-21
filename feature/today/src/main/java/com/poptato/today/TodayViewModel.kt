@@ -4,21 +4,23 @@ import androidx.lifecycle.viewModelScope
 import com.poptato.core.util.TimeFormatter
 import com.poptato.domain.model.enums.TodoStatus
 import com.poptato.domain.model.request.today.GetTodayListRequestModel
-import com.poptato.domain.model.request.todo.DeadlineContentModel
-import com.poptato.domain.model.request.todo.UpdateDeadlineRequestModel
+import com.poptato.domain.model.request.todo.TodoIdModel
 import com.poptato.domain.model.response.today.TodayListModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.domain.usecase.today.GetTodayListUseCase
+import com.poptato.domain.usecase.todo.SwipeTodoUseCase
 import com.poptato.domain.usecase.todo.UpdateTodoCompletionUseCase
 import com.poptato.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class TodayViewModel @Inject constructor(
     private val getTodayListUseCase: GetTodayListUseCase,
-    private val updateTodoCompletionUseCase: UpdateTodoCompletionUseCase
+    private val updateTodoCompletionUseCase: UpdateTodoCompletionUseCase,
+    private val swipeTodoUseCase: SwipeTodoUseCase
 ) : BaseViewModel<TodayPageState>(TodayPageState()) {
     private var snapshotList: List<TodoItemModel> = emptyList()
 
@@ -49,7 +51,7 @@ class TodayViewModel @Inject constructor(
 
         viewModelScope.launch {
             updateTodoCompletionUseCase.invoke(id).collect {
-                resultResponse(it, { onSuccessUpdateBacklogList() }, { onFailedUpdateBacklogList() })
+                resultResponse(it, { onSuccessUpdateTodayList() }, { onFailedUpdateTodayList() })
             }
         }
     }
@@ -57,7 +59,7 @@ class TodayViewModel @Inject constructor(
     private fun getTodayList(page: Int, size: Int) {
         viewModelScope.launch {
             getTodayListUseCase.invoke(request = GetTodayListRequestModel(page = page, size = size)).collect {
-                resultResponse(it, ::onSuccessGetTodayList, { onFailedUpdateBacklogList() })
+                resultResponse(it, ::onSuccessGetTodayList, { onFailedUpdateTodayList() })
             }
         }
     }
@@ -73,11 +75,11 @@ class TodayViewModel @Inject constructor(
         )
     }
 
-    private fun onSuccessUpdateBacklogList() {
+    private fun onSuccessUpdateTodayList() {
         snapshotList = uiState.value.todayList
     }
 
-    private fun onFailedUpdateBacklogList() {
+    private fun onFailedUpdateTodayList() {
         updateList(snapshotList)
         emitEventFlow(TodayEvent.OnFailedUpdateTodayList)
     }
@@ -104,5 +106,19 @@ class TodayViewModel @Inject constructor(
                 selectedItem = updatedItem
             )
         )
+    }
+
+    fun swipeTodayItem(item: TodoItemModel) {
+        val newList = uiState.value.todayList.filter { it.todoId != item.todoId }
+
+        updateList(newList)
+
+        Timber.i(item.todoId.toString())
+
+        viewModelScope.launch {
+            swipeTodoUseCase.invoke(TodoIdModel(item.todoId)).collect {
+                resultResponse(it, { onSuccessUpdateTodayList() }, { onFailedUpdateTodayList() })
+            }
+        }
     }
 }

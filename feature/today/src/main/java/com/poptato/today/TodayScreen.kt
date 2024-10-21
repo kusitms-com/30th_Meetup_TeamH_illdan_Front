@@ -1,14 +1,21 @@
 package com.poptato.today
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,6 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -38,10 +46,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.poptato.core.util.TimeFormatter
@@ -83,7 +93,8 @@ fun TodayScreen(
         onCheckedChange = { status, id ->
             viewModel.onCheckedTodo(status = status, id = id)
         },
-        onClickBtnGetTodo = { goToBacklog() }
+        onClickBtnGetTodo = { goToBacklog() },
+        onItemSwiped = { itemToRemove -> viewModel.swipeTodayItem(itemToRemove) }
     )
 }
 
@@ -92,7 +103,8 @@ fun TodayContent(
     date: String = "09.28",
     uiState: TodayPageState = TodayPageState(),
     onCheckedChange: (TodoStatus, Long) -> Unit = {_, _ ->},
-    onClickBtnGetTodo: () -> Unit = {}
+    onClickBtnGetTodo: () -> Unit = {},
+    onItemSwiped: (TodoItemModel) -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -121,7 +133,8 @@ fun TodayContent(
             )
             else TodayTodoList(
                 list = uiState.todayList,
-                onCheckedChange = onCheckedChange
+                onCheckedChange = onCheckedChange,
+                onItemSwiped = onItemSwiped
             )
         }
     }
@@ -130,7 +143,8 @@ fun TodayContent(
 @Composable
 fun TodayTodoList(
     list: List<TodoItemModel> = emptyList(),
-    onCheckedChange: (TodoStatus, Long) -> Unit = { _, _ -> }
+    onCheckedChange: (TodoStatus, Long) -> Unit = { _, _ -> },
+    onItemSwiped: (TodoItemModel) -> Unit = {}
 ) {
     LazyColumn(
         modifier = Modifier
@@ -138,17 +152,37 @@ fun TodayTodoList(
             .padding(horizontal = 16.dp)
     ) {
         items(list, key = { it.todoId }) { item ->
+            var offsetX by remember { mutableFloatStateOf(0f) }
+
             TodayTodoItem(
                 item = item,
                 onCheckedChange = onCheckedChange,
-                modifier = Modifier.animateItem(
-                    fadeInSpec = null, fadeOutSpec = null, placementSpec = spring(
-                        stiffness = Spring.StiffnessMediumLow,
-                        visibilityThreshold = IntOffset.VisibilityThreshold
+                modifier = Modifier
+                    .animateItem(
+                        fadeInSpec = null, fadeOutSpec = null, placementSpec = spring(
+                            stiffness = Spring.StiffnessMediumLow,
+                            visibilityThreshold = IntOffset.VisibilityThreshold
+                        )
                     )
-                )
+                    .offset { IntOffset(offsetX.toInt(), 0) }
+                    .pointerInput(Unit) {
+                        detectHorizontalDragGestures(
+                            onDragEnd = {
+                                if (offsetX > 200f) {
+                                    onItemSwiped(item)
+                                } else {
+                                    offsetX = 0f
+                                }
+                            },
+                            onHorizontalDrag = { change, dragAmount ->
+                                change.consume()
+                                if (offsetX + dragAmount >= 0f) {
+                                    offsetX += dragAmount
+                                }
+                            }
+                        )
+                    }
             )
-
             Spacer(modifier = Modifier.height(12.dp))
         }
     }
@@ -220,7 +254,7 @@ fun TodayTodoItem(
                     Spacer(modifier = Modifier.width(6.dp))
                 }
                 if (item.dDay != null) Text(
-                    text = String.format(DEADLINE, item.dDay),
+                    text = if(item.dDay != 0) String.format(DEADLINE, item.dDay) else DEADLINE_DDAY,
                     style = PoptatoTypo.xsSemiBold,
                     color = Gray70
                 )
