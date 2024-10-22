@@ -15,6 +15,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -80,6 +81,7 @@ fun MainScreen() {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val snackBarHost = remember { SnackbarHostState() }
+    val interactionSource = remember { MutableInteractionSource() }
     val sheetState = androidx.compose.material.rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
         skipHalfExpanded = true
@@ -234,7 +236,8 @@ fun MainScreen() {
                                     }
                                 }
                             },
-                            modifier = Modifier.navigationBarsPadding()
+                            modifier = Modifier.navigationBarsPadding(),
+                            interactionSource = interactionSource
                         )
                     }
                 },
