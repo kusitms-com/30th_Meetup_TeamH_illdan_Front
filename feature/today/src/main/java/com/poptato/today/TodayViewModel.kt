@@ -1,13 +1,17 @@
 package com.poptato.today
 
 import androidx.lifecycle.viewModelScope
+import com.poptato.core.enums.TodoType
 import com.poptato.core.util.TimeFormatter
+import com.poptato.core.util.move
 import com.poptato.domain.model.enums.TodoStatus
 import com.poptato.domain.model.request.today.GetTodayListRequestModel
+import com.poptato.domain.model.request.todo.DragDropRequestModel
 import com.poptato.domain.model.request.todo.TodoIdModel
 import com.poptato.domain.model.response.today.TodayListModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.domain.usecase.today.GetTodayListUseCase
+import com.poptato.domain.usecase.todo.DragDropUseCase
 import com.poptato.domain.usecase.todo.SwipeTodoUseCase
 import com.poptato.domain.usecase.todo.UpdateTodoCompletionUseCase
 import com.poptato.ui.base.BaseViewModel
@@ -20,7 +24,8 @@ import javax.inject.Inject
 class TodayViewModel @Inject constructor(
     private val getTodayListUseCase: GetTodayListUseCase,
     private val updateTodoCompletionUseCase: UpdateTodoCompletionUseCase,
-    private val swipeTodoUseCase: SwipeTodoUseCase
+    private val swipeTodoUseCase: SwipeTodoUseCase,
+    private val dragDropUseCase: DragDropUseCase,
 ) : BaseViewModel<TodayPageState>(TodayPageState()) {
     private var snapshotList: List<TodoItemModel> = emptyList()
 
@@ -117,6 +122,40 @@ class TodayViewModel @Inject constructor(
 
         viewModelScope.launch {
             swipeTodoUseCase.invoke(TodoIdModel(item.todoId)).collect {
+                resultResponse(it, { onSuccessUpdateTodayList() }, { onFailedUpdateTodayList() })
+            }
+        }
+    }
+
+    fun moveItem(fromIndex: Int, toIndex: Int) {
+        val currentList = uiState.value.todayList.toMutableList()
+        val lastIncompleteIndex = currentList.indexOfLast { it.todoStatus == TodoStatus.INCOMPLETE }
+        var safeToIndex = toIndex
+
+        if (lastIncompleteIndex in fromIndex..<toIndex) {
+            safeToIndex = lastIncompleteIndex
+        } else if (lastIncompleteIndex in toIndex..<fromIndex) {
+            safeToIndex = lastIncompleteIndex + 1
+        }
+
+        if (fromIndex != safeToIndex) {
+            currentList.move(fromIndex, safeToIndex)
+            updateList(currentList)
+        }
+    }
+
+    fun updateSnapshotListByMoving() {
+        val todoIdList = uiState.value.todayList
+            .filter { it.todoStatus == TodoStatus.INCOMPLETE }
+            .map { it.todoId }
+
+        viewModelScope.launch {
+            dragDropUseCase.invoke(
+                request = DragDropRequestModel(
+                    type = TodoType.TODAY,
+                    todoIds = todoIdList
+                )
+            ).collect {
                 resultResponse(it, { onSuccessUpdateTodayList() }, { onFailedUpdateTodayList() })
             }
         }
