@@ -120,6 +120,7 @@ private fun signInKakaoApp(context: Context, onSuccessKaKaoLogin: (String) -> Un
     UserApiClient.instance.loginWithKakaoTalk(context) { token, error ->
         if (error != null) {
             Timber.tag("KaKao Login Error").e(error.stackTraceToString())
+            signInKakaoEmail(context, onSuccessKaKaoLogin)
             return@loginWithKakaoTalk
         }
         token?.let {
