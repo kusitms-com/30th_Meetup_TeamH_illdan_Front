@@ -258,7 +258,7 @@ fun TodayTodoItem(
             Row(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
-                    .padding(top = if (item.isBookmark || item.dDay != null) 16.dp else 0.dp),
+                    .padding(top = if (item.isBookmark || item.dDay != null) 8.dp else 0.dp),
                 horizontalArrangement = Arrangement.Start
             ) {
                 if (item.isBookmark) {
