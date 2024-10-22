@@ -75,7 +75,8 @@ class TodayViewModel @Inject constructor(
         updateState(
             uiState.value.copy(
                 todayList = response.todays,
-                totalPageCount = response.totalPageCount
+                totalPageCount = response.totalPageCount,
+                isFinishedInitialization = true
             )
         )
     }

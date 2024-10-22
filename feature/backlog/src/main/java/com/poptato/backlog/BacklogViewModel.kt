@@ -68,7 +68,8 @@ class BacklogViewModel @Inject constructor(
             uiState.value.copy(
                 backlogList = response.backlogs,
                 totalPageCount = response.totalPageCount,
-                totalItemCount = response.totalCount
+                totalItemCount = response.totalCount,
+                isFinishedInitialization = true
             )
         )
     }

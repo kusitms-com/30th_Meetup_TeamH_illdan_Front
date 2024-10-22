@@ -157,33 +157,35 @@ fun BacklogScreen(
         }
     }
 
-    BacklogContent(
-        uiState = uiState,
-        onValueChange = { newValue -> viewModel.onValueChange(newValue) },
-        createBacklog = { newItem -> viewModel.createBacklog(newItem) },
-        onItemSwiped = { itemToRemove -> viewModel.swipeBacklogItem(itemToRemove) },
-        onClickYesterdayList = { goToYesterdayList() },      // TODO 테스트용: "어제 리스트 체크하기" 스낵바 생성 후 변경 예정
-        dragDropListState = dragDropListState,
-        onClickBtnTodoSettings = {
-            showBottomSheet(uiState.backlogList[it])
-            viewModel.onSelectedItem(uiState.backlogList[it])
-        },
-        interactionSource = interactionSource,
-        activeItemId = activeItemId,
-        onClearActiveItem = { activeItemId = null },
-        onTodoItemModified = { id: Long, content: String ->
-            viewModel.modifyTodo(
-                item = ModifyTodoRequestModel(
-                    todoId = id,
-                    content = TodoContentModel(
-                        content = content
+    if (uiState.isFinishedInitialization) {
+        BacklogContent(
+            uiState = uiState,
+            onValueChange = { newValue -> viewModel.onValueChange(newValue) },
+            createBacklog = { newItem -> viewModel.createBacklog(newItem) },
+            onItemSwiped = { itemToRemove -> viewModel.swipeBacklogItem(itemToRemove) },
+            onClickYesterdayList = { goToYesterdayList() },      // TODO 테스트용: "어제 리스트 체크하기" 스낵바 생성 후 변경 예정
+            dragDropListState = dragDropListState,
+            onClickBtnTodoSettings = {
+                showBottomSheet(uiState.backlogList[it])
+                viewModel.onSelectedItem(uiState.backlogList[it])
+            },
+            interactionSource = interactionSource,
+            activeItemId = activeItemId,
+            onClearActiveItem = { activeItemId = null },
+            onTodoItemModified = { id: Long, content: String ->
+                viewModel.modifyTodo(
+                    item = ModifyTodoRequestModel(
+                        todoId = id,
+                        content = TodoContentModel(
+                            content = content
+                        )
                     )
                 )
-            )
-        },
-        resetNewItemFlag = { viewModel.updateNewItemFlag(false) },
-        onDragEnd = { viewModel.updateSnapshotListByMoving() }
-    )
+            },
+            resetNewItemFlag = { viewModel.updateNewItemFlag(false) },
+            onDragEnd = { viewModel.updateSnapshotListByMoving() }
+        )
+    }
 }
 
 @Composable

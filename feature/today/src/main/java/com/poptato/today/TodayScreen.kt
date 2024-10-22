@@ -121,17 +121,19 @@ fun TodayScreen(
         }
     }
 
-    TodayContent(
-        date = date,
-        uiState = uiState,
-        onCheckedChange = { status, id ->
-            viewModel.onCheckedTodo(status = status, id = id)
-        },
-        onClickBtnGetTodo = { goToBacklog() },
-        onItemSwiped = { itemToRemove -> viewModel.swipeTodayItem(itemToRemove) },
-        dragDropListState = dragDropListState,
-        onDragEnd = { viewModel.updateSnapshotListByMoving() }
-    )
+    if (uiState.isFinishedInitialization) {
+        TodayContent(
+            date = date,
+            uiState = uiState,
+            onCheckedChange = { status, id ->
+                viewModel.onCheckedTodo(status = status, id = id)
+            },
+            onClickBtnGetTodo = { goToBacklog() },
+            onItemSwiped = { itemToRemove -> viewModel.swipeTodayItem(itemToRemove) },
+            dragDropListState = dragDropListState,
+            onDragEnd = { viewModel.updateSnapshotListByMoving() }
+        )
+    }
 }
 
 @Composable
