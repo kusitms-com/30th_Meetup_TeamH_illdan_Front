@@ -18,19 +18,19 @@ import timber.log.Timber
 import javax.inject.Inject
 
 class TokenAuthenticator @Inject constructor(
-    private val getTokenUseCase: GetTokenUseCase,
-    private val saveTokenUseCase: SaveTokenUseCase,
-    private val reissueTokenUseCase: ReissueTokenUseCase
+    private val getTokenUseCase: Lazy<GetTokenUseCase>,
+    private val saveTokenUseCase: Lazy<SaveTokenUseCase>,
+    private val reissueTokenUseCase: Lazy<ReissueTokenUseCase>
 ): Authenticator {
     override fun authenticate(route: Route?, response: Response): Request? {
         val tokens = runBlocking {
-            getTokenUseCase.invoke(Unit).firstOrNull()
+            getTokenUseCase.get().invoke(Unit).firstOrNull()
         }
 
         return tokens?.let { tokenModel ->
             runBlocking {
                 try {
-                    val newTokensResult = reissueTokenUseCase.invoke(
+                    val newTokensResult = reissueTokenUseCase.get().invoke(
                         ReissueRequestModel(
                             accessToken = tokenModel.accessToken,
                             refreshToken = tokenModel.refreshToken
@@ -38,7 +38,7 @@ class TokenAuthenticator @Inject constructor(
                     ).firstOrNull()
 
                     newTokensResult?.getOrNull()?.let { newTokens ->
-                        saveTokenUseCase.invoke(newTokens).collect {}
+                        saveTokenUseCase.get().invoke(newTokens).collect {}
 
                         response.request.newBuilder()
                             .header("Authorization", "Bearer ${newTokens.accessToken}")
