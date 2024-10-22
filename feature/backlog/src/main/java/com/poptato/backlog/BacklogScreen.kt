@@ -572,7 +572,6 @@ fun BacklogItem(
                                 )
                             }
                         },
-                    singleLine = true,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         imeAction = ImeAction.Done
                     ),
