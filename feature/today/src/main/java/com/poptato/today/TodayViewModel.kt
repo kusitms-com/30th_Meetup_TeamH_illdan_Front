@@ -98,22 +98,6 @@ class TodayViewModel @Inject constructor(
         )
     }
 
-    fun setDeadline(deadline: String?) {
-        val dDay = TimeFormatter.calculateDDay(deadline)
-        val updatedItem = uiState.value.selectedItem.copy(deadline = deadline ?: "", dDay = dDay)
-        val newList = uiState.value.todayList.map {
-            if (it.todoId == updatedItem.todoId) updatedItem
-            else it
-        }
-
-        updateState(
-            uiState.value.copy(
-                todayList = newList,
-                selectedItem = updatedItem
-            )
-        )
-    }
-
     fun swipeTodayItem(item: TodoItemModel) {
         val newList = uiState.value.todayList.filter { it.todoId != item.todoId }
 
@@ -143,9 +127,7 @@ class TodayViewModel @Inject constructor(
             currentList.move(fromIndex, safeToIndex)
             updateList(currentList)
         }
-    }
 
-    fun updateSnapshotListByMoving() {
         val todoIdList = uiState.value.todayList
             .filter { it.todoStatus == TodoStatus.INCOMPLETE }
             .map { it.todoId }

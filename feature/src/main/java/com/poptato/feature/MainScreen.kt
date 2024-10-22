@@ -252,18 +252,6 @@ fun MainScreen() {
                         modifier = Modifier.background(Gray100),
                         navController = navController,
                         startDestination = NavRoutes.SplashGraph.route,
-//                        enterTransition = {
-//                            fadeIn(animationSpec = tween(durationMillis = 100))
-//                        },
-//                        exitTransition = {
-//                            fadeOut(animationSpec = tween(durationMillis = 100))
-//                        },
-//                        popEnterTransition = {
-//                            fadeIn(animationSpec = tween(durationMillis = 100))
-//                        },
-//                        popExitTransition = {
-//                            fadeOut(animationSpec = tween(durationMillis = 100))
-//                        }
                         exitTransition = { ExitTransition.None },
                         enterTransition = {
                             slideIntoContainer(

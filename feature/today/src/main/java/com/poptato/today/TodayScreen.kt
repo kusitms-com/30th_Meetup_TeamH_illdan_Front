@@ -69,6 +69,7 @@ import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.poptato.core.util.TimeFormatter
+import com.poptato.core.util.move
 import com.poptato.design_system.BOOKMARK
 import com.poptato.design_system.BtnGetTodoText
 import com.poptato.design_system.DEADLINE
@@ -104,12 +105,6 @@ fun TodayScreen(
     val viewModel: TodayViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val date = TimeFormatter.getTodayMonthDay()
-    val dragDropListState = rememberDragDropListState(
-        lazyListState = rememberLazyListState(),
-        onMove = { from, to ->
-//            viewModel.moveItem(from, to)
-        }
-    )
 
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collect { event ->
@@ -130,8 +125,7 @@ fun TodayScreen(
             },
             onClickBtnGetTodo = { goToBacklog() },
             onItemSwiped = { itemToRemove -> viewModel.swipeTodayItem(itemToRemove) },
-            dragDropListState = dragDropListState,
-            onDragEnd = { viewModel.updateSnapshotListByMoving() }
+            onDragEnd = { from, to -> viewModel.moveItem(from, to) }
         )
     }
 }
@@ -143,8 +137,7 @@ fun TodayContent(
     onCheckedChange: (TodoStatus, Long) -> Unit = {_, _ ->},
     onClickBtnGetTodo: () -> Unit = {},
     onItemSwiped: (TodoItemModel) -> Unit = {},
-    dragDropListState: DragDropListState,
-    onDragEnd: () -> Unit = {}
+    onDragEnd: (fromIndex: Int, toIndex: Int) -> Unit = { _, _ -> }
 ) {
     Column(
         modifier = Modifier
@@ -175,7 +168,6 @@ fun TodayContent(
                 list = uiState.todayList,
                 onCheckedChange = onCheckedChange,
                 onItemSwiped = onItemSwiped,
-                dragDropListState = dragDropListState,
                 onDragEnd = onDragEnd
             )
         }
@@ -187,67 +179,91 @@ fun TodayTodoList(
     list: List<TodoItemModel> = emptyList(),
     onCheckedChange: (TodoStatus, Long) -> Unit = { _, _ -> },
     onItemSwiped: (TodoItemModel) -> Unit = {},
-    dragDropListState: DragDropListState,
-    onDragEnd: () -> Unit = {}
+    onDragEnd: (fromIndex: Int, toIndex: Int) -> Unit = { _, _ -> }
 ) {
+    val uiList = remember { list.toMutableList() }
     var draggedItem by remember { mutableStateOf<TodoItemModel?>(null) }
     var isDragging by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    fun moveItemInUI(fromIndex: Int, toIndex: Int) {
+        val lastIncompleteIndex = uiList.indexOfLast { it.todoStatus == TodoStatus.INCOMPLETE }
+        var safeToIndex = toIndex
+
+        if (lastIncompleteIndex in fromIndex..<toIndex) {
+            safeToIndex = lastIncompleteIndex
+        } else if (lastIncompleteIndex in toIndex..<fromIndex) {
+            safeToIndex = lastIncompleteIndex + 1
+        }
+
+        if (fromIndex != safeToIndex) {
+            val item = uiList.removeAt(fromIndex)
+            uiList.add(safeToIndex, item)
+        }
+
+        onDragEnd(fromIndex, safeToIndex)
+    }
+    val dragDropState = rememberDragDropListState(
+        lazyListState = rememberLazyListState(),
+        onMove = { from, to ->
+            if (from != to) {
+                moveItemInUI(from, to)
+            }
+        }
+    )
 
     LazyColumn(
-        state = dragDropListState.lazyListState,
+        state = dragDropState.lazyListState,
         modifier = Modifier
             .pointerInput(Unit) {
                 detectDragGesturesAfterLongPress(
                     onDragStart = { offset ->
-                        dragDropListState.onDragStart(offset)
-                        draggedItem = list[dragDropListState.currentIndexOfDraggedItem
+                        dragDropState.onDragStart(offset)
+                        draggedItem = list[dragDropState.currentIndexOfDraggedItem
                             ?: return@detectDragGesturesAfterLongPress]
                         isDragging = true
                     },
                     onDragEnd = {
-                        dragDropListState.onDragInterrupted()
+                        dragDropState.onDragInterrupted()
                         draggedItem = null
                         isDragging = false
-                        onDragEnd()
                     },
                     onDragCancel = {
-                        dragDropListState.onDragInterrupted()
+                        dragDropState.onDragInterrupted()
                         draggedItem = null
                         isDragging = false
                     },
                     onDrag = { change, offset ->
                         change.consume()
-                        dragDropListState.onDrag(offset)
-                        if (dragDropListState.overscrollJob?.isActive == true) return@detectDragGesturesAfterLongPress
-                        dragDropListState
+                        dragDropState.onDrag(offset)
+                        if (dragDropState.overscrollJob?.isActive == true) return@detectDragGesturesAfterLongPress
+                        dragDropState
                             .checkForOverScroll()
                             .takeIf { it != 0f }
                             ?.let {
-                                dragDropListState.overscrollJob = scope.launch {
+                                dragDropState.overscrollJob = scope.launch {
                                     val adjustedScroll = it * 0.5f
-                                    dragDropListState.lazyListState.scrollBy(adjustedScroll)
+                                    dragDropState.lazyListState.scrollBy(adjustedScroll)
                                 }
-                            } ?: run { dragDropListState.overscrollJob?.cancel() }
+                            } ?: run { dragDropState.overscrollJob?.cancel() }
                     }
                 )
             }
             .fillMaxSize()
             .padding(horizontal = 16.dp)
     ) {
-        itemsIndexed(items = list, key = { index, item -> item.todoId }) { index, item ->
-            var offsetX by remember { mutableFloatStateOf(0f) }
-            val isDragged = index == dragDropListState.currentIndexOfDraggedItem
 
+        itemsIndexed(items = uiList, key = { index, item -> item.todoId }) { index, item ->
+            var offsetX by remember { mutableFloatStateOf(0f) }
+            val isDragged = index == dragDropState.currentIndexOfDraggedItem
 
             TodayTodoItem(
                 item = item,
                 onCheckedChange = onCheckedChange,
                 modifier = Modifier
-                    .zIndex(if (index == dragDropListState.currentIndexOfDraggedItem) 1f else 0f)
+                    .zIndex(if (index == dragDropState.currentIndexOfDraggedItem) 1f else 0f)
                     .graphicsLayer {
                         translationY =
-                            dragDropListState.elementDisplacement.takeIf { index == dragDropListState.currentIndexOfDraggedItem }
+                            dragDropState.elementDisplacement.takeIf { index == dragDropState.currentIndexOfDraggedItem }
                                 ?: 0f
                         scaleX = if (isDragged) 1.05f else 1f
                         scaleY = if (isDragged) 1.05f else 1f
@@ -291,6 +307,8 @@ fun TodayTodoList(
             )
             Spacer(modifier = Modifier.height(12.dp))
         }
+
+        item { Spacer(modifier = Modifier.height(30.dp)) }
     }
 }
 

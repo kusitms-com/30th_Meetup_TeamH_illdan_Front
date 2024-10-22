@@ -64,9 +64,6 @@ class DragDropListState(
 
             currentElement?.let { hovered ->
                 lazyListState.layoutInfo.visibleItemsInfo.filterNot { item ->
-                    if (currentIndexOfDraggedItem == 0 && item.index == 0 && draggedDistance < 0) {
-                        return@filterNot true
-                    }
                     item.offset + item.size <= startOffset || item.offset >= endOffset || hovered.index == item.index
                 }.firstOrNull { item ->
                     when {
@@ -75,7 +72,6 @@ class DragDropListState(
                     }
                 }?.also { item ->
                     currentIndexOfDraggedItem?.let { current ->
-                        if (current == 0 && item.index == 0) return@let
                         onMove.invoke(current, item.index)
                     }
                     currentIndexOfDraggedItem = item.index
