@@ -108,7 +108,7 @@ fun BacklogScreen(
     val dragDropListState = rememberDragDropListState(
         lazyListState = rememberLazyListState(),
         onMove = { from, to ->
-            viewModel.moveItem(from, to)
+//            viewModel.moveItem(from, to)
         }
     )
     var activeItemId by remember { mutableStateOf<Long?>(null) }
@@ -174,7 +174,8 @@ fun BacklogScreen(
                 )
             )
         },
-        resetNewItemFlag = { viewModel.updateNewItemFlag(false) }
+        resetNewItemFlag = { viewModel.updateNewItemFlag(false) },
+        onDragEnd = { viewModel.updateSnapshotListByMoving() }
     )
 }
 
@@ -191,7 +192,8 @@ fun BacklogContent(
     activeItemId: Long?,
     onClearActiveItem: () -> Unit = {},
     onTodoItemModified: (Long, String) -> Unit = {_,_ ->},
-    resetNewItemFlag: () -> Unit = {}
+    resetNewItemFlag: () -> Unit = {},
+    onDragEnd: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -245,7 +247,8 @@ fun BacklogContent(
                         onClearActiveItem = onClearActiveItem,
                         onTodoItemModified = onTodoItemModified,
                         isNewItemCreated = uiState.isNewItemCreated,
-                        resetNewItemFlag = resetNewItemFlag
+                        resetNewItemFlag = resetNewItemFlag,
+                        onDragEnd = onDragEnd
                     )
                 }
             }
@@ -349,7 +352,8 @@ fun BacklogTaskList(
     onClearActiveItem: () -> Unit = {},
     onTodoItemModified: (Long, String) -> Unit = {_,_ ->},
     isNewItemCreated: Boolean = false,
-    resetNewItemFlag: () -> Unit = {}
+    resetNewItemFlag: () -> Unit = {},
+    onDragEnd: () -> Unit = {}
 ) {
     var draggedItem by remember { mutableStateOf<TodoItemModel?>(null) }
     var isDragging by remember { mutableStateOf(false) }
@@ -371,6 +375,7 @@ fun BacklogTaskList(
                         dragDropListState.onDragInterrupted()
                         draggedItem = null
                         isDragging = false
+                        onDragEnd()
                     },
                     onDragCancel = {
                         dragDropListState.onDragInterrupted()
