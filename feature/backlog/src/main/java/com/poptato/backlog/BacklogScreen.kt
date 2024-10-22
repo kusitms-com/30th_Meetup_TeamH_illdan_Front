@@ -147,7 +147,7 @@ fun BacklogScreen(
 
     LaunchedEffect(updateDeadlineFlow) {
         updateDeadlineFlow.collect {
-            viewModel.setDeadline(it)
+            viewModel.setDeadline(it, uiState.selectedItem.todoId)
         }
     }
 

@@ -168,6 +168,7 @@ fun MainScreen() {
                             TodoBottomSheet(
                                 item = uiState.selectedTodoItem,
                                 setDeadline = {
+                                    viewModel.onUpdatedDeadline(it)
                                     scope.launch { updateDeadlineFlow.emit(it) }
                                 },
                                 onClickShowDatePicker = { bottomSheetType = BottomSheetType.FullDate },
@@ -184,6 +185,7 @@ fun MainScreen() {
                                     }
                                 },
                                 onClickBtnBookmark = {
+                                    viewModel.onUpdatedBookmark(!uiState.selectedTodoItem.isBookmark)
                                     scope.launch {
                                         updateBookmarkFlow.emit(it)
                                     }
@@ -198,7 +200,6 @@ fun MainScreen() {
                                     viewModel.onUpdatedDeadline(date)
                                     scope.launch {
                                         updateDeadlineFlow.emit(date)
-                                        sheetState.hide()
                                     }
                                 }
                             )
