@@ -288,7 +288,8 @@ fun CreateBacklogTextFiled(
             onValueChange = { onValueChange(it) },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(vertical = 16.dp)
+                .padding(start = 16.dp, end = 28.dp)
                 .onFocusChanged { focusState ->
                     isFocused = focusState.isFocused
                 },
