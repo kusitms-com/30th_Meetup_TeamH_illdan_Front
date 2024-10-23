@@ -537,7 +537,7 @@ fun BacklogItem(
         ) {
             Row(
                 modifier = Modifier
-                    .padding(top = if (item.isBookmark || item.dDay != null) 8.dp else 0.dp),
+                    .padding(top = if (item.isBookmark || item.dDay != null) 12.dp else 0.dp),
                 horizontalArrangement = Arrangement.Start
             ) {
                 if (item.isBookmark) {

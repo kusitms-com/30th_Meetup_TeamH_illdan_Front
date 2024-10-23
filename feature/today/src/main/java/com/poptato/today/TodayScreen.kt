@@ -174,6 +174,7 @@ fun TodayContent(
     }
 }
 
+@SuppressLint("MutableCollectionMutableState")
 @Composable
 fun TodayTodoList(
     list: List<TodoItemModel> = emptyList(),
@@ -181,10 +182,15 @@ fun TodayTodoList(
     onItemSwiped: (TodoItemModel) -> Unit = {},
     onDragEnd: (fromIndex: Int, toIndex: Int) -> Unit = { _, _ -> }
 ) {
-    val uiList = remember { list.toMutableList() }
+    var uiList by remember { mutableStateOf(list.toMutableList()) }
     var draggedItem by remember { mutableStateOf<TodoItemModel?>(null) }
     var isDragging by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+
+    LaunchedEffect(list) {
+        uiList = list.toMutableList()
+    }
+
     fun moveItemInUI(fromIndex: Int, toIndex: Int) {
         val lastIncompleteIndex = uiList.indexOfLast { it.todoStatus == TodoStatus.INCOMPLETE }
         var safeToIndex = toIndex
@@ -370,7 +376,7 @@ fun TodayTodoItem(
             Row(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
-                    .padding(top = if (item.isBookmark || item.dDay != null) 8.dp else 0.dp),
+                    .padding(top = if (item.isBookmark || item.dDay != null) 12.dp else 0.dp),
                 horizontalArrangement = Arrangement.Start
             ) {
                 if (item.isBookmark) {
