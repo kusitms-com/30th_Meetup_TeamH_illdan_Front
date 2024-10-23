@@ -152,9 +152,7 @@ class BacklogViewModel @Inject constructor(
             currentList.move(safeFromIndex, safeToIndex)
             updateList(currentList)
         }
-    }
 
-    fun updateSnapshotListByMoving() {
         val todoIdList = uiState.value.backlogList.map { it.todoId }
 
         viewModelScope.launch {
