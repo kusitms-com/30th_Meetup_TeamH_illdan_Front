@@ -30,7 +30,7 @@ const val EmptyBacklogTitle = "할 일을 생각나는 대로\n추가해보세�
 const val BACKLOG_YESTERDAY_TASK_GUIDE = "어제 한 일 체크를 깜빡했다면?"
 
 // YesterdayList
-const val YesterdayListTitle = "어제 완료한 일 왼쪽으로 스와이프!"
+const val YesterdayListTitle = "어제 한 일을 모두 체크하세요!"
 const val YesterdayAllCheckBtn = "완료"
 const val YesterdayAllCheckContent = "좋아요! 오늘 하루도\n힘차게 시작해볼까요?"
 
