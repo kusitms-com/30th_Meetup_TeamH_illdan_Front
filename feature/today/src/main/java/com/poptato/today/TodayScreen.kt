@@ -202,11 +202,9 @@ fun TodayTodoList(
         }
 
         if (fromIndex != safeToIndex) {
-            val item = uiList.removeAt(fromIndex)
-            uiList.add(safeToIndex, item)
+            uiList.move(fromIndex, safeToIndex)
+            onDragEnd(fromIndex, safeToIndex)
         }
-
-        onDragEnd(fromIndex, safeToIndex)
     }
     val dragDropState = rememberDragDropListState(
         lazyListState = rememberLazyListState(),
@@ -292,15 +290,9 @@ fun TodayTodoList(
                             }
                         )
                     }
-                    .then(
-                        if (!isDragging) {
-                            Modifier.animateItem(
-                                fadeInSpec = null,
-                                fadeOutSpec = null
-                            )
-                        } else {
-                            Modifier
-                        }
+                    .animateItem(
+                        fadeInSpec = null,
+                        fadeOutSpec = null
                     )
                     .border(
                         if (isDragged) BorderStroke(1.dp, Color.White) else BorderStroke(
