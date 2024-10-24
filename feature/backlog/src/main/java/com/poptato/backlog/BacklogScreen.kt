@@ -500,8 +500,8 @@ fun BacklogTaskList(
         item { Spacer(modifier = Modifier.height(45.dp)) }
     }
 
-    LaunchedEffect(taskList.size, isDragging) {
-        if (dragDropState.lazyListState.firstVisibleItemIndex != 0 && !isDragging && isNewItemCreated) {
+    LaunchedEffect(isNewItemCreated) {
+        if (isNewItemCreated) {
             dragDropState.lazyListState.scrollToItem(0)
             resetNewItemFlag()
         }
