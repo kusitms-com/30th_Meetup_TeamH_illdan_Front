@@ -1,6 +1,12 @@
+import java.util.Properties
+
 plugins {
     id("poptato.android.feature")
     id("poptato.android.compose")
+}
+
+val properties = Properties().apply {
+    load(rootProject.file("local.properties").inputStream())
 }
 
 android {
@@ -8,6 +14,12 @@ android {
 
     defaultConfig {
         buildConfigField(type = "String", name = "VERSION_NAME", value = "\"${project.version}\"")
+
+        val noticeUrl = properties.getProperty("NOTICE_URL")
+        buildConfigField("String", "NOTICE_URL", "\"$noticeUrl\"")
+
+        val faqUrl = properties.getProperty("FAQ_URL")
+        buildConfigField("String", "FAQ_URL", "\"$faqUrl\"")
     }
 }
 
