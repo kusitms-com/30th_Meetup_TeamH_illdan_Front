@@ -1,21 +1,17 @@
 package com.poptato.today
 
 import android.annotation.SuppressLint
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.updateTransition
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,7 +25,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -39,6 +36,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -55,7 +53,6 @@ import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.poptato.core.util.TimeFormatter
-import com.poptato.design_system.BOOKMARK
 import com.poptato.design_system.BtnGetTodoText
 import com.poptato.design_system.DEADLINE
 import com.poptato.design_system.DEADLINE_DDAY
@@ -76,9 +73,10 @@ import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.ui.common.BookmarkItem
 import com.poptato.ui.common.PoptatoCheckBox
 import com.poptato.ui.common.TopBar
+import com.poptato.ui.util.rememberDragDropListState
 import com.poptato.ui.util.toPx
 import kotlinx.coroutines.flow.filter
-import timber.log.Timber
+import kotlinx.coroutines.launch
 
 @Composable
 fun TodayScreen(
@@ -99,15 +97,19 @@ fun TodayScreen(
         }
     }
 
-    TodayContent(
-        date = date,
-        uiState = uiState,
-        onCheckedChange = { status, id ->
-            viewModel.onCheckedTodo(status = status, id = id)
-        },
-        onClickBtnGetTodo = { goToBacklog() },
-        onItemSwiped = { itemToRemove -> viewModel.swipeTodayItem(itemToRemove) }
-    )
+    if (uiState.isFinishedInitialization) {
+        TodayContent(
+            date = date,
+            uiState = uiState,
+            onCheckedChange = { status, id ->
+                viewModel.onCheckedTodo(status = status, id = id)
+            },
+            onClickBtnGetTodo = { goToBacklog() },
+            onItemSwiped = { itemToRemove -> viewModel.swipeTodayItem(itemToRemove) },
+            onMove = { from, to -> viewModel.moveItem(from, to) },
+            onDragEnd = { viewModel.onDragEnd() }
+        )
+    }
 }
 
 @Composable
@@ -116,7 +118,9 @@ fun TodayContent(
     uiState: TodayPageState = TodayPageState(),
     onCheckedChange: (TodoStatus, Long) -> Unit = {_, _ ->},
     onClickBtnGetTodo: () -> Unit = {},
-    onItemSwiped: (TodoItemModel) -> Unit = {}
+    onItemSwiped: (TodoItemModel) -> Unit = {},
+    onMove: (fromIndex: Int, toIndex: Int) -> Unit = { _, _ -> },
+    onDragEnd: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -146,36 +150,89 @@ fun TodayContent(
             else TodayTodoList(
                 list = uiState.todayList,
                 onCheckedChange = onCheckedChange,
-                onItemSwiped = onItemSwiped
+                onItemSwiped = onItemSwiped,
+                onMove = onMove,
+                onDragEnd = onDragEnd
             )
         }
     }
 }
 
+@SuppressLint("MutableCollectionMutableState")
 @Composable
 fun TodayTodoList(
     list: List<TodoItemModel> = emptyList(),
     onCheckedChange: (TodoStatus, Long) -> Unit = { _, _ -> },
-    onItemSwiped: (TodoItemModel) -> Unit = {}
+    onItemSwiped: (TodoItemModel) -> Unit = {},
+    onMove: (fromIndex: Int, toIndex: Int) -> Unit = { _, _ -> },
+    onDragEnd: () -> Unit
 ) {
+    var draggedItem by remember { mutableStateOf<TodoItemModel?>(null) }
+    var isDragging by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    val dragDropState = rememberDragDropListState(
+        lazyListState = rememberLazyListState(),
+        onMove = onMove
+    )
+
     LazyColumn(
+        state = dragDropState.lazyListState,
         modifier = Modifier
+            .pointerInput(Unit) {
+                detectDragGesturesAfterLongPress(
+                    onDragStart = { offset ->
+                        dragDropState.onDragStart(offset)
+                        draggedItem = list[dragDropState.currentIndexOfDraggedItem
+                            ?: return@detectDragGesturesAfterLongPress]
+                        isDragging = true
+                    },
+                    onDragEnd = {
+                        dragDropState.onDragInterrupted()
+                        draggedItem = null
+                        isDragging = false
+                        onDragEnd()
+                    },
+                    onDragCancel = {
+                        dragDropState.onDragInterrupted()
+                        draggedItem = null
+                        isDragging = false
+                    },
+                    onDrag = { change, offset ->
+                        change.consume()
+                        dragDropState.onDrag(offset)
+                        if (dragDropState.overscrollJob?.isActive == true) return@detectDragGesturesAfterLongPress
+                        dragDropState
+                            .checkForOverScroll()
+                            .takeIf { it != 0f }
+                            ?.let {
+                                dragDropState.overscrollJob = scope.launch {
+                                    val adjustedScroll = it * 0.5f
+                                    dragDropState.lazyListState.scrollBy(adjustedScroll)
+                                }
+                            } ?: run { dragDropState.overscrollJob?.cancel() }
+                    }
+                )
+            }
             .fillMaxSize()
             .padding(horizontal = 16.dp)
     ) {
-        items(list, key = { it.todoId }) { item ->
+
+        itemsIndexed(items = list, key = { index, item -> item.todoId }) { index, item ->
             var offsetX by remember { mutableFloatStateOf(0f) }
+            val isDragged = index == dragDropState.currentIndexOfDraggedItem
 
             TodayTodoItem(
                 item = item,
                 onCheckedChange = onCheckedChange,
                 modifier = Modifier
-                    .animateItem(
-                        fadeInSpec = null, fadeOutSpec = null, placementSpec = spring(
-                            stiffness = Spring.StiffnessMediumLow,
-                            visibilityThreshold = IntOffset.VisibilityThreshold
-                        )
-                    )
+                    .zIndex(if (index == dragDropState.currentIndexOfDraggedItem) 1f else 0f)
+                    .graphicsLayer {
+                        translationY =
+                            dragDropState.elementDisplacement.takeIf { index == dragDropState.currentIndexOfDraggedItem }
+                                ?: 0f
+                        scaleX = if (isDragged) 1.05f else 1f
+                        scaleY = if (isDragged) 1.05f else 1f
+                    }
                     .offset { IntOffset(offsetX.toInt(), 0) }
                     .pointerInput(Unit) {
                         detectHorizontalDragGestures(
@@ -194,9 +251,29 @@ fun TodayTodoList(
                             }
                         )
                     }
+                    .then(
+                        if (!isDragging) {
+                            Modifier.animateItem(
+                                fadeInSpec = null,
+                                fadeOutSpec = null
+                            )
+                        } else {
+                            Modifier
+                        }
+                    )
+                    .border(
+                        if (isDragged) BorderStroke(1.dp, Color.White) else BorderStroke(
+                            0.dp,
+                            Color.Transparent
+                        ),
+                        RoundedCornerShape(8.dp)
+                    )
+
             )
             Spacer(modifier = Modifier.height(12.dp))
         }
+
+        item { Spacer(modifier = Modifier.height(30.dp)) }
     }
 }
 
@@ -205,9 +282,9 @@ fun TodayTodoList(
 fun TodayTodoItem(
     item: TodoItemModel = TodoItemModel(),
     onCheckedChange: (TodoStatus, Long) -> Unit = { _, _ -> },
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-    var showAnimation by remember { mutableStateOf(item.todoStatus == TodoStatus.COMPLETED) }
+    var showAnimation by remember { mutableStateOf(false) }
     val transition = updateTransition(targetState = showAnimation, label = "")
 
     LaunchedEffect(transition) {
@@ -258,7 +335,7 @@ fun TodayTodoItem(
             Row(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
-                    .padding(top = if (item.isBookmark || item.dDay != null) 16.dp else 0.dp),
+                    .padding(top = if (item.isBookmark || item.dDay != null) 12.dp else 0.dp),
                 horizontalArrangement = Arrangement.Start
             ) {
                 if (item.isBookmark) {
@@ -345,5 +422,5 @@ fun EmptyTodoView(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun PreviewToday() {
-    TodayContent()
+//    TodayContent()
 }
