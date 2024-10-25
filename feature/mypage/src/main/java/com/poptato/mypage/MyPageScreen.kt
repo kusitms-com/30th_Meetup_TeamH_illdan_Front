@@ -45,7 +45,6 @@ import com.poptato.design_system.VersionSetting
 import com.poptato.mypage.BuildConfig.VERSION_NAME
 import com.poptato.mypage.MyPageViewModel.Companion.FAQ_TYPE
 import com.poptato.mypage.MyPageViewModel.Companion.NOTICE_TYPE
-import com.poptato.mypage.MyPageViewModel.Companion.POLICY_TYPE
 
 @Composable
 fun MyPageScreen(
@@ -65,7 +64,7 @@ fun MyPageScreen(
         interactionSource = interactionSource,
         onClickServiceNotice = { viewModel.updateState(true, NOTICE_TYPE) },
         onClickServiceFAQ = { viewModel.updateState(true, FAQ_TYPE) },
-        onClickPolicyBtn = { viewModel.updateState(true, POLICY_TYPE) },
+        onClickPolicyBtn = { goToPolicyViewerPage() },
     )
 
     if (uiState.noticeWebViewState) {
@@ -74,10 +73,6 @@ fun MyPageScreen(
 
     if (uiState.faqWebViewState) {
         goToFAQViewerPage()
-    }
-
-    if (uiState.policyViewState) {
-        goToPolicyViewerPage()
     }
 }
 

@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -107,20 +109,20 @@ fun TitleTopBar(
 fun PolicyData(
     policyContent: String = ""
 ) {
-    Box(
+
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .wrapContentHeight()
-            .padding(16.dp)
+            .padding(horizontal = 16.dp)
+            .verticalScroll(rememberScrollState())
     ) {
-
         Text(
             text = policyContent,
             style = PoptatoTypo.smMedium,
             color = Gray40,
-            modifier = Modifier
-                .fillMaxSize()
-                .align(Alignment.Center)
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+                .padding(vertical = 16.dp)
         )
     }
 }
