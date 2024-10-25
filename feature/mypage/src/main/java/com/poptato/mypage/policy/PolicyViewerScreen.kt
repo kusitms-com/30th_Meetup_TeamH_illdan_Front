@@ -7,6 +7,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.github.barteksc.pdfviewer.PDFView
 import com.poptato.design_system.R
 import java.io.File
@@ -15,6 +16,8 @@ import java.io.File
 fun PolicyViewerScreen(
     goBackToMyPage: () -> Unit = {}
 ) {
+
+    val viewModel: PolicyViewModel = hiltViewModel()
 
     PolicyPDFViewer(
         pdfResId = R.raw.policy,
