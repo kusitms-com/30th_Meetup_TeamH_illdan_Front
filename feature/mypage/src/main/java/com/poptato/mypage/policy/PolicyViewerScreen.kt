@@ -1,5 +1,6 @@
 package com.poptato.mypage.policy
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -40,11 +41,13 @@ fun PolicyViewerScreen(
     val viewModel: PolicyViewModel = hiltViewModel()
     val uiState: PolicyPageState by viewModel.uiState.collectAsStateWithLifecycle()
     val interactionSource = remember { MutableInteractionSource() }
+    val scrollState = rememberScrollState()
 
     PolicyViewerContent(
         onClickCloseBtn = { goBackToMyPage() },
         uiState = uiState,
-        interactionSource = interactionSource
+        interactionSource = interactionSource,
+        scrollState = scrollState
     )
 }
 
@@ -52,6 +55,7 @@ fun PolicyViewerScreen(
 fun PolicyViewerContent(
     uiState: PolicyPageState = PolicyPageState(),
     interactionSource: MutableInteractionSource = MutableInteractionSource(),
+    scrollState: ScrollState = rememberScrollState(),
     onClickCloseBtn: () -> Unit = {},
 ) {
     Column(
@@ -65,7 +69,8 @@ fun PolicyViewerContent(
         )
 
         PolicyData(
-            policyContent = uiState.policyModel.content
+            policyContent = uiState.policyModel.content,
+            scrollState = scrollState
         )
     }
 }
@@ -107,7 +112,8 @@ fun TitleTopBar(
 
 @Composable
 fun PolicyData(
-    policyContent: String = ""
+    policyContent: String = "",
+    scrollState: ScrollState = rememberScrollState()
 ) {
 
     Column(
@@ -115,13 +121,14 @@ fun PolicyData(
             .fillMaxSize()
             .wrapContentHeight()
             .padding(horizontal = 16.dp)
-            .verticalScroll(rememberScrollState())
+            .verticalScroll(scrollState)
     ) {
         Text(
             text = policyContent,
             style = PoptatoTypo.smMedium,
             color = Gray40,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
                 .padding(vertical = 16.dp)
         )
     }
