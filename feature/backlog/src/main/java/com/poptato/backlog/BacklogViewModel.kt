@@ -143,16 +143,13 @@ class BacklogViewModel @Inject constructor(
         }
     }
 
-    fun moveItem(fromIndex: Int, toIndex: Int) {
+    fun onMove(from: Int, to: Int) {
         val currentList = uiState.value.backlogList.toMutableList()
-        val safeToIndex = toIndex.coerceIn(0, currentList.size - 1)
-        val safeFromIndex = fromIndex.coerceIn(0, currentList.size - 1)
+        currentList.move(from, to)
+        updateList(currentList)
+    }
 
-        if (safeFromIndex != safeToIndex) {
-            currentList.move(safeFromIndex, safeToIndex)
-            updateList(currentList)
-        }
-
+    fun onDragEnd() {
         val todoIdList = uiState.value.backlogList.map { it.todoId }
 
         viewModelScope.launch {
@@ -167,10 +164,15 @@ class BacklogViewModel @Inject constructor(
         }
     }
 
+    fun updateBacklogList(newList: List<TodoItemModel>) {
+        updateState(uiState.value.copy(backlogList = newList))
+    }
+
     private fun updateList(updatedList: List<TodoItemModel>) {
+        val newList = updatedList.toList()
         updateState(
             uiState.value.copy(
-                backlogList = updatedList
+                backlogList = newList
             )
         )
     }

@@ -1,22 +1,14 @@
 package com.poptato.today
 
 import android.annotation.SuppressLint
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.updateTransition
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.scrollBy
@@ -33,7 +25,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -42,9 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -53,14 +42,9 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
@@ -69,8 +53,6 @@ import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.poptato.core.util.TimeFormatter
-import com.poptato.core.util.move
-import com.poptato.design_system.BOOKMARK
 import com.poptato.design_system.BtnGetTodoText
 import com.poptato.design_system.DEADLINE
 import com.poptato.design_system.DEADLINE_DDAY
@@ -91,7 +73,6 @@ import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.ui.common.BookmarkItem
 import com.poptato.ui.common.PoptatoCheckBox
 import com.poptato.ui.common.TopBar
-import com.poptato.ui.util.DragDropListState
 import com.poptato.ui.util.rememberDragDropListState
 import com.poptato.ui.util.toPx
 import kotlinx.coroutines.flow.filter
@@ -125,7 +106,8 @@ fun TodayScreen(
             },
             onClickBtnGetTodo = { goToBacklog() },
             onItemSwiped = { itemToRemove -> viewModel.swipeTodayItem(itemToRemove) },
-            onDragEnd = { from, to -> viewModel.moveItem(from, to) }
+            onMove = { from, to -> viewModel.moveItem(from, to) },
+            onDragEnd = { viewModel.onDragEnd() }
         )
     }
 }
@@ -137,7 +119,8 @@ fun TodayContent(
     onCheckedChange: (TodoStatus, Long) -> Unit = {_, _ ->},
     onClickBtnGetTodo: () -> Unit = {},
     onItemSwiped: (TodoItemModel) -> Unit = {},
-    onDragEnd: (fromIndex: Int, toIndex: Int) -> Unit = { _, _ -> }
+    onMove: (fromIndex: Int, toIndex: Int) -> Unit = { _, _ -> },
+    onDragEnd: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -168,6 +151,7 @@ fun TodayContent(
                 list = uiState.todayList,
                 onCheckedChange = onCheckedChange,
                 onItemSwiped = onItemSwiped,
+                onMove = onMove,
                 onDragEnd = onDragEnd
             )
         }
@@ -180,39 +164,15 @@ fun TodayTodoList(
     list: List<TodoItemModel> = emptyList(),
     onCheckedChange: (TodoStatus, Long) -> Unit = { _, _ -> },
     onItemSwiped: (TodoItemModel) -> Unit = {},
-    onDragEnd: (fromIndex: Int, toIndex: Int) -> Unit = { _, _ -> }
+    onMove: (fromIndex: Int, toIndex: Int) -> Unit = { _, _ -> },
+    onDragEnd: () -> Unit
 ) {
-    var uiList by remember { mutableStateOf(list.toMutableList()) }
     var draggedItem by remember { mutableStateOf<TodoItemModel?>(null) }
     var isDragging by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
-
-    LaunchedEffect(list) {
-        uiList = list.toMutableList()
-    }
-
-    fun moveItemInUI(fromIndex: Int, toIndex: Int) {
-        val lastIncompleteIndex = uiList.indexOfLast { it.todoStatus == TodoStatus.INCOMPLETE }
-        var safeToIndex = toIndex
-
-        if (lastIncompleteIndex in fromIndex..<toIndex) {
-            safeToIndex = lastIncompleteIndex
-        } else if (lastIncompleteIndex in toIndex..<fromIndex) {
-            safeToIndex = lastIncompleteIndex + 1
-        }
-
-        if (fromIndex != safeToIndex) {
-            uiList.move(fromIndex, safeToIndex)
-            onDragEnd(fromIndex, safeToIndex)
-        }
-    }
     val dragDropState = rememberDragDropListState(
         lazyListState = rememberLazyListState(),
-        onMove = { from, to ->
-            if (from != to) {
-                moveItemInUI(from, to)
-            }
-        }
+        onMove = onMove
     )
 
     LazyColumn(
@@ -230,6 +190,7 @@ fun TodayTodoList(
                         dragDropState.onDragInterrupted()
                         draggedItem = null
                         isDragging = false
+                        onDragEnd()
                     },
                     onDragCancel = {
                         dragDropState.onDragInterrupted()
@@ -256,7 +217,7 @@ fun TodayTodoList(
             .padding(horizontal = 16.dp)
     ) {
 
-        itemsIndexed(items = uiList, key = { index, item -> item.todoId }) { index, item ->
+        itemsIndexed(items = list, key = { index, item -> item.todoId }) { index, item ->
             var offsetX by remember { mutableFloatStateOf(0f) }
             val isDragged = index == dragDropState.currentIndexOfDraggedItem
 
@@ -290,9 +251,15 @@ fun TodayTodoList(
                             }
                         )
                     }
-                    .animateItem(
-                        fadeInSpec = null,
-                        fadeOutSpec = null
+                    .then(
+                        if (!isDragging) {
+                            Modifier.animateItem(
+                                fadeInSpec = null,
+                                fadeOutSpec = null
+                            )
+                        } else {
+                            Modifier
+                        }
                     )
                     .border(
                         if (isDragged) BorderStroke(1.dp, Color.White) else BorderStroke(

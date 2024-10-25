@@ -1,12 +1,6 @@
 package com.poptato.backlog
 
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.view.ViewTreeObserver
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -28,7 +22,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -41,10 +34,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -89,16 +82,15 @@ import com.poptato.design_system.Gray95
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.Primary60
 import com.poptato.design_system.R
-import com.poptato.domain.model.enums.TodoStatus
 import com.poptato.domain.model.request.todo.ModifyTodoRequestModel
 import com.poptato.domain.model.request.todo.TodoContentModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.ui.common.BookmarkItem
 import com.poptato.ui.common.TopBar
-import com.poptato.ui.util.DragDropListState
 import com.poptato.ui.util.rememberDragDropListState
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @Composable
 fun BacklogScreen(
@@ -178,7 +170,8 @@ fun BacklogScreen(
                 )
             },
             resetNewItemFlag = { viewModel.updateNewItemFlag(false) },
-            onDragEnd = { from, to -> viewModel.moveItem(from, to) }
+            onDragEnd = { viewModel.onDragEnd() },
+            onMove = { from, to -> viewModel.onMove(from, to) }
         )
     }
 }
@@ -196,7 +189,8 @@ fun BacklogContent(
     onClearActiveItem: () -> Unit = {},
     onTodoItemModified: (Long, String) -> Unit = {_,_ ->},
     resetNewItemFlag: () -> Unit = {},
-    onDragEnd: (fromIndex: Int, toIndex: Int) -> Unit = { _, _ -> }
+    onDragEnd: (List<TodoItemModel>) -> Unit = {  },
+    onMove: (Int, Int) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -242,7 +236,7 @@ fun BacklogContent(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     BacklogTaskList(
-                        taskList = uiState.backlogList,
+                        backlogList = uiState.backlogList,
                         onItemSwiped = onItemSwiped,
                         onClickBtnTodoSettings = onClickBtnTodoSettings,
                         activeItemId = activeItemId,
@@ -250,7 +244,8 @@ fun BacklogContent(
                         onTodoItemModified = onTodoItemModified,
                         isNewItemCreated = uiState.isNewItemCreated,
                         resetNewItemFlag = resetNewItemFlag,
-                        onDragEnd = onDragEnd
+                        onDragEnd = onDragEnd,
+                        onMove = onMove
                     )
                 }
             }
@@ -267,99 +262,10 @@ fun BacklogContent(
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-fun CreateBacklogTextFiled(
-    taskInput: String = "",
-    onValueChange: (String) -> Unit = {},
-    createBacklog: (String) -> Unit = {}
-) {
-    var isFocused by remember { mutableStateOf(false) }
-    val focusManager = LocalFocusManager.current
-
-    val imeVisible = WindowInsets.isImeVisible
-
-    LaunchedEffect(imeVisible) {
-        if (!imeVisible) {
-            focusManager.clearFocus()
-        }
-    }
-
-
-    Box(
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .clip(RoundedCornerShape(8.dp))
-            .border(
-                width = 1.dp,
-                color = if (isFocused) Gray00 else Gray70,
-                shape = RoundedCornerShape(8.dp)
-            )
-    ) {
-        BasicTextField(
-            value = taskInput,
-            onValueChange = { onValueChange(it) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 16.dp)
-                .padding(start = 16.dp, end = 28.dp)
-                .onFocusChanged { focusState ->
-                    isFocused = focusState.isFocused
-                },
-            textStyle = PoptatoTypo.mdRegular,
-            cursorBrush = SolidColor(Gray00),
-            keyboardOptions = KeyboardOptions.Default.copy(
-                imeAction = ImeAction.Done
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    if(taskInput.isNotEmpty()) createBacklog(taskInput)
-                    onValueChange("")
-                }
-            ),
-            decorationBox = { innerTextField ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    if (taskInput.isEmpty() && !isFocused) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_add),
-                            contentDescription = "",
-                            tint = Color.Gray
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = BacklogHint,
-                            style = PoptatoTypo.mdMedium,
-                            color = Color.Gray
-                        )
-                    }
-                    innerTextField()
-                }
-            }
-        )
-        if (taskInput.isNotEmpty()) {
-            IconButton(
-                onClick = { onValueChange("") },
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_close),
-                    contentDescription = "",
-                    tint = Color.Unspecified
-                )
-            }
-        }
-    }
-}
-
 @SuppressLint("MutableCollectionMutableState")
 @Composable
 fun BacklogTaskList(
-    taskList: List<TodoItemModel> = emptyList(),
+    backlogList: List<TodoItemModel> = emptyList(),
     onItemSwiped: (TodoItemModel) -> Unit = {},
     onClickBtnTodoSettings: (Int) -> Unit = {},
     activeItemId: Long?,
@@ -367,31 +273,15 @@ fun BacklogTaskList(
     onTodoItemModified: (Long, String) -> Unit = {_,_ ->},
     isNewItemCreated: Boolean = false,
     resetNewItemFlag: () -> Unit = {},
-    onDragEnd: (fromIndex: Int, toIndex: Int) -> Unit = { _, _ -> }
+    onDragEnd: (List<TodoItemModel>) -> Unit = { },
+    onMove: (Int, Int) -> Unit,
 ) {
-    var uiList by remember { mutableStateOf(taskList.toMutableList()) }
     var draggedItem by remember { mutableStateOf<TodoItemModel?>(null) }
     var isDragging by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
-
-    LaunchedEffect(taskList) {
-        uiList = taskList.toMutableList()
-    }
-
-    fun moveItemInUI(fromIndex: Int, toIndex: Int) {
-        if (fromIndex != toIndex) {
-            uiList.move(fromIndex, toIndex)
-        }
-
-        onDragEnd(fromIndex, toIndex)
-    }
     val dragDropState = rememberDragDropListState(
         lazyListState = rememberLazyListState(),
-        onMove = { from, to ->
-            if (from != to) {
-                moveItemInUI(from, to)
-            }
-        }
+        onMove = onMove
     )
 
     LazyColumn(
@@ -403,7 +293,7 @@ fun BacklogTaskList(
                 detectDragGesturesAfterLongPress(
                     onDragStart = { offset ->
                         dragDropState.onDragStart(offset)
-                        draggedItem = taskList[dragDropState.currentIndexOfDraggedItem
+                        draggedItem = backlogList[dragDropState.currentIndexOfDraggedItem
                             ?: return@detectDragGesturesAfterLongPress]
                         isDragging = true
                     },
@@ -426,7 +316,7 @@ fun BacklogTaskList(
                             .takeIf { it != 0f }
                             ?.let {
                                 dragDropState.overscrollJob = scope.launch {
-                                    val adjustedScroll = it * 0.5f
+                                    val adjustedScroll = it * 0.3f
                                     dragDropState.lazyListState.scrollBy(adjustedScroll)
                                 }
                             } ?: run { dragDropState.overscrollJob?.cancel() }
@@ -434,7 +324,7 @@ fun BacklogTaskList(
                 )
             }
     ) {
-        itemsIndexed(uiList, key = { _, item -> item.todoId }) { index, item ->
+        itemsIndexed(backlogList, key = { _, item -> item.todoId }) { index, item ->
             var offsetX by remember { mutableFloatStateOf(0f) }
             val isDragged = index == dragDropState.currentIndexOfDraggedItem
             val isActive = activeItemId == item.todoId
@@ -453,8 +343,9 @@ fun BacklogTaskList(
                     .pointerInput(Unit) {
                         detectHorizontalDragGestures(
                             onDragEnd = {
-                                if (offsetX < -200f) {
+                                if (offsetX < -300f) {
                                     onItemSwiped(item)
+                                    offsetX = 0f
                                 } else {
                                     offsetX = 0f
                                 }
@@ -469,10 +360,7 @@ fun BacklogTaskList(
                     }
                     .then(
                         if (!isDragging) {
-                            Modifier.animateItem(
-                                fadeInSpec = null,
-                                fadeOutSpec = null
-                            )
+                            Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null)
                         } else {
                             Modifier
                         }
@@ -501,24 +389,26 @@ fun BacklogTaskList(
     }
 
     LaunchedEffect(isNewItemCreated) {
-        if (isNewItemCreated) {
+        if (isNewItemCreated && !isDragging) {
             dragDropState.lazyListState.scrollToItem(0)
             resetNewItemFlag()
         }
     }
 }
 
+@SuppressLint("ModifierParameter")
 @Composable
 fun BacklogItem(
     item: TodoItemModel,
     index: Int = -1,
     isActive: Boolean = false,
+    modifier: Modifier = Modifier,
     onClickBtnTodoSettings: (Int) -> Unit = {},
     onClearActiveItem: () -> Unit = {},
     onTodoItemModified: (Long, String) -> Unit = {_,_ ->}
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
             .background(Gray95)
@@ -619,6 +509,95 @@ fun BacklogItem(
                     onClickBtnTodoSettings(index)
                 }
         )
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun CreateBacklogTextFiled(
+    taskInput: String = "",
+    onValueChange: (String) -> Unit = {},
+    createBacklog: (String) -> Unit = {}
+) {
+    var isFocused by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
+
+    val imeVisible = WindowInsets.isImeVisible
+
+    LaunchedEffect(imeVisible) {
+        if (!imeVisible) {
+            focusManager.clearFocus()
+        }
+    }
+
+
+    Box(
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .border(
+                width = 1.dp,
+                color = if (isFocused) Gray00 else Gray70,
+                shape = RoundedCornerShape(8.dp)
+            )
+    ) {
+        BasicTextField(
+            value = taskInput,
+            onValueChange = { onValueChange(it) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp)
+                .padding(start = 16.dp, end = 28.dp)
+                .onFocusChanged { focusState ->
+                    isFocused = focusState.isFocused
+                },
+            textStyle = PoptatoTypo.mdRegular,
+            cursorBrush = SolidColor(Gray00),
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    if(taskInput.isNotEmpty()) createBacklog(taskInput)
+                    onValueChange("")
+                }
+            ),
+            decorationBox = { innerTextField ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (taskInput.isEmpty() && !isFocused) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_add),
+                            contentDescription = "",
+                            tint = Color.Gray
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = BacklogHint,
+                            style = PoptatoTypo.mdMedium,
+                            color = Color.Gray
+                        )
+                    }
+                    innerTextField()
+                }
+            }
+        )
+        if (taskInput.isNotEmpty()) {
+            IconButton(
+                onClick = { onValueChange("") },
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_close),
+                    contentDescription = "",
+                    tint = Color.Unspecified
+                )
+            }
+        }
     }
 }
 

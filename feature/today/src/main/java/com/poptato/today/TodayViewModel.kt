@@ -127,7 +127,9 @@ class TodayViewModel @Inject constructor(
             currentList.move(fromIndex, safeToIndex)
             updateList(currentList)
         }
+    }
 
+    fun onDragEnd() {
         val todoIdList = uiState.value.todayList
             .filter { it.todoStatus == TodoStatus.INCOMPLETE }
             .map { it.todoId }
