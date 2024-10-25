@@ -1,5 +1,7 @@
 package com.poptato.ui.util
 
+import androidx.compose.foundation.lazy.LazyListItemInfo
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
@@ -21,3 +23,10 @@ fun Modifier.fadingEdge(brush: Brush) = this
         drawContent()
         drawRect(brush = brush, blendMode = BlendMode.DstIn)
     }
+
+fun LazyListState.getVisibleItemInfoFor(absolute: Int): LazyListItemInfo? {
+    return this.layoutInfo.visibleItemsInfo.getOrNull(absolute - this.layoutInfo.visibleItemsInfo.first().index)
+}
+
+val LazyListItemInfo.offsetEnd: Int
+    get() = this.offset + this.size

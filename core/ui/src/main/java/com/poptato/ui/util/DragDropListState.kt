@@ -1,6 +1,5 @@
 package com.poptato.ui.util
 
-import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.lazy.LazyListItemInfo
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -15,31 +14,32 @@ import androidx.compose.ui.geometry.Offset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlin.math.abs
 
 class DragDropListState(
     val lazyListState: LazyListState,
-    val scope: CoroutineScope,
-    private val onMove: (Int, Int) -> Unit
+    private val onMove: (Int, Int) -> Unit,
+    val scope: CoroutineScope
 ) {
-    private var draggedDistance by mutableFloatStateOf(0f)
+    var draggedDistance by mutableFloatStateOf(0f)
     private var initiallyDraggedElement by mutableStateOf<LazyListItemInfo?>(null)
     private val initialOffsets: Pair<Int, Int>?
-        get() = initiallyDraggedElement?.let { Pair(it.offset, it.offset + it.size) }
+        get() = initiallyDraggedElement?.let { Pair(it.offset, it.offsetEnd) }
     var currentIndexOfDraggedItem by mutableStateOf<Int?>(null)
     val elementDisplacement
         get() = currentIndexOfDraggedItem?.let {
-            lazyListState.layoutInfo.visibleItemsInfo.getOrNull(it - lazyListState.layoutInfo.visibleItemsInfo.first().index)
+            lazyListState.getVisibleItemInfoFor(absolute = it)
         }?.let { item ->
             (initiallyDraggedElement?.offset ?: 0f).toFloat() + draggedDistance - item.offset
         }
     private val currentElement: LazyListItemInfo?
         get() = currentIndexOfDraggedItem?.let {
-            lazyListState.layoutInfo.visibleItemsInfo.getOrNull(it - lazyListState.layoutInfo.visibleItemsInfo.first().index)
+            lazyListState.getVisibleItemInfoFor(absolute = it)
         }
     var overscrollJob by mutableStateOf<Job?>(null)
 
     fun onDragStart(offset: Offset) {
+        scope.launch { lazyListState.scrollToItem(lazyListState.firstVisibleItemIndex) }
+
         lazyListState.layoutInfo.visibleItemsInfo.firstOrNull { item ->
             offset.y.toInt() in item.offset..(item.offset + item.size)
         }?.also {
@@ -64,11 +64,12 @@ class DragDropListState(
 
             currentElement?.let { hovered ->
                 lazyListState.layoutInfo.visibleItemsInfo.filterNot { item ->
-                    item.offset + item.size <= startOffset || item.offset >= endOffset || hovered.index == item.index
+                    item.offsetEnd < startOffset || item.offset > endOffset || hovered.index == item.index
                 }.firstOrNull { item ->
+                    val delta = startOffset - hovered.offset
                     when {
-                        startOffset > hovered.offset -> (endOffset > item.offset + item.size / 2)
-                        else -> (startOffset < item.offset + item.size / 2)
+                        delta > 0 -> (endOffset > item.offsetEnd)
+                        else -> (startOffset < item.offset)
                     }
                 }?.also { item ->
                     currentIndexOfDraggedItem?.let { current ->
@@ -78,19 +79,12 @@ class DragDropListState(
                 }
             }
         }
-
-        val overscroll = checkForOverScroll()
-        if (overscroll != 0f) {
-            scope.launch {
-                lazyListState.scrollBy(overscroll * 0.05f)
-            }
-        }
     }
 
     fun checkForOverScroll(): Float {
         return initiallyDraggedElement?.let {
             val startOffset = it.offset + draggedDistance
-            val endOffset = it.offset + it.size + draggedDistance
+            val endOffset = it.offsetEnd + draggedDistance
 
             return@let when {
                 draggedDistance > 0 -> (endOffset - lazyListState.layoutInfo.viewportEndOffset).takeIf { diff -> diff > 0 }
@@ -107,7 +101,6 @@ fun rememberDragDropListState(
     onMove: (Int, Int) -> Unit,
 ): DragDropListState {
     val scope = rememberCoroutineScope()
-
     return remember {
         DragDropListState(
             lazyListState = lazyListState,

@@ -68,7 +68,8 @@ class BacklogViewModel @Inject constructor(
             uiState.value.copy(
                 backlogList = response.backlogs,
                 totalPageCount = response.totalPageCount,
-                totalItemCount = response.totalCount
+                totalItemCount = response.totalCount,
+                isFinishedInitialization = true
             )
         )
     }
@@ -142,17 +143,14 @@ class BacklogViewModel @Inject constructor(
         }
     }
 
-    fun moveItem(fromIndex: Int, toIndex: Int) {
+    fun onMove(from: Int, to: Int) {
         val currentList = uiState.value.backlogList.toMutableList()
-        val safeToIndex = toIndex.coerceIn(0, currentList.size - 1)
-        val safeFromIndex = fromIndex.coerceIn(0, currentList.size - 1)
+        currentList.move(from, to)
+        updateList(currentList)
+    }
 
-        if (safeFromIndex != safeToIndex) {
-            currentList.move(safeFromIndex, safeToIndex)
-            updateList(currentList)
-        }
-
-        val todoIdList = currentList.map { it.todoId }
+    fun onDragEnd() {
+        val todoIdList = uiState.value.backlogList.map { it.todoId }
 
         viewModelScope.launch {
             dragDropUseCase.invoke(
@@ -166,21 +164,29 @@ class BacklogViewModel @Inject constructor(
         }
     }
 
+    fun updateBacklogList(newList: List<TodoItemModel>) {
+        updateState(uiState.value.copy(backlogList = newList))
+    }
+
     private fun updateList(updatedList: List<TodoItemModel>) {
+        val newList = updatedList.toList()
         updateState(
             uiState.value.copy(
-                backlogList = updatedList
+                backlogList = newList
             )
         )
     }
 
-    fun setDeadline(deadline: String?) {
+    fun setDeadline(deadline: String?, id: Long) {
         val dDay = TimeFormatter.calculateDDay(deadline)
-        val updatedItem = uiState.value.selectedItem.copy(deadline = deadline ?: "", dDay = dDay)
         val newList = uiState.value.backlogList.map {
-            if (it.todoId == updatedItem.todoId) updatedItem
-            else it
+            if (it.todoId == id) {
+                it.copy(deadline = deadline ?: "", dDay = dDay)
+            } else {
+                it
+            }
         }
+        val updatedItem = uiState.value.selectedItem.copy(deadline = deadline ?: "", dDay = dDay)
 
         updateState(
             uiState.value.copy(
@@ -263,7 +269,14 @@ class BacklogViewModel @Inject constructor(
                 it
             }
         }
-        updateList(newList)
+        val updatedItem = uiState.value.selectedItem.copy(isBookmark = !uiState.value.selectedItem.isBookmark)
+
+        updateState(
+            uiState.value.copy(
+                backlogList = newList,
+                selectedItem = updatedItem
+            )
+        )
 
         viewModelScope.launch {
             updateBookmarkUseCase.invoke(id).collect {
