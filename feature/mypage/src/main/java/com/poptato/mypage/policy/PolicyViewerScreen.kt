@@ -1,4 +1,4 @@
-package com.poptato.mypage.viewer
+package com.poptato.mypage.policy
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
