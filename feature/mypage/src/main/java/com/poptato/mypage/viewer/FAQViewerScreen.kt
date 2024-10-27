@@ -9,6 +9,7 @@ import com.google.accompanist.web.WebViewNavigator
 import com.google.accompanist.web.WebViewState
 import com.google.accompanist.web.rememberWebViewNavigator
 import com.google.accompanist.web.rememberWebViewState
+import com.poptato.mypage.BuildConfig
 
 @Composable
 fun FAQViewerScreen(
@@ -16,7 +17,7 @@ fun FAQViewerScreen(
 ) {
 
     val faqWebView = rememberWebViewState(
-        url = "https://mountain-fang-96a.notion.site/FAQ-124d60b563cc801e8650edf2b64a445c?pvs=4",
+        url = BuildConfig.FAQ_URL,
         additionalHttpHeaders = emptyMap()
     )
     val webviewClient = AccompanistWebViewClient()
