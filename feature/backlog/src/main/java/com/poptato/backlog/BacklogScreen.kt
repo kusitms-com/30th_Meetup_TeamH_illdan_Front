@@ -287,119 +287,108 @@ fun BacklogTaskList(
         onMove = onMove
     )
 
-    LazyColumnScrollbar(
+    LazyColumn(
         state = dragDropState.lazyListState,
-        settings = ScrollbarSettings(
-            alwaysShowScrollbar = true,
-            thumbSelectedColor = Gray00,
-            thumbUnselectedColor = Gray00,
-            thumbThickness = 3.dp,
-            thumbMaxLength = 0.5f
-        )
-    ) {
-        LazyColumn(
-            state = dragDropState.lazyListState,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp)
-                .pointerInput(Unit) {
-                    detectDragGesturesAfterLongPress(
-                        onDragStart = { offset ->
-                            dragDropState.onDragStart(offset)
-                            draggedItem = backlogList[dragDropState.currentIndexOfDraggedItem
-                                ?: return@detectDragGesturesAfterLongPress]
-                            isDragging = true
-                        },
-                        onDragEnd = {
-                            dragDropState.onDragInterrupted()
-                            draggedItem = null
-                            isDragging = false
-                        },
-                        onDragCancel = {
-                            dragDropState.onDragInterrupted()
-                            draggedItem = null
-                            isDragging = false
-                        },
-                        onDrag = { change, offset ->
-                            change.consume()
-                            dragDropState.onDrag(offset)
-                            if (dragDropState.overscrollJob?.isActive == true) return@detectDragGesturesAfterLongPress
-                            dragDropState
-                                .checkForOverScroll()
-                                .takeIf { it != 0f }
-                                ?.let {
-                                    dragDropState.overscrollJob = scope.launch {
-                                        val adjustedScroll = it * 0.3f
-                                        dragDropState.lazyListState.scrollBy(adjustedScroll)
-                                    }
-                                } ?: run { dragDropState.overscrollJob?.cancel() }
-                        }
-                    )
-                }
-        ) {
-            itemsIndexed(backlogList, key = { _, item -> item.todoId }) { index, item ->
-                var offsetX by remember { mutableFloatStateOf(0f) }
-                val isDragged = index == dragDropState.currentIndexOfDraggedItem
-                val isActive = activeItemId == item.todoId
-
-                Box(
-                    modifier = Modifier
-                        .zIndex(if (index == dragDropState.currentIndexOfDraggedItem) 1f else 0f)
-                        .graphicsLayer {
-                            translationY =
-                                dragDropState.elementDisplacement.takeIf { index == dragDropState.currentIndexOfDraggedItem }
-                                    ?: 0f
-                            scaleX = if (isDragged) 1.05f else 1f
-                            scaleY = if (isDragged) 1.05f else 1f
-                        }
-                        .offset { IntOffset(offsetX.toInt(), 0) }
-                        .pointerInput(Unit) {
-                            detectHorizontalDragGestures(
-                                onDragEnd = {
-                                    if (offsetX < -300f) {
-                                        onItemSwiped(item)
-                                        offsetX = 0f
-                                    } else {
-                                        offsetX = 0f
-                                    }
-                                },
-                                onHorizontalDrag = { change, dragAmount ->
-                                    change.consume()
-                                    if (offsetX + dragAmount <= 0f) {
-                                        offsetX += dragAmount
-                                    }
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp)
+            .pointerInput(Unit) {
+                detectDragGesturesAfterLongPress(
+                    onDragStart = { offset ->
+                        dragDropState.onDragStart(offset)
+                        draggedItem = backlogList[dragDropState.currentIndexOfDraggedItem
+                            ?: return@detectDragGesturesAfterLongPress]
+                        isDragging = true
+                    },
+                    onDragEnd = {
+                        dragDropState.onDragInterrupted()
+                        draggedItem = null
+                        isDragging = false
+                    },
+                    onDragCancel = {
+                        dragDropState.onDragInterrupted()
+                        draggedItem = null
+                        isDragging = false
+                    },
+                    onDrag = { change, offset ->
+                        change.consume()
+                        dragDropState.onDrag(offset)
+                        if (dragDropState.overscrollJob?.isActive == true) return@detectDragGesturesAfterLongPress
+                        dragDropState
+                            .checkForOverScroll()
+                            .takeIf { it != 0f }
+                            ?.let {
+                                dragDropState.overscrollJob = scope.launch {
+                                    val adjustedScroll = it * 0.3f
+                                    dragDropState.lazyListState.scrollBy(adjustedScroll)
                                 }
-                            )
-                        }
-                        .then(
-                            if (!isDragging) {
-                                Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null)
-                            } else {
-                                Modifier
+                            } ?: run { dragDropState.overscrollJob?.cancel() }
+                    }
+                )
+            }
+    ) {
+        itemsIndexed(backlogList, key = { _, item -> item.todoId }) { index, item ->
+            var offsetX by remember { mutableFloatStateOf(0f) }
+            val isDragged = index == dragDropState.currentIndexOfDraggedItem
+            val isActive = activeItemId == item.todoId
+
+            Box(
+                modifier = Modifier
+                    .zIndex(if (index == dragDropState.currentIndexOfDraggedItem) 1f else 0f)
+                    .graphicsLayer {
+                        translationY =
+                            dragDropState.elementDisplacement.takeIf { index == dragDropState.currentIndexOfDraggedItem }
+                                ?: 0f
+                        scaleX = if (isDragged) 1.05f else 1f
+                        scaleY = if (isDragged) 1.05f else 1f
+                    }
+                    .offset { IntOffset(offsetX.toInt(), 0) }
+                    .pointerInput(Unit) {
+                        detectHorizontalDragGestures(
+                            onDragEnd = {
+                                if (offsetX < -300f) {
+                                    onItemSwiped(item)
+                                    offsetX = 0f
+                                } else {
+                                    offsetX = 0f
+                                }
+                            },
+                            onHorizontalDrag = { change, dragAmount ->
+                                change.consume()
+                                if (offsetX + dragAmount <= 0f) {
+                                    offsetX += dragAmount
+                                }
                             }
                         )
-                        .border(
-                            if (isDragged) BorderStroke(1.dp, Color.White) else BorderStroke(
-                                0.dp,
-                                Color.Transparent
-                            ),
-                            RoundedCornerShape(8.dp)
-                        )
-                ) {
-                    BacklogItem(
-                        item = item,
-                        index = index,
-                        isActive = isActive,
-                        onClickBtnTodoSettings = onClickBtnTodoSettings,
-                        onClearActiveItem = onClearActiveItem,
-                        onTodoItemModified = onTodoItemModified
+                    }
+                    .then(
+                        if (!isDragging) {
+                            Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null)
+                        } else {
+                            Modifier
+                        }
                     )
-                }
-                Spacer(modifier = Modifier.height(12.dp))
+                    .border(
+                        if (isDragged) BorderStroke(1.dp, Color.White) else BorderStroke(
+                            0.dp,
+                            Color.Transparent
+                        ),
+                        RoundedCornerShape(8.dp)
+                    )
+            ) {
+                BacklogItem(
+                    item = item,
+                    index = index,
+                    isActive = isActive,
+                    onClickBtnTodoSettings = onClickBtnTodoSettings,
+                    onClearActiveItem = onClearActiveItem,
+                    onTodoItemModified = onTodoItemModified
+                )
             }
-
-            item { Spacer(modifier = Modifier.height(45.dp)) }
+            Spacer(modifier = Modifier.height(12.dp))
         }
+
+        item { Spacer(modifier = Modifier.height(45.dp)) }
     }
 
     LaunchedEffect(isNewItemCreated) {
