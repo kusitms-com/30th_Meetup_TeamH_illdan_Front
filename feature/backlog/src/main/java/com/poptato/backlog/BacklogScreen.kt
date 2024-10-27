@@ -304,6 +304,7 @@ fun BacklogTaskList(
                         dragDropState.onDragInterrupted()
                         draggedItem = null
                         isDragging = false
+                        onDragEnd(backlogList)
                     },
                     onDragCancel = {
                         dragDropState.onDragInterrupted()
