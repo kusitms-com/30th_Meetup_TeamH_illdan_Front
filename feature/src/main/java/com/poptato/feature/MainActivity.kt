@@ -35,20 +35,25 @@ class MainActivity : ComponentActivity() {
             window.statusBarColor = statusBarColor
             WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = isLightIcons
 
-            if (isLoading) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Gray80)
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center),
-                        color = Primary60
-                    )
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                MainScreen()
+
+                if (isLoading) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Gray80.copy(alpha = 0.7f))
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.Center),
+                            color = Primary60
+                        )
+                    }
                 }
             }
 
-            MainScreen()
         }
     }
 }
