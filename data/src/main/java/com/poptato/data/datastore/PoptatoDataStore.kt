@@ -13,11 +13,6 @@ private val Context.dataStore by preferencesDataStore(name = "poptato_prefs")
 class PoptatoDataStore(context: Context) {
     private val dataStore = context.dataStore
 
-    companion object {
-        val ACCESS_TOKEN_KEY = stringPreferencesKey("access_token")
-        val REFRESH_TOKEN_KEY = stringPreferencesKey("refresh_token")
-    }
-
     val accessToken: Flow<String?> = dataStore.data
         .map { preferences ->
             preferences[ACCESS_TOKEN_KEY]
@@ -47,5 +42,10 @@ class PoptatoDataStore(context: Context) {
             preferences.remove(ACCESS_TOKEN_KEY)
             preferences.remove(REFRESH_TOKEN_KEY)
         }
+    }
+
+    companion object {
+        val ACCESS_TOKEN_KEY = stringPreferencesKey("access_token")
+        val REFRESH_TOKEN_KEY = stringPreferencesKey("refresh_token")
     }
 }
