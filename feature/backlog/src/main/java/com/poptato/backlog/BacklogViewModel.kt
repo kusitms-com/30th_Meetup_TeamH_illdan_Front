@@ -47,6 +47,7 @@ class BacklogViewModel @Inject constructor(
     BacklogPageState()
 ) {
     private var snapshotList: List<TodoItemModel> = emptyList()
+    private var tempTodoId: Long? = null
 
     init {
         getYesterdayList(0, 1)
@@ -105,18 +106,28 @@ class BacklogViewModel @Inject constructor(
 
     fun createBacklog(content: String) {
         val newList = uiState.value.backlogList.toMutableList()
-        newList.add(0, TodoItemModel(content = content, todoId = Random.nextLong()))
+        val temporaryId = Random.nextLong()
+
+        newList.add(0, TodoItemModel(content = content, todoId = temporaryId))
         updateNewItemFlag(true)
         updateList(newList)
+        tempTodoId = temporaryId
 
         viewModelScope.launch(Dispatchers.IO) {
             createBacklogUseCase.invoke(request = CreateBacklogRequestModel(content)).collect {
-                resultResponse(it, { onSuccessCreateBacklog() }, { onFailedUpdateBacklogList() })
+                resultResponse(it, ::onSuccessCreateBacklog, { onFailedUpdateBacklogList() })
             }
         }
     }
 
-    private fun onSuccessCreateBacklog() {
+    private fun onSuccessCreateBacklog(response: TodoIdModel) {
+        val updatedList = uiState.value.backlogList.map { item ->
+            if (item.todoId == tempTodoId) {
+                item.copy(todoId = response.todoId)
+            } else item
+        }
+        updateList(updatedList)
+
         getBacklogList(page = 0, size = uiState.value.backlogList.size)
     }
 
