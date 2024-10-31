@@ -34,6 +34,16 @@ class TodayViewModel @Inject constructor(
     }
 
     fun onCheckedTodo(status: TodoStatus, id: Long) {
+        updateTodoStatusInUI(status = status, id = id)
+
+        viewModelScope.launch {
+            updateTodoCompletionUseCase.invoke(id).collect {
+                resultResponse(it, { updateSnapshotList(uiState.value.todayList) }, { onFailedUpdateTodayList() })
+            }
+        }
+    }
+
+    private fun updateTodoStatusInUI(status: TodoStatus, id: Long) {
         val newStatus = if(status == TodoStatus.COMPLETED) TodoStatus.INCOMPLETE else TodoStatus.COMPLETED
         val selectedItem = uiState.value.todayList.find { it.todoId == id }?.copy(todoStatus = newStatus)
         val remainingItems = uiState.value.todayList.filter { it.todoId != id }
@@ -53,12 +63,6 @@ class TodayViewModel @Inject constructor(
         }
 
         updateList(newTodays)
-
-        viewModelScope.launch {
-            updateTodoCompletionUseCase.invoke(id).collect {
-                resultResponse(it, { onSuccessUpdateTodayList() }, { onFailedUpdateTodayList() })
-            }
-        }
     }
 
     private fun getTodayList(page: Int, size: Int) {
@@ -70,7 +74,7 @@ class TodayViewModel @Inject constructor(
     }
 
     private fun onSuccessGetTodayList(response: TodayListModel) {
-        snapshotList = response.todays
+        updateSnapshotList(response.todays)
 
         updateState(
             uiState.value.copy(
@@ -79,10 +83,6 @@ class TodayViewModel @Inject constructor(
                 isFinishedInitialization = true
             )
         )
-    }
-
-    private fun onSuccessUpdateTodayList() {
-        snapshotList = uiState.value.todayList
     }
 
     private fun onFailedUpdateTodayList() {
@@ -103,11 +103,9 @@ class TodayViewModel @Inject constructor(
 
         updateList(newList)
 
-        Timber.i(item.todoId.toString())
-
         viewModelScope.launch {
             swipeTodoUseCase.invoke(TodoIdModel(item.todoId)).collect {
-                resultResponse(it, { onSuccessUpdateTodayList() }, { onFailedUpdateTodayList() })
+                resultResponse(it, { updateSnapshotList(uiState.value.todayList) }, { onFailedUpdateTodayList() })
             }
         }
     }
@@ -141,8 +139,12 @@ class TodayViewModel @Inject constructor(
                     todoIds = todoIdList
                 )
             ).collect {
-                resultResponse(it, { onSuccessUpdateTodayList() }, { onFailedUpdateTodayList() })
+                resultResponse(it, { updateSnapshotList(uiState.value.todayList) }, { onFailedUpdateTodayList() })
             }
         }
+    }
+
+    private fun updateSnapshotList(newList: List<TodoItemModel>) {
+        snapshotList = newList
     }
 }
