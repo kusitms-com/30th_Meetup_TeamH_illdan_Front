@@ -86,33 +86,24 @@ fun MainScreen() {
         initialValue = ModalBottomSheetValue.Hidden,
         skipHalfExpanded = true
     )
-    val animationDuration = 300
     val showBottomSheet: (TodoItemModel) -> Unit = { item: TodoItemModel ->
         viewModel.onSelectedTodoItem(item)
         scope.launch { sheetState.show() }
     }
-    val updateDeadlineFlow = MutableSharedFlow<String?>()
-    val deleteTodoFlow = MutableSharedFlow<Long>()
-    val activateItemFlow = MutableSharedFlow<Long>()
-    val updateBookmarkFlow = MutableSharedFlow<Long>()
-    var bottomSheetType by remember { mutableStateOf(BottomSheetType.Main) }
-    var backPressedOnce by remember { mutableStateOf(false) }
     val backPressHandler: () -> Unit = {
-        if (backPressedOnce) {
+        if (uiState.backPressedOnce) {
             (context as? Activity)?.finish()
         } else {
-            backPressedOnce = true
+            viewModel.toggleBackPressed(true)
             Toast.makeText(context, FINISH_APP_GUIDE, Toast.LENGTH_SHORT).show()
             scope.launch {
                 delay(2000)
-                backPressedOnce = false
+                viewModel.toggleBackPressed(false)
             }
         }
     }
     val showSnackBar: (String) -> Unit = { message ->
-        scope.launch {
-            snackBarHost.showSnackbar(message = message)
-        }
+        scope.launch { snackBarHost.showSnackbar(message = message) }
     }
 
     if (uiState.bottomNavType != BottomNavType.DEFAULT) {
@@ -131,18 +122,14 @@ fun MainScreen() {
         snapshotFlow { sheetState.isVisible }
             .distinctUntilChanged()
             .collect { isVisible ->
-                if (!isVisible) {
-                    bottomSheetType = BottomSheetType.Main
-                }
+                if (!isVisible) { viewModel.updateBottomSheetType(BottomSheetType.Main) }
             }
     }
 
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collect { event ->
             when(event) {
-                is MainEvent.ShowTodoBottomSheet -> {
-                    sheetState.show()
-                }
+                is MainEvent.ShowTodoBottomSheet -> { sheetState.show() }
             }
         }
     }
@@ -150,10 +137,10 @@ fun MainScreen() {
     DismissKeyboardOnClick {
         ModalBottomSheetLayout(
             sheetState = sheetState,
-            sheetGesturesEnabled = bottomSheetType == BottomSheetType.Main,
+            sheetGesturesEnabled = uiState.bottomSheetType == BottomSheetType.Main,
             sheetContent = {
                 AnimatedContent(
-                    targetState = bottomSheetType,
+                    targetState = uiState.bottomSheetType,
                     transitionSpec = {
                         fadeIn(animationSpec = tween(500)) togetherWith fadeOut(animationSpec = tween(500))
                     },
@@ -169,37 +156,37 @@ fun MainScreen() {
                                 item = uiState.selectedTodoItem,
                                 setDeadline = {
                                     viewModel.onUpdatedDeadline(it)
-                                    scope.launch { updateDeadlineFlow.emit(it) }
+                                    scope.launch { viewModel.updateDeadlineFlow.emit(it) }
                                 },
-                                onClickShowDatePicker = { bottomSheetType = BottomSheetType.FullDate },
+                                onClickShowDatePicker = { viewModel.updateBottomSheetType(BottomSheetType.FullDate) },
                                 onClickBtnDelete = {
                                     scope.launch {
-                                        deleteTodoFlow.emit(it)
+                                        viewModel.deleteTodoFlow.emit(it)
                                         sheetState.hide()
                                     }
                                 },
                                 onClickBtnModify = {
                                     scope.launch {
-                                        activateItemFlow.emit(it)
+                                        viewModel.activateItemFlow.emit(it)
                                         sheetState.hide()
                                     }
                                 },
                                 onClickBtnBookmark = {
                                     viewModel.onUpdatedBookmark(!uiState.selectedTodoItem.isBookmark)
                                     scope.launch {
-                                        updateBookmarkFlow.emit(it)
+                                        viewModel.updateBookmarkFlow.emit(it)
                                     }
                                 }
                             )
                         }
                         BottomSheetType.FullDate -> {
                             DatePickerBottomSheet(
-                                onDismissRequest = { bottomSheetType = BottomSheetType.Main },
+                                onDismissRequest = { viewModel.updateBottomSheetType(BottomSheetType.Main) },
                                 bottomSheetType = BottomSheetType.FullDate,
                                 onFullDateSelected = { date ->
                                     viewModel.onUpdatedDeadline(date)
                                     scope.launch {
-                                        updateDeadlineFlow.emit(date)
+                                        viewModel.updateDeadlineFlow.emit(date)
                                     }
                                 }
                             )
@@ -207,7 +194,7 @@ fun MainScreen() {
                         BottomSheetType.Calendar -> TODO("캘린더 바텀시트 컴포저블을 여기에 추가")
                         BottomSheetType.SubDate -> {
                             DatePickerBottomSheet(
-                                onDismissRequest = { bottomSheetType = BottomSheetType.Calendar },
+                                onDismissRequest = { viewModel.updateBottomSheetType(BottomSheetType.Calendar) },
                                 bottomSheetType = BottomSheetType.SubDate
                             )
                         }
@@ -221,8 +208,8 @@ fun MainScreen() {
                 bottomBar = {
                     AnimatedVisibility(
                         visible = uiState.bottomNavType != BottomNavType.DEFAULT,
-                        enter = slideInHorizontally(animationSpec = tween(durationMillis = animationDuration)),
-                        exit = slideOutHorizontally(animationSpec = tween(durationMillis = animationDuration)),
+                        enter = slideInHorizontally(animationSpec = tween(durationMillis = viewModel.animationDuration)),
+                        exit = slideOutHorizontally(animationSpec = tween(durationMillis = viewModel.animationDuration)),
                         modifier = Modifier.background(Gray100)
                     ) {
                         BottomNavBar(
@@ -256,19 +243,19 @@ fun MainScreen() {
                         enterTransition = {
                             slideIntoContainer(
                                 AnimatedContentTransitionScope.SlideDirection.Start,
-                                tween(animationDuration)
+                                tween(viewModel.animationDuration)
                             )
                         },
                         popEnterTransition = {
                             slideIntoContainer(
                                 AnimatedContentTransitionScope.SlideDirection.End,
-                                tween(animationDuration)
+                                tween(viewModel.animationDuration)
                             )
                         },
                         popExitTransition = {
                             slideOutOfContainer(
                                 AnimatedContentTransitionScope.SlideDirection.End,
-                                tween(animationDuration)
+                                tween(viewModel.animationDuration)
                             )
                         }
                     ) {
@@ -279,10 +266,10 @@ fun MainScreen() {
                         backlogNavGraph(
                             navController = navController,
                             showBottomSheet = showBottomSheet,
-                            updateDeadlineFlow = updateDeadlineFlow,
-                            deleteTodoFlow = deleteTodoFlow,
-                            activateItemFlow = activateItemFlow,
-                            updateBookmarkFlow = updateBookmarkFlow,
+                            updateDeadlineFlow = viewModel.updateDeadlineFlow,
+                            deleteTodoFlow = viewModel.deleteTodoFlow,
+                            activateItemFlow = viewModel.activateItemFlow,
+                            updateBookmarkFlow = viewModel.updateBookmarkFlow,
                             showSnackBar = showSnackBar
                         )
                         todayNavGraph(navController = navController, showSnackBar = showSnackBar)

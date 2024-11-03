@@ -1,19 +1,24 @@
 package com.poptato.feature
 
 import com.poptato.core.enums.BottomNavType
+import com.poptato.domain.model.enums.BottomSheetType
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.navigation.NavRoutes
 import com.poptato.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor(
-
-) : BaseViewModel<MainPageState>(MainPageState()) {
+class MainViewModel @Inject constructor() : BaseViewModel<MainPageState>(MainPageState()) {
+    val updateDeadlineFlow = MutableSharedFlow<String?>()
+    val deleteTodoFlow = MutableSharedFlow<Long>()
+    val activateItemFlow = MutableSharedFlow<Long>()
+    val updateBookmarkFlow = MutableSharedFlow<Long>()
+    val animationDuration = 300
 
     fun setBottomNavType(route: String?) {
         val type = when (route) {
@@ -72,4 +77,8 @@ class MainViewModel @Inject constructor(
             )
         )
     }
+
+    fun toggleBackPressed(value: Boolean) { updateState(uiState.value.copy(backPressedOnce = value)) }
+
+    fun updateBottomSheetType(type: BottomSheetType) { updateState(uiState.value.copy(bottomSheetType = type)) }
 }

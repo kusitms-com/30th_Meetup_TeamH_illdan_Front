@@ -47,6 +47,7 @@ class BacklogViewModel @Inject constructor(
     BacklogPageState()
 ) {
     private var snapshotList: List<TodoItemModel> = emptyList()
+    private var tempTodoId: Long? = null
 
     init {
         getYesterdayList(0, 1)
@@ -62,7 +63,7 @@ class BacklogViewModel @Inject constructor(
     }
 
     private fun onSuccessGetBacklogList(response: BacklogListModel) {
-        snapshotList = response.backlogs
+        updateSnapshotList(response.backlogs)
 
         updateState(
             uiState.value.copy(
@@ -104,24 +105,34 @@ class BacklogViewModel @Inject constructor(
     }
 
     fun createBacklog(content: String) {
-        val newList = uiState.value.backlogList.toMutableList()
-        newList.add(0, TodoItemModel(content = content, todoId = Random.nextLong()))
-        updateNewItemFlag(true)
-        updateList(newList)
+        addTemporaryBacklog(content)
 
         viewModelScope.launch(Dispatchers.IO) {
             createBacklogUseCase.invoke(request = CreateBacklogRequestModel(content)).collect {
-                resultResponse(it, { onSuccessCreateBacklog() }, { onFailedUpdateBacklogList() })
+                resultResponse(it, ::onSuccessCreateBacklog, { onFailedUpdateBacklogList() })
             }
         }
     }
 
-    private fun onSuccessCreateBacklog() {
-        getBacklogList(page = 0, size = uiState.value.backlogList.size)
+    private fun addTemporaryBacklog(content: String) {
+        val newList = uiState.value.backlogList.toMutableList()
+        val temporaryId = Random.nextLong()
+
+        newList.add(0, TodoItemModel(content = content, todoId = temporaryId))
+        updateNewItemFlag(true)
+        updateList(newList)
+        tempTodoId = temporaryId
     }
 
-    private fun onSuccessUpdateBacklogList() {
-        snapshotList = uiState.value.backlogList
+    private fun onSuccessCreateBacklog(response: TodoIdModel) {
+        val updatedList = uiState.value.backlogList.map { item ->
+            if (item.todoId == tempTodoId) {
+                item.copy(todoId = response.todoId)
+            } else item
+        }
+        updateList(updatedList)
+
+        getBacklogList(page = 0, size = uiState.value.backlogList.size)
     }
 
     private fun onFailedUpdateBacklogList() {
@@ -134,11 +145,9 @@ class BacklogViewModel @Inject constructor(
 
         updateList(newList)
 
-        Timber.i(item.todoId.toString())
-
         viewModelScope.launch {
             swipeTodoUseCase.invoke(TodoIdModel(item.todoId)).collect {
-                resultResponse(it, { onSuccessUpdateBacklogList() }, { onFailedUpdateBacklogList() })
+                resultResponse(it, { updateSnapshotList(uiState.value.backlogList) }, { onFailedUpdateBacklogList() })
             }
         }
     }
@@ -159,13 +168,9 @@ class BacklogViewModel @Inject constructor(
                     todoIds = todoIdList
                 )
             ).collect {
-                resultResponse(it, { onSuccessUpdateBacklogList() }, { onFailedUpdateBacklogList() })
+                resultResponse(it, { updateSnapshotList(uiState.value.backlogList) }, { onFailedUpdateBacklogList() })
             }
         }
-    }
-
-    fun updateBacklogList(newList: List<TodoItemModel>) {
-        updateState(uiState.value.copy(backlogList = newList))
     }
 
     private fun updateList(updatedList: List<TodoItemModel>) {
@@ -178,6 +183,21 @@ class BacklogViewModel @Inject constructor(
     }
 
     fun setDeadline(deadline: String?, id: Long) {
+        updateDeadlineInUI(deadline = deadline, id = id)
+
+        viewModelScope.launch {
+            updateDeadlineUseCase.invoke(
+                request = UpdateDeadlineRequestModel(
+                    todoId = uiState.value.selectedItem.todoId,
+                    deadline = DeadlineContentModel(deadline)
+                )
+            ).collect {
+                resultResponse(it, { updateSnapshotList(uiState.value.backlogList) }, { onFailedUpdateBacklogList() })
+            }
+        }
+    }
+
+    private fun updateDeadlineInUI(deadline: String?, id: Long) {
         val dDay = TimeFormatter.calculateDDay(deadline)
         val newList = uiState.value.backlogList.map {
             if (it.todoId == id) {
@@ -194,17 +214,6 @@ class BacklogViewModel @Inject constructor(
                 selectedItem = updatedItem
             )
         )
-
-        viewModelScope.launch {
-            updateDeadlineUseCase.invoke(
-                request = UpdateDeadlineRequestModel(
-                    todoId = uiState.value.selectedItem.todoId,
-                    deadline = DeadlineContentModel(deadline)
-                )
-            ).collect {
-                resultResponse(it, { onSuccessUpdateBacklogList() }, { onFailedUpdateBacklogList() })
-            }
-        }
     }
 
     fun onSelectedItem(item: TodoItemModel) {
@@ -224,7 +233,7 @@ class BacklogViewModel @Inject constructor(
                 resultResponse(
                     it,
                     {
-                        onSuccessUpdateBacklogList()
+                        updateSnapshotList(uiState.value.backlogList)
                         emitEventFlow(BacklogEvent.OnSuccessDeleteBacklog)
                     },
                     { onFailedUpdateBacklogList() }
@@ -234,6 +243,18 @@ class BacklogViewModel @Inject constructor(
     }
 
     fun modifyTodo(item: ModifyTodoRequestModel) {
+        modifyTodoInUI(item = item)
+
+        viewModelScope.launch {
+            modifyTodoUseCase.invoke(
+                request = item
+            ).collect {
+                resultResponse(it, { updateSnapshotList(uiState.value.backlogList) }, { onFailedUpdateBacklogList() })
+            }
+        }
+    }
+
+    private fun modifyTodoInUI(item: ModifyTodoRequestModel) {
         val newList = uiState.value.backlogList.map {
             if (it.todoId == item.todoId) {
                 it.copy(content = item.content.content)
@@ -243,14 +264,6 @@ class BacklogViewModel @Inject constructor(
         }
 
         updateList(newList)
-
-        viewModelScope.launch {
-            modifyTodoUseCase.invoke(
-                request = item
-            ).collect {
-                resultResponse(it, { onSuccessUpdateBacklogList() }, { onFailedUpdateBacklogList() })
-            }
-        }
     }
 
     fun updateNewItemFlag(flag: Boolean) {
@@ -262,6 +275,16 @@ class BacklogViewModel @Inject constructor(
     }
 
     fun updateBookmark(id: Long) {
+        updateBookmarkInUI(id)
+
+        viewModelScope.launch {
+            updateBookmarkUseCase.invoke(id).collect {
+                resultResponse(it, { updateSnapshotList(uiState.value.backlogList) }, { onFailedUpdateBacklogList() })
+            }
+        }
+    }
+
+    private fun updateBookmarkInUI(id: Long) {
         val newList = uiState.value.backlogList.map {
             if (it.todoId == id) {
                 it.copy(isBookmark = !it.isBookmark)
@@ -277,11 +300,9 @@ class BacklogViewModel @Inject constructor(
                 selectedItem = updatedItem
             )
         )
+    }
 
-        viewModelScope.launch {
-            updateBookmarkUseCase.invoke(id).collect {
-                resultResponse(it, { onSuccessUpdateBacklogList() }, { onFailedUpdateBacklogList() })
-            }
-        }
+    private fun updateSnapshotList(newList: List<TodoItemModel>) {
+        snapshotList = newList
     }
 }

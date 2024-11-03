@@ -3,6 +3,7 @@ package com.poptato.data.service
 import com.poptato.data.base.ApiResponse
 import com.poptato.data.base.Endpoints
 import com.poptato.data.model.response.backlog.BacklogListResponse
+import com.poptato.data.model.response.backlog.TodoIdResponse
 import com.poptato.domain.model.request.backlog.CreateBacklogRequestModel
 import retrofit2.Response
 import retrofit2.http.Body
@@ -15,7 +16,7 @@ interface BacklogService {
     @POST(Endpoints.Backlog.BACKLOG)
     suspend fun createBacklog(
         @Body request: CreateBacklogRequestModel
-    ): Response<ApiResponse<Unit>>
+    ): Response<ApiResponse<TodoIdResponse>>
 
     @GET(Endpoints.Backlog.BACKLOGS)
     suspend fun getBacklogList(

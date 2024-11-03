@@ -74,6 +74,7 @@ fun DatePickerBottomSheet(
     )
 }
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun DatePickerBottomSheetContent(
     initialYear: Int = -1,
@@ -85,7 +86,7 @@ fun DatePickerBottomSheetContent(
     onSubDateSelected: (Int, Int) -> Unit = {_, _ ->},
     bottomSheetType: BottomSheetType = BottomSheetType.FullDate
 ) {
-    val yearState = rememberLazyListState(initialFirstVisibleItemIndex = initialYear - 2000)
+    val yearState = rememberLazyListState(initialFirstVisibleItemIndex = initialYear - 2024)
     val monthState = rememberLazyListState(initialFirstVisibleItemIndex = initialMonth - 1)
     val dayState = rememberLazyListState(initialFirstVisibleItemIndex = initialDay - 1)
 
@@ -108,7 +109,7 @@ fun DatePickerBottomSheetContent(
                     .weight(1f)
             ) {
                 DialPicker(
-                    items = (2000..2026).toList(),
+                    items = (2024..2100).toList(),
                     listState = yearState,
                     dateType = DateType.YEAR,
                 )
@@ -164,12 +165,13 @@ fun DatePickerBottomSheetContent(
                 btnText = Confirm,
                 textColor = Gray100,
                 onClickBtn = {
-                    val selectedYear = 2000 + yearState.firstVisibleItemIndex
+                    val selectedYear = 2024 + yearState.firstVisibleItemIndex
                     val selectedMonth = 1 + monthState.firstVisibleItemIndex
                     val selectedDay = 1 + dayState.firstVisibleItemIndex
+                    val formattedDate = String.format("%04d-%02d-%02d", selectedYear, selectedMonth, selectedDay)
 
                     if (bottomSheetType == BottomSheetType.FullDate) {
-                        onFullDateSelected("$selectedYear-$selectedMonth-$selectedDay")
+                        onFullDateSelected(formattedDate)
                     } else if (bottomSheetType == BottomSheetType.SubDate) {
                         onSubDateSelected(selectedYear, selectedMonth)
                     }

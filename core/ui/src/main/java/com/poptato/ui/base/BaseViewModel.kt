@@ -36,7 +36,7 @@ abstract class BaseViewModel<STATE: PageState>(
         response: Result<D>,
         successCallback: (D) -> Unit,
         errorCallback: ((Throwable) -> Unit)? = null,
-        needLoading: Boolean = true
+        needLoading: Boolean = false
     ) {
         if (needLoading) LoadingManager.startLoading()
 
