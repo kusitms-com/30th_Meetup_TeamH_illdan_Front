@@ -9,6 +9,7 @@ import com.google.accompanist.web.WebViewNavigator
 import com.google.accompanist.web.WebViewState
 import com.google.accompanist.web.rememberWebViewNavigator
 import com.google.accompanist.web.rememberWebViewState
+import com.poptato.mypage.BuildConfig
 
 @Composable
 fun NoticeViewerScreen(
@@ -16,7 +17,7 @@ fun NoticeViewerScreen(
 ) {
 
     val noticeWebView = rememberWebViewState(
-        url = "https://mountain-fang-96a.notion.site/124d60b563cc80e894e0d2f3ed82e2d0?pvs=4",
+        url = BuildConfig.NOTICE_URL,
         additionalHttpHeaders = emptyMap()
     )
     val webviewClient = AccompanistWebViewClient()
