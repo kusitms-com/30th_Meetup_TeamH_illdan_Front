@@ -1,5 +1,7 @@
 package com.poptato.di
 
+import com.google.gson.Gson
+import com.poptato.data.base.ApiResponse
 import com.poptato.data.datastore.PoptatoDataStore
 import com.poptato.domain.model.request.ReissueRequestModel
 import com.poptato.domain.model.response.auth.TokenModel
@@ -23,38 +25,60 @@ class TokenAuthenticator @Inject constructor(
     private val reissueTokenUseCase: Lazy<ReissueTokenUseCase>
 ): Authenticator {
     override fun authenticate(route: Route?, response: Response): Request? {
-        val tokens = runBlocking {
-            getTokenUseCase.get().invoke(Unit).firstOrNull()
+        val errorCode = response.parseErrorCode()
+
+        return when (errorCode) {
+            6001 -> {
+                val tokens = runBlocking {
+                    getTokenUseCase.get().invoke(Unit).firstOrNull()
+                }
+                tokens?.let { handleTokenRefresh(response, it) }
+            }
+            6002 -> {
+                Timber.e("Token invalid: 유효하지 않은 토큰, 로그인 필요")
+                null
+            }
+            else -> {
+                Timber.e("Unhandled error code: $errorCode")
+                null
+            }
         }
+    }
 
-        return tokens?.let { tokenModel ->
-            runBlocking {
-                try {
-                    val newTokensResult = reissueTokenUseCase.get().invoke(
-                        ReissueRequestModel(
-                            accessToken = tokenModel.accessToken,
-                            refreshToken = tokenModel.refreshToken
-                        )
-                    ).firstOrNull()
+    private fun handleTokenRefresh(response: Response, tokenModel: TokenModel): Request? {
+        return runBlocking {
+            try {
+                val newTokensResult = reissueTokenUseCase.get().invoke(
+                    ReissueRequestModel(
+                        accessToken = tokenModel.accessToken,
+                        refreshToken = tokenModel.refreshToken
+                    )
+                ).firstOrNull()
 
-                    newTokensResult?.getOrNull()?.let { newTokens ->
-                        saveTokenUseCase.get().invoke(newTokens).collect {}
-
-                        response.request.newBuilder()
-                            .header("Authorization", "Bearer ${newTokens.accessToken}")
-                            .build()
-                    } ?: run {
-                        Timber.e("Token reissue failed: 새로운 토큰 없음")
-                        null
-                    }
-                } catch (e: Exception) {
-                    Timber.e("Token reissue failed: ${e.message}")
+                newTokensResult?.getOrNull()?.let { newTokens ->
+                    saveTokenUseCase.get().invoke(newTokens).collect {}
+                    response.request.newBuilder()
+                        .header("Authorization", "Bearer ${newTokens.accessToken}")
+                        .build()
+                } ?: run {
+                    Timber.e("Token reissue failed: 새로운 토큰 없음")
                     null
                 }
+            } catch (e: Exception) {
+                Timber.e("Token reissue failed: ${e.message}")
+                null
             }
-        } ?: run {
-            Timber.e("유효한 토큰 없음")
-            null
+        }
+    }
+
+    private fun Response.parseErrorCode(): Int {
+        return try {
+            val errorBody = this.peekBody(Long.MAX_VALUE).charStream()
+            val apiResponse = Gson().fromJson(errorBody, ApiResponse::class.java) as ApiResponse<*>
+            apiResponse.code
+        } catch (e: Exception) {
+            Timber.e("알 수 없는 에러 코드: ${e.message}")
+            -1
         }
     }
 }
