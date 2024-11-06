@@ -2,6 +2,7 @@ package com.poptato.data.base
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.poptato.domain.base.ApiException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.Response
@@ -26,9 +27,9 @@ abstract class BaseRepository {
             false -> {
                 val errorBody = response.errorBody()?.charStream()
                 val errorResponse = fromGson<D>(errorBody)
-                val errorData = responseMapper.responseToModel(errorResponse.result)
-
-                emit(Result.failure(Exception("API Error: ${response.code()}")))
+                emit(
+                    Result.failure(ApiException(errorResponse.code, errorResponse.message))
+                )
             }
         }
     }
