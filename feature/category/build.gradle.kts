@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.poptato.history"
+    namespace = "com.poptato.category"
 }
 
 dependencies {

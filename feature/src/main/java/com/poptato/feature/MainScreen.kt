@@ -60,6 +60,7 @@ import com.poptato.navigation.historyNavGraph
 import com.poptato.navigation.loginNavGraph
 import com.poptato.navigation.myPageNavGraph
 import com.poptato.navigation.backlogNavGraph
+import com.poptato.navigation.categoryNavGraph
 import com.poptato.navigation.splashNavGraph
 import com.poptato.navigation.todayNavGraph
 import com.poptato.navigation.yesterdayListNavGraph
@@ -272,6 +273,7 @@ fun MainScreen() {
                             updateBookmarkFlow = viewModel.updateBookmarkFlow,
                             showSnackBar = showSnackBar
                         )
+                        categoryNavGraph(navController = navController)
                         todayNavGraph(navController = navController, showSnackBar = showSnackBar)
                         historyNavGraph(navController = navController)
                     }

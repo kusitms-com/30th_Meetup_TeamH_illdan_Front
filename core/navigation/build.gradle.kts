@@ -18,4 +18,5 @@ dependencies {
     implementation(projects.feature.mypage)
     implementation(projects.feature.today)
     implementation(projects.feature.history)
+    implementation(projects.feature.category)
 }

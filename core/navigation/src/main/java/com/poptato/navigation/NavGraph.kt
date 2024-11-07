@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.poptato.backlog.BacklogScreen
+import com.poptato.category.CategoryScreen
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.login.KaKaoLoginScreen
 import com.poptato.mypage.MyPageScreen
@@ -86,6 +87,17 @@ fun NavGraphBuilder.backlogNavGraph(
                 updateBookmarkFlow = updateBookmarkFlow,
                 showSnackBar = showSnackBar
             )
+        }
+    }
+}
+
+fun NavGraphBuilder.categoryNavGraph(navController: NavHostController) {
+    navigation(
+        startDestination = NavRoutes.CategoryScreen.route,
+        route = NavRoutes.CategoryGraph.route
+    ) {
+        composable(NavRoutes.CategoryScreen.route) {
+            CategoryScreen()
         }
     }
 }
