@@ -80,6 +80,7 @@ fun NavGraphBuilder.backlogNavGraph(
         composable(NavRoutes.BacklogScreen.route) {
             BacklogScreen(
                 goToYesterdayList = { navController.navigate(NavRoutes.YesterdayListScreen.route) },
+                goToCategorySelect = { navController.navigate(NavRoutes.CategoryScreen.route) },
                 showBottomSheet = showBottomSheet,
                 updateDeadlineFlow = updateDeadlineFlow,
                 deleteTodoFlow = deleteTodoFlow,

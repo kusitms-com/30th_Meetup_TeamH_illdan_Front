@@ -99,6 +99,7 @@ import timber.log.Timber
 @Composable
 fun BacklogScreen(
     goToYesterdayList: () -> Unit = {},
+    goToCategorySelect: () -> Unit = {},
     showBottomSheet: (TodoItemModel) -> Unit = {},
     updateDeadlineFlow: SharedFlow<String?>,
     deleteTodoFlow: SharedFlow<Long>,
@@ -155,7 +156,8 @@ fun BacklogScreen(
             onValueChange = { newValue -> viewModel.onValueChange(newValue) },
             createBacklog = { newItem -> viewModel.createBacklog(newItem) },
             onItemSwiped = { itemToRemove -> viewModel.swipeBacklogItem(itemToRemove) },
-            onClickYesterdayList = { goToYesterdayList() },      // TODO 테스트용: "어제 리스트 체크하기" 스낵바 생성 후 변경 예정
+            onClickYesterdayList = { goToYesterdayList() },
+            onClickCategoryAdd = { goToCategorySelect() },
             onClickBtnTodoSettings = {
                 showBottomSheet(uiState.backlogList[it])
                 viewModel.onSelectedItem(uiState.backlogList[it])
@@ -186,6 +188,7 @@ fun BacklogContent(
     onValueChange: (String) -> Unit = {},
     createBacklog: (String) -> Unit = {},
     onClickYesterdayList: () -> Unit = {},
+    onClickCategoryAdd:() -> Unit = {},
     onItemSwiped: (TodoItemModel) -> Unit = {},
     onClickBtnTodoSettings: (Int) -> Unit = {},
     interactionSource: MutableInteractionSource,
@@ -201,7 +204,9 @@ fun BacklogContent(
             .fillMaxSize()
             .background(Gray100)
     ) {
-        BacklogCategoryList()
+        BacklogCategoryList(
+            onClickCategoryAdd = onClickCategoryAdd
+        )
 
         TopBar(
             titleText = com.poptato.design_system.TODO,
@@ -269,7 +274,9 @@ fun BacklogContent(
 }
 
 @Composable
-fun BacklogCategoryList() {
+fun BacklogCategoryList(
+    onClickCategoryAdd:() -> Unit = {},
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -282,6 +289,7 @@ fun BacklogCategoryList() {
                 tint = Color.Unspecified,
                 modifier = Modifier
                     .padding(vertical = 12.dp, horizontal = 6.dp)
+                    .clickable { onClickCategoryAdd() }
             )
         }
     }
