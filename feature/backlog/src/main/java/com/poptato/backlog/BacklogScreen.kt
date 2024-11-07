@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -200,6 +201,8 @@ fun BacklogContent(
             .fillMaxSize()
             .background(Gray100)
     ) {
+        BacklogCategoryList()
+
         TopBar(
             titleText = com.poptato.design_system.TODO,
             subText = uiState.backlogList.size.toString(),
@@ -261,6 +264,25 @@ fun BacklogContent(
                     interactionSource = interactionSource
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun BacklogCategoryList() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+    ) {
+        Row {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_add_circle),
+                contentDescription = "add backlog category",
+                tint = Color.Unspecified,
+                modifier = Modifier
+                    .padding(vertical = 12.dp, horizontal = 6.dp)
+            )
         }
     }
 }
