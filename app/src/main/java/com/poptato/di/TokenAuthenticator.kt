@@ -9,6 +9,7 @@ import com.poptato.domain.repository.AuthRepository
 import com.poptato.domain.usecase.auth.GetTokenUseCase
 import com.poptato.domain.usecase.auth.ReissueTokenUseCase
 import com.poptato.domain.usecase.auth.SaveTokenUseCase
+import com.poptato.ui.util.CommonEventManager
 import dagger.Lazy
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
@@ -36,6 +37,9 @@ class TokenAuthenticator @Inject constructor(
             }
             6002 -> {
                 Timber.e("Token invalid: 유효하지 않은 토큰, 로그인 필요")
+                runBlocking {
+                    CommonEventManager.triggerLogout()
+                }
                 null
             }
             else -> {

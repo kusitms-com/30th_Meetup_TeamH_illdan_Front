@@ -66,6 +66,7 @@ import com.poptato.navigation.yesterdayListNavGraph
 import com.poptato.ui.common.CommonSnackBar
 import com.poptato.ui.common.DatePickerBottomSheet
 import com.poptato.ui.common.TodoBottomSheet
+import com.poptato.ui.util.CommonEventManager
 import com.poptato.ui.util.DismissKeyboardOnClick
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -108,6 +109,14 @@ fun MainScreen() {
 
     if (uiState.bottomNavType != BottomNavType.DEFAULT) {
         BackHandler(onBack = backPressHandler)
+    }
+
+    LaunchedEffect(Unit) {
+        CommonEventManager.logoutTriggerFlow.collect {
+            navController.navigate(NavRoutes.KaKaoLoginGraph.route) {
+                popUpTo(0) { inclusive = true }
+            }
+        }
     }
 
     LaunchedEffect(navController) {
