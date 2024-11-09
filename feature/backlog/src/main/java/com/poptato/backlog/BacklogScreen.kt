@@ -562,8 +562,12 @@ fun CreateBacklogTextFiled(
             ),
             keyboardActions = KeyboardActions(
                 onDone = {
-                    if(taskInput.isNotEmpty()) createBacklog(taskInput)
-                    onValueChange("")
+                    if (taskInput.isNotEmpty()) {
+                        createBacklog(taskInput)
+                        onValueChange("")
+                    } else {
+                        focusManager.clearFocus()
+                    }
                 }
             ),
             decorationBox = { innerTextField ->
