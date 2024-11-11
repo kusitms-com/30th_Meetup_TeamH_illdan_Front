@@ -33,19 +33,21 @@ import com.poptato.design_system.R
 
 @Composable
 fun CategoryScreen(
-
+    goBackToBacklog: () -> Unit = {}
 ) {
 
     val interactionSource = remember { MutableInteractionSource() }
 
     CategoryContent(
-        interactionSource = interactionSource
+        interactionSource = interactionSource,
+        onClickBackBtn = { goBackToBacklog() }
     )
 }
 
 @Composable
 fun CategoryContent(
-    interactionSource: MutableInteractionSource = MutableInteractionSource()
+    interactionSource: MutableInteractionSource = MutableInteractionSource(),
+    onClickBackBtn: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -53,7 +55,9 @@ fun CategoryContent(
             .background(Gray100)
     ) {
         CategoryTitle(
-            interactionSource = interactionSource)
+            interactionSource = interactionSource,
+            onClickBackBtn = onClickBackBtn
+        )
     }
 }
 

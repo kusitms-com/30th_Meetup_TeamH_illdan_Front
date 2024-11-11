@@ -98,7 +98,9 @@ fun NavGraphBuilder.categoryNavGraph(navController: NavHostController) {
         route = NavRoutes.CategoryGraph.route
     ) {
         composable(NavRoutes.CategoryScreen.route) {
-            CategoryScreen()
+            CategoryScreen(
+                goBackToBacklog = { navController.popBackStack() }
+            )
         }
     }
 }
