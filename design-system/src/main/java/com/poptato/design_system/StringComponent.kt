@@ -29,6 +29,9 @@ const val BacklogHint = "새로 추가하기..."
 const val EmptyBacklogTitle = "할 일을 생각나는 대로\n추가해보세요."
 const val BACKLOG_YESTERDAY_TASK_GUIDE = "어제 한 일 체크를 깜빡했다면?"
 
+// Category
+const val CategoryAddTitle = "카테고리 추가"
+
 // YesterdayList
 const val YesterdayListTitle = "어제 한 일을 모두 체크하세요!"
 const val YesterdayAllCheckBtn = "완료"
