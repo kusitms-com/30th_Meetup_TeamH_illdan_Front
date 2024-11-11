@@ -216,7 +216,9 @@ fun CategoryNameTextField(
         BasicTextField(
             value = textInput,
             onValueChange = { input ->
-                onValueChange(input)
+                if (input.length <= 15) {
+                    onValueChange(input)
+                }
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -224,8 +226,16 @@ fun CategoryNameTextField(
                 .onFocusChanged { focusState ->
                     isFocused = focusState.isFocused
                 },
-            textStyle = PoptatoTypo.xLMedium,
+            textStyle = PoptatoTypo.xLMedium.copy(color = Gray00),
             cursorBrush = SolidColor(Gray00),
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    focusManager.clearFocus()
+                }
+            ),
             decorationBox = { innerTextField ->
                 Column(
                     modifier = Modifier
