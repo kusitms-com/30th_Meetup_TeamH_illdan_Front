@@ -5,25 +5,38 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.poptato.design_system.CategoryAddTitle
@@ -164,29 +177,66 @@ fun CategoryAddContent(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun CategoryNameTextField() {
+fun CategoryNameTextField(
+    textInput: String = "",
+    onValueChange: (String) -> Unit = {}
+) {
+    var isFocused by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
+
+    val imeVisible = WindowInsets.isImeVisible
+
+    LaunchedEffect(imeVisible) {
+        if (!imeVisible) {
+            focusManager.clearFocus()
+        }
+    }
+
     Box(
         modifier = Modifier
-            .wrapContentHeight()
+            .fillMaxWidth()
     ) {
         BasicTextField(
-            value = "test",
-            onValueChange = {},
+            value = textInput,
+            onValueChange = { input ->
+                onValueChange(input)
+            },
             modifier = Modifier
-                .fillMaxWidth(),
-            decorationBox = {
-                Column {
-                    Text(
-                        text = CategoryNameInputTitle,
-                        style = PoptatoTypo.xLMedium,
-                        color = Gray70
-                    )
+                .fillMaxWidth()
+                .padding(vertical = 16.dp)
+                .onFocusChanged { focusState ->
+                    isFocused = focusState.isFocused
+                },
+            textStyle = PoptatoTypo.xLMedium,
+            cursorBrush = SolidColor(Gray00),
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Done
+            ),
+            decorationBox = { innerTextField ->
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ){
+                        if (textInput.isEmpty() && !isFocused) {
+                            Text(
+                                text = CategoryNameInputTitle,
+                                style = PoptatoTypo.xLMedium,
+                                color = Gray70
+                            )
+                        }
+                        innerTextField()
+                    }
                     Divider(
-                        color = Gray90,
+                        color = if (textInput.isEmpty()) Gray90 else Gray00,
                         thickness = 1.dp,
                         modifier = Modifier.
-                            padding(top = 4.dp)
+                        padding(top = 4.dp)
                     )
                 }
             }
