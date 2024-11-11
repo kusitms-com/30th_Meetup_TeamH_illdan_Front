@@ -39,6 +39,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.poptato.design_system.CategoryAddTitle
 import com.poptato.design_system.CategoryNameInputTitle
 import com.poptato.design_system.Complete
@@ -55,18 +57,24 @@ fun CategoryScreen(
     goBackToBacklog: () -> Unit = {}
 ) {
 
+    val viewModel: CategoryViewModel = hiltViewModel()
+    val uiState: CategoryPageState by viewModel.uiState.collectAsStateWithLifecycle()
     val interactionSource = remember { MutableInteractionSource() }
 
     CategoryContent(
+        uiState = uiState,
         interactionSource = interactionSource,
-        onClickBackBtn = { goBackToBacklog() }
+        onClickBackBtn = { goBackToBacklog() },
+        onValueChange = { newValue -> viewModel.onValueChange(newValue) }
     )
 }
 
 @Composable
 fun CategoryContent(
+    uiState: CategoryPageState = CategoryPageState(),
     interactionSource: MutableInteractionSource = MutableInteractionSource(),
-    onClickBackBtn: () -> Unit = {}
+    onClickBackBtn: () -> Unit = {},
+    onValueChange: (String) -> Unit = {},
 ) {
     Column(
         modifier = Modifier
@@ -78,7 +86,10 @@ fun CategoryContent(
             onClickBackBtn = onClickBackBtn
         )
 
-        CategoryAddContent()
+        CategoryAddContent(
+            uiState = uiState,
+            onValueChange = onValueChange
+        )
     }
 }
 
@@ -148,7 +159,8 @@ fun AddFinishBtn() {
 
 @Composable
 fun CategoryAddContent(
-
+    uiState: CategoryPageState = CategoryPageState(),
+    onValueChange: (String) -> Unit = {},
 ) {
     Row(
         modifier = Modifier
@@ -163,7 +175,10 @@ fun CategoryAddContent(
                 .align(Alignment.CenterVertically)
                 .padding(end = 16.dp)
         ) {
-            CategoryNameTextField()
+            CategoryNameTextField(
+                textInput = uiState.textInput,
+                onValueChange = onValueChange
+            )
         }
 
         Icon(
@@ -211,9 +226,6 @@ fun CategoryNameTextField(
                 },
             textStyle = PoptatoTypo.xLMedium,
             cursorBrush = SolidColor(Gray00),
-            keyboardOptions = KeyboardOptions.Default.copy(
-                imeAction = ImeAction.Done
-            ),
             decorationBox = { innerTextField ->
                 Column(
                     modifier = Modifier
