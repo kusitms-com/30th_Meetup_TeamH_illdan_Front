@@ -57,6 +57,13 @@ fun NavGraphBuilder.loginNavGraph(
                         }
                     }
                 },
+                goToToday = {
+                    navController.navigate(NavRoutes.TodayScreen.route) {
+                        popUpTo(NavRoutes.KaKaoLoginScreen.route) {
+                            inclusive = true
+                        }
+                    }
+                },
                 showSnackBar = showSnackBar
             )
         }

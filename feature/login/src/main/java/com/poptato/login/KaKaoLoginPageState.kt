@@ -3,5 +3,5 @@ package com.poptato.login
 import com.poptato.ui.base.PageState
 
 data class KaKaoLoginPageState(
-    val temp: String = ""
+    val isExistTodayTodo: Boolean = false
 ): PageState
