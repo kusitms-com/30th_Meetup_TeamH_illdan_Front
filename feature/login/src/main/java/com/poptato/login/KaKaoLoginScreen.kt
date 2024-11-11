@@ -52,7 +52,7 @@ fun KaKaoLoginScreen(
                 is KaKaoLoginEvent.OnSuccessLogin -> {
                     if (uiState.isExistTodayTodo) { goToToday() }
                     else { goToBacklog() }
-                    
+
                     showSnackBar(SUCCESS_LOGIN)
                 }
             }

@@ -21,10 +21,6 @@ class KaKaoLoginViewModel @Inject constructor(
     private val getTodayListUseCase: GetTodayListUseCase
 ) : BaseViewModel<KaKaoLoginPageState>(KaKaoLoginPageState()) {
 
-    init {
-        getTodayList()
-    }
-
     fun kakaoLogin(token: String) {
         viewModelScope.launch {
             postKaKaoLoginUseCase.invoke(request = KaKaoLoginRequest(token)).collect {
@@ -38,9 +34,10 @@ class KaKaoLoginViewModel @Inject constructor(
             saveTokenUseCase.invoke(
                 request = TokenModel(accessToken = model.accessToken, refreshToken = model.refreshToken)
             ).collect {
-                resultResponse(it, {})
+                resultResponse(it, { getTodayList() })
             }
         }
+
         emitEventFlow(KaKaoLoginEvent.OnSuccessLogin)
     }
 
