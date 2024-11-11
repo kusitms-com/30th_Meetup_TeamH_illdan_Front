@@ -74,6 +74,7 @@ import com.poptato.design_system.COMPLETE_DELETE_TODO
 import com.poptato.design_system.CONFIRM_ACTION
 import com.poptato.design_system.DEADLINE
 import com.poptato.design_system.DEADLINE_DDAY
+import com.poptato.design_system.DEADLINE_PASSED
 import com.poptato.design_system.ERROR_GENERIC_MESSAGE
 import com.poptato.design_system.EmptyBacklogTitle
 import com.poptato.design_system.Gray00
@@ -476,7 +477,7 @@ fun BacklogItem(
                     Spacer(modifier = Modifier.width(6.dp))
                 }
                 if (item.dDay != null) Text(
-                    text = if(item.dDay != 0) String.format(DEADLINE, item.dDay) else DEADLINE_DDAY,
+                    text = formatDeadline(item.dDay),
                     style = PoptatoTypo.xsSemiBold,
                     color = Gray70
                 )
@@ -592,8 +593,12 @@ fun CreateBacklogTextFiled(
             ),
             keyboardActions = KeyboardActions(
                 onDone = {
-                    if(taskInput.isNotEmpty()) createBacklog(taskInput)
-                    onValueChange("")
+                    if (taskInput.isNotEmpty()) {
+                        createBacklog(taskInput)
+                        onValueChange("")
+                    } else {
+                        focusManager.clearFocus()
+                    }
                 }
             ),
             decorationBox = { innerTextField ->
@@ -683,5 +688,14 @@ fun BacklogGuideItem(
                 tint = Color.Unspecified
             )
         }
+    }
+}
+
+fun formatDeadline(dDay: Int?): String {
+    return when {
+        dDay == null -> ""
+        dDay > 0 -> String.format(DEADLINE, dDay)
+        dDay < 0 -> String.format(DEADLINE_PASSED, -dDay)
+        else -> DEADLINE_DDAY
     }
 }

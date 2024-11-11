@@ -31,6 +31,7 @@ dependencies {
     implementation(projects.domain)
     implementation(projects.core)
     implementation(projects.data)
+    implementation(projects.core.ui)
 
     implementation(libs.gson)
     implementation(libs.retrofit.gson)
