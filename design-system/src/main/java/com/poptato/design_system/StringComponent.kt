@@ -31,6 +31,7 @@ const val BACKLOG_YESTERDAY_TASK_GUIDE = "어제 한 일 체크를 깜빡했다�
 
 // Category
 const val CategoryAddTitle = "카테고리 추가"
+const val CategoryNameInputTitle = "카테고리 이름은 무엇인가요?"
 
 // YesterdayList
 const val YesterdayListTitle = "어제 한 일을 모두 체크하세요!"

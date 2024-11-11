@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -12,6 +13,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -24,9 +27,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.poptato.design_system.CategoryAddTitle
+import com.poptato.design_system.CategoryNameInputTitle
 import com.poptato.design_system.Complete
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
+import com.poptato.design_system.Gray70
+import com.poptato.design_system.Gray90
 import com.poptato.design_system.Gray95
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.R
@@ -58,6 +64,8 @@ fun CategoryContent(
             interactionSource = interactionSource,
             onClickBackBtn = onClickBackBtn
         )
+
+        CategoryAddContent()
     }
 }
 
@@ -121,6 +129,67 @@ fun AddFinishBtn() {
             color = Gray00,
             modifier = Modifier
                 .padding(vertical = 6.dp, horizontal = 12.dp)
+        )
+    }
+}
+
+@Composable
+fun CategoryAddContent(
+
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .padding(horizontal = 16.dp, vertical = 24.dp)
+    ) {
+
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .align(Alignment.CenterVertically)
+                .padding(end = 16.dp)
+        ) {
+            CategoryNameTextField()
+        }
+
+        Icon(
+            painter = painterResource(id = R.drawable.ic_add_category_icon),
+            contentDescription = "add category icon",
+            tint = Color.Unspecified,
+            modifier = Modifier
+                .size(40.dp)
+                .align(Alignment.CenterVertically)
+        )
+    }
+}
+
+@Composable
+fun CategoryNameTextField() {
+    Box(
+        modifier = Modifier
+            .wrapContentHeight()
+    ) {
+        BasicTextField(
+            value = "test",
+            onValueChange = {},
+            modifier = Modifier
+                .fillMaxWidth(),
+            decorationBox = {
+                Column {
+                    Text(
+                        text = CategoryNameInputTitle,
+                        style = PoptatoTypo.xLMedium,
+                        color = Gray70
+                    )
+                    Divider(
+                        color = Gray90,
+                        thickness = 1.dp,
+                        modifier = Modifier.
+                            padding(top = 4.dp)
+                    )
+                }
+            }
         )
     }
 }
