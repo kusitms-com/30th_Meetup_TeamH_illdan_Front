@@ -142,7 +142,7 @@ fun MainScreen() {
     DismissKeyboardOnClick {
         ModalBottomSheetLayout(
             sheetState = sheetState,
-            sheetGesturesEnabled = uiState.bottomSheetType == BottomSheetType.Main,
+            sheetGesturesEnabled = uiState.bottomSheetType == BottomSheetType.Main || uiState.bottomSheetType == BottomSheetType.Category,
             sheetContent = {
                 AnimatedContent(
                     targetState = uiState.bottomSheetType,
