@@ -81,4 +81,8 @@ class MainViewModel @Inject constructor() : BaseViewModel<MainPageState>(MainPag
     fun toggleBackPressed(value: Boolean) { updateState(uiState.value.copy(backPressedOnce = value)) }
 
     fun updateBottomSheetType(type: BottomSheetType) { updateState(uiState.value.copy(bottomSheetType = type)) }
+
+    fun onSelectedCategoryIcon() {
+        updateState(uiState.value.copy(bottomSheetType = BottomSheetType.Category))
+    }
 }

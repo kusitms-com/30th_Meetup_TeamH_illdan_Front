@@ -24,21 +24,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.Snackbar
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -47,30 +41,27 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.poptato.core.enums.BottomNavType
-import com.poptato.design_system.BgSnackBar
 import com.poptato.design_system.FINISH_APP_GUIDE
-import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
-import com.poptato.design_system.PoptatoTypo
 import com.poptato.domain.model.enums.BottomSheetType
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.feature.component.BottomNavBar
 import com.poptato.navigation.NavRoutes
+import com.poptato.navigation.backlogNavGraph
+import com.poptato.navigation.categoryNavGraph
 import com.poptato.navigation.historyNavGraph
 import com.poptato.navigation.loginNavGraph
 import com.poptato.navigation.myPageNavGraph
-import com.poptato.navigation.backlogNavGraph
-import com.poptato.navigation.categoryNavGraph
 import com.poptato.navigation.splashNavGraph
 import com.poptato.navigation.todayNavGraph
 import com.poptato.navigation.yesterdayListNavGraph
+import com.poptato.ui.common.CategoryBottomSheet
 import com.poptato.ui.common.CommonSnackBar
 import com.poptato.ui.common.DatePickerBottomSheet
 import com.poptato.ui.common.TodoBottomSheet
 import com.poptato.ui.util.CommonEventManager
 import com.poptato.ui.util.DismissKeyboardOnClick
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
@@ -90,6 +81,10 @@ fun MainScreen() {
     )
     val showBottomSheet: (TodoItemModel) -> Unit = { item: TodoItemModel ->
         viewModel.onSelectedTodoItem(item)
+        scope.launch { sheetState.show() }
+    }
+    val showCategoryIconBottomSheet: () -> Unit = {
+        viewModel.onSelectedCategoryIcon()
         scope.launch { sheetState.show() }
     }
     val backPressHandler: () -> Unit = {
@@ -208,6 +203,9 @@ fun MainScreen() {
                                 bottomSheetType = BottomSheetType.SubDate
                             )
                         }
+                        BottomSheetType.Category -> {
+                            CategoryBottomSheet()
+                        }
                     }
                 }
             },
@@ -282,7 +280,10 @@ fun MainScreen() {
                             updateBookmarkFlow = viewModel.updateBookmarkFlow,
                             showSnackBar = showSnackBar
                         )
-                        categoryNavGraph(navController = navController)
+                        categoryNavGraph(
+                            navController = navController,
+                            showCategoryIconBottomSheet = showCategoryIconBottomSheet
+                        )
                         todayNavGraph(navController = navController, showSnackBar = showSnackBar)
                         historyNavGraph(navController = navController)
                     }

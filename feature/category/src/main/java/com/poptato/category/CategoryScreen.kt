@@ -54,7 +54,8 @@ import com.poptato.design_system.R
 
 @Composable
 fun CategoryScreen(
-    goBackToBacklog: () -> Unit = {}
+    goBackToBacklog: () -> Unit = {},
+    showIconBottomSheet: () -> Unit = {}
 ) {
 
     val viewModel: CategoryViewModel = hiltViewModel()
@@ -65,7 +66,8 @@ fun CategoryScreen(
         uiState = uiState,
         interactionSource = interactionSource,
         onClickBackBtn = { goBackToBacklog() },
-        onValueChange = { newValue -> viewModel.onValueChange(newValue) }
+        onValueChange = { newValue -> viewModel.onValueChange(newValue) },
+        onClickSelectCategoryIcon = { showIconBottomSheet() }
     )
 }
 
@@ -75,6 +77,7 @@ fun CategoryContent(
     interactionSource: MutableInteractionSource = MutableInteractionSource(),
     onClickBackBtn: () -> Unit = {},
     onValueChange: (String) -> Unit = {},
+    onClickSelectCategoryIcon: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -88,7 +91,9 @@ fun CategoryContent(
 
         CategoryAddContent(
             uiState = uiState,
-            onValueChange = onValueChange
+            interactionSource = interactionSource,
+            onValueChange = onValueChange,
+            onClickSelectIcon = onClickSelectCategoryIcon
         )
     }
 }
@@ -160,7 +165,9 @@ fun AddFinishBtn() {
 @Composable
 fun CategoryAddContent(
     uiState: CategoryPageState = CategoryPageState(),
+    interactionSource: MutableInteractionSource,
     onValueChange: (String) -> Unit = {},
+    onClickSelectIcon: () -> Unit = {}
 ) {
     Row(
         modifier = Modifier
@@ -188,6 +195,11 @@ fun CategoryAddContent(
             modifier = Modifier
                 .size(40.dp)
                 .align(Alignment.CenterVertically)
+                .clickable(
+                    indication = null,
+                    interactionSource = interactionSource,
+                    onClick = { onClickSelectIcon() }
+                )
         )
     }
 }

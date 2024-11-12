@@ -9,9 +9,9 @@ import com.poptato.category.CategoryScreen
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.login.KaKaoLoginScreen
 import com.poptato.mypage.MyPageScreen
-import com.poptato.mypage.viewer.NoticeViewerScreen
-import com.poptato.mypage.viewer.FAQViewerScreen
 import com.poptato.mypage.policy.PolicyViewerScreen
+import com.poptato.mypage.viewer.FAQViewerScreen
+import com.poptato.mypage.viewer.NoticeViewerScreen
 import com.poptato.setting.servicedelete.ServiceDeleteScreen
 import com.poptato.setting.userdata.UserDataScreen
 import com.poptato.splash.SplashScreen
@@ -92,14 +92,18 @@ fun NavGraphBuilder.backlogNavGraph(
     }
 }
 
-fun NavGraphBuilder.categoryNavGraph(navController: NavHostController) {
+fun NavGraphBuilder.categoryNavGraph(
+    navController: NavHostController,
+    showCategoryIconBottomSheet: () -> Unit
+) {
     navigation(
         startDestination = NavRoutes.CategoryScreen.route,
         route = NavRoutes.CategoryGraph.route
     ) {
         composable(NavRoutes.CategoryScreen.route) {
             CategoryScreen(
-                goBackToBacklog = { navController.popBackStack() }
+                goBackToBacklog = { navController.popBackStack() },
+                showIconBottomSheet = showCategoryIconBottomSheet
             )
         }
     }
@@ -145,25 +149,31 @@ fun NavGraphBuilder.myPageNavGraph(navController: NavHostController) {
 
         composable(NavRoutes.NoticeViewScreen.route) {
             NoticeViewerScreen(
-                goBackToMyPage = { navController.navigate(NavRoutes.MyPageScreen.route) {
-                    popUpTo(NavRoutes.MyPageScreen.route) { inclusive = true }
-                } }
+                goBackToMyPage = {
+                    navController.navigate(NavRoutes.MyPageScreen.route) {
+                        popUpTo(NavRoutes.MyPageScreen.route) { inclusive = true }
+                    }
+                }
             )
         }
 
         composable(NavRoutes.FAQViewScreen.route) {
             FAQViewerScreen(
-                goBackToMyPage = { navController.navigate(NavRoutes.MyPageScreen.route) {
-                    popUpTo(NavRoutes.MyPageScreen.route) { inclusive = true }
-                } }
+                goBackToMyPage = {
+                    navController.navigate(NavRoutes.MyPageScreen.route) {
+                        popUpTo(NavRoutes.MyPageScreen.route) { inclusive = true }
+                    }
+                }
             )
         }
 
         composable(NavRoutes.PolicyViewScreen.route) {
             PolicyViewerScreen(
-                goBackToMyPage = { navController.navigate(NavRoutes.MyPageScreen.route) {
-                    popUpTo(NavRoutes.MyPageScreen.route) { inclusive = true }
-                } }
+                goBackToMyPage = {
+                    navController.navigate(NavRoutes.MyPageScreen.route) {
+                        popUpTo(NavRoutes.MyPageScreen.route) { inclusive = true }
+                    }
+                }
             )
         }
 
