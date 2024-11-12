@@ -151,7 +151,13 @@ fun MainScreen() {
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(324.dp)
+                        .then(
+                            if (uiState.bottomSheetType == BottomSheetType.Category) {
+                                Modifier.height(610.dp)
+                            } else {
+                                Modifier.height(324.dp)
+                            }
+                        )
                         .background(Gray100),
                     label = ""
                 ) { currentSheet ->
