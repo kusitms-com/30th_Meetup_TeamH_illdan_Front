@@ -73,6 +73,10 @@ const val BtnGetTodoText = "할 일 가져오기"
 const val HistoryTitle = "기록"
 const val HistoryListEmpty = "아직 완료한 일이 없어요"
 
+// BottomSheet
+const val REPEAT_TASK_OPTION = "반복 할 일 설정"
+const val DEADLINE_OPTION = "마감기한 설정"
+
 // Error
 const val ERROR_GENERIC_MESSAGE = "에러가 발생하였습니다"
 
