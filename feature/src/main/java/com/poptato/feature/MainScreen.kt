@@ -92,7 +92,9 @@ fun MainScreen() {
         scope.launch { sheetState.show() }
     }
     val backPressHandler: () -> Unit = {
-        if (uiState.backPressedOnce) {
+        if (sheetState.isVisible) {
+            scope.launch { sheetState.hide() }
+        } else if (uiState.backPressedOnce) {
             (context as? Activity)?.finish()
         } else {
             viewModel.toggleBackPressed(true)
