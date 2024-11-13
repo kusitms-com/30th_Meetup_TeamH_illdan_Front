@@ -8,9 +8,13 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
@@ -219,8 +223,30 @@ fun MainScreen() {
                 bottomBar = {
                     AnimatedVisibility(
                         visible = uiState.bottomNavType != BottomNavType.DEFAULT,
-                        enter = slideInHorizontally(animationSpec = tween(durationMillis = viewModel.animationDuration)),
-                        exit = slideOutHorizontally(animationSpec = tween(durationMillis = viewModel.animationDuration)),
+                        enter = fadeIn(
+                            animationSpec = tween(
+                                durationMillis = viewModel.animationDuration,
+                                easing = FastOutSlowInEasing
+                            )
+                        ) + scaleIn(
+                            initialScale = 0.9f,
+                            animationSpec = tween(
+                                durationMillis = viewModel.animationDuration,
+                                easing = FastOutSlowInEasing
+                            )
+                        ),
+                        exit = fadeOut(
+                            animationSpec = tween(
+                                durationMillis = viewModel.animationDuration,
+                                easing = LinearOutSlowInEasing
+                            )
+                        ) + scaleOut(
+                            targetScale = 0.9f,
+                            animationSpec = tween(
+                                durationMillis = viewModel.animationDuration,
+                                easing = LinearOutSlowInEasing
+                            )
+                        ),
                         modifier = Modifier.background(Gray100)
                     ) {
                         BottomNavBar(
@@ -250,23 +276,36 @@ fun MainScreen() {
                         modifier = Modifier.background(Gray100),
                         navController = navController,
                         startDestination = NavRoutes.SplashGraph.route,
-                        exitTransition = { ExitTransition.None },
+                        exitTransition = {
+                            fadeOut(
+                                animationSpec = tween(
+                                    durationMillis = viewModel.animationDuration,
+                                    easing = LinearOutSlowInEasing
+                                )
+                            )
+                        },
                         enterTransition = {
-                            slideIntoContainer(
-                                AnimatedContentTransitionScope.SlideDirection.Start,
-                                tween(viewModel.animationDuration)
+                            fadeIn(
+                                animationSpec = tween(
+                                    durationMillis = viewModel.animationDuration,
+                                    easing = FastOutSlowInEasing
+                                )
                             )
                         },
                         popEnterTransition = {
-                            slideIntoContainer(
-                                AnimatedContentTransitionScope.SlideDirection.End,
-                                tween(viewModel.animationDuration)
+                            fadeIn(
+                                animationSpec = tween(
+                                    durationMillis = viewModel.animationDuration,
+                                    easing = FastOutSlowInEasing
+                                )
                             )
                         },
                         popExitTransition = {
-                            slideOutOfContainer(
-                                AnimatedContentTransitionScope.SlideDirection.End,
-                                tween(viewModel.animationDuration)
+                            fadeOut(
+                                animationSpec = tween(
+                                    durationMillis = viewModel.animationDuration,
+                                    easing = LinearOutSlowInEasing
+                                )
                             )
                         }
                     ) {
