@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.poptato.backlog.BacklogScreen
 import com.poptato.category.CategoryScreen
+import com.poptato.domain.model.response.category.CategoryIconTotalListModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.login.KaKaoLoginScreen
 import com.poptato.mypage.MyPageScreen
@@ -94,7 +95,7 @@ fun NavGraphBuilder.backlogNavGraph(
 
 fun NavGraphBuilder.categoryNavGraph(
     navController: NavHostController,
-    showCategoryIconBottomSheet: () -> Unit
+    showCategoryIconBottomSheet: (CategoryIconTotalListModel) -> Unit
 ) {
     navigation(
         startDestination = NavRoutes.CategoryScreen.route,

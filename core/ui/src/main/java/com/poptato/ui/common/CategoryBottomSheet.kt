@@ -16,9 +16,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.poptato.design_system.Gray80
 import com.poptato.design_system.Gray90
+import com.poptato.domain.model.response.category.CategoryIconTotalListModel
 
 @Composable
-fun CategoryBottomSheet() {
+fun CategoryBottomSheet(
+    categoryIconList: CategoryIconTotalListModel = CategoryIconTotalListModel()
+) {
 
     CategoryBottomSheetContent()
 }

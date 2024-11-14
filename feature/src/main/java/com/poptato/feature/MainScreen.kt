@@ -44,6 +44,7 @@ import com.poptato.core.enums.BottomNavType
 import com.poptato.design_system.FINISH_APP_GUIDE
 import com.poptato.design_system.Gray100
 import com.poptato.domain.model.enums.BottomSheetType
+import com.poptato.domain.model.response.category.CategoryIconTotalListModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.feature.component.BottomNavBar
 import com.poptato.navigation.NavRoutes
@@ -83,8 +84,8 @@ fun MainScreen() {
         viewModel.onSelectedTodoItem(item)
         scope.launch { sheetState.show() }
     }
-    val showCategoryIconBottomSheet: () -> Unit = {
-        viewModel.onSelectedCategoryIcon()
+    val showCategoryIconBottomSheet: (CategoryIconTotalListModel) -> Unit = { categoryList: CategoryIconTotalListModel ->
+        viewModel.onSelectedCategoryIcon(categoryList)
         scope.launch { sheetState.show() }
     }
     val backPressHandler: () -> Unit = {
@@ -210,7 +211,9 @@ fun MainScreen() {
                             )
                         }
                         BottomSheetType.Category -> {
-                            CategoryBottomSheet()
+                            CategoryBottomSheet(
+                                categoryIconList = uiState.categoryIconList
+                            )
                         }
                     }
                 }
