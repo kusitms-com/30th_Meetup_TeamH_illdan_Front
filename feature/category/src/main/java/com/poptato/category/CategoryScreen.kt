@@ -51,11 +51,12 @@ import com.poptato.design_system.Gray90
 import com.poptato.design_system.Gray95
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.R
+import com.poptato.domain.model.response.category.CategoryIconTotalListModel
 
 @Composable
 fun CategoryScreen(
     goBackToBacklog: () -> Unit = {},
-    showIconBottomSheet: () -> Unit = {}
+    showIconBottomSheet: (CategoryIconTotalListModel) -> Unit = {}
 ) {
 
     val viewModel: CategoryViewModel = hiltViewModel()
@@ -67,7 +68,9 @@ fun CategoryScreen(
         interactionSource = interactionSource,
         onClickBackBtn = { goBackToBacklog() },
         onValueChange = { newValue -> viewModel.onValueChange(newValue) },
-        onClickSelectCategoryIcon = { showIconBottomSheet() }
+        onClickSelectCategoryIcon = {
+            showIconBottomSheet(uiState.categoryIconList)
+        }
     )
 }
 
