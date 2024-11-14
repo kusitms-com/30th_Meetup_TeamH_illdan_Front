@@ -39,20 +39,16 @@ import timber.log.Timber
 @Composable
 fun KaKaoLoginScreen(
     goToBacklog: () -> Unit = {},
-    goToToday: () -> Unit = {},
     showSnackBar: (String) -> Unit
 ) {
     val viewModel: KaKaoLoginViewModel = hiltViewModel()
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collect { event ->
             when(event) {
                 is KaKaoLoginEvent.OnSuccessLogin -> {
-                    if (uiState.isExistTodayTodo) { goToToday() }
-                    else { goToBacklog() }
-
+                    goToBacklog()
                     showSnackBar(SUCCESS_LOGIN)
                 }
             }

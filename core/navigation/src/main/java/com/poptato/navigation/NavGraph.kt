@@ -40,13 +40,6 @@ fun NavGraphBuilder.splashNavGraph(navController: NavHostController) {
                             inclusive = true
                         }
                     }
-                },
-                goToToday = {
-                    navController.navigate(NavRoutes.TodayScreen.route) {
-                        popUpTo(NavRoutes.SplashScreen.route) {
-                            inclusive = true
-                        }
-                    }
                 }
             )
         }
@@ -65,13 +58,6 @@ fun NavGraphBuilder.loginNavGraph(
             KaKaoLoginScreen(
                 goToBacklog = {
                     navController.navigate(NavRoutes.BacklogScreen.route) {
-                        popUpTo(NavRoutes.KaKaoLoginScreen.route) {
-                            inclusive = true
-                        }
-                    }
-                },
-                goToToday = {
-                    navController.navigate(NavRoutes.TodayScreen.route) {
                         popUpTo(NavRoutes.KaKaoLoginScreen.route) {
                             inclusive = true
                         }

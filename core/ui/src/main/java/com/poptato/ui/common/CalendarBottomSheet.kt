@@ -37,6 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.poptato.design_system.Complete
 import com.poptato.design_system.DELETE
+import com.poptato.design_system.FRI
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
 import com.poptato.design_system.Gray40
@@ -46,7 +47,13 @@ import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.R
 import com.poptato.design_system.YEAR_MONTH
 import com.poptato.design_system.Gray90
+import com.poptato.design_system.MON
 import com.poptato.design_system.Primary60
+import com.poptato.design_system.SAT
+import com.poptato.design_system.SUN
+import com.poptato.design_system.THU
+import com.poptato.design_system.TUE
+import com.poptato.design_system.WED
 import org.threeten.bp.LocalDate
 import org.threeten.bp.YearMonth
 
@@ -136,7 +143,7 @@ fun CalendarBottomSheetContent(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
         ) {
-            val weekdays = listOf("일", "월", "화", "수", "목", "금", "토")
+            val weekdays = listOf(SUN, MON, TUE, WED, THU, FRI, SAT)
             items(weekdays) { day ->
                 Text(
                     text = day,

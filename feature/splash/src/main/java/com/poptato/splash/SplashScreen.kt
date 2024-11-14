@@ -22,8 +22,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun SplashScreen(
     goToKaKaoLogin: () -> Unit = {},
-    goToBacklog: () -> Unit,
-    goToToday: () -> Unit
+    goToBacklog: () -> Unit
 ) {
     val viewModel: SplashViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -31,10 +30,7 @@ fun SplashScreen(
     LaunchedEffect(Unit) {
         delay(2000L)
 
-        if (uiState.skipLogin) {
-            if (uiState.isExistTodayTodo) { goToToday() }
-            else { goToBacklog() }
-        }
+        if (uiState.skipLogin) { goToBacklog() }
         else { goToKaKaoLogin() }
     }
 

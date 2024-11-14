@@ -10,6 +10,7 @@ import com.poptato.domain.usecase.PostKaKaoLoginUseCase
 import com.poptato.domain.usecase.auth.SaveTokenUseCase
 import com.poptato.domain.usecase.today.GetTodayListUseCase
 import com.poptato.ui.base.BaseViewModel
+import com.poptato.ui.base.PageState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -17,9 +18,8 @@ import javax.inject.Inject
 @HiltViewModel
 class KaKaoLoginViewModel @Inject constructor(
     private val postKaKaoLoginUseCase: PostKaKaoLoginUseCase,
-    private val saveTokenUseCase: SaveTokenUseCase,
-    private val getTodayListUseCase: GetTodayListUseCase
-) : BaseViewModel<KaKaoLoginPageState>(KaKaoLoginPageState()) {
+    private val saveTokenUseCase: SaveTokenUseCase
+) : BaseViewModel<PageState.Default>(PageState.Default) {
 
     fun kakaoLogin(token: String) {
         viewModelScope.launch {
@@ -34,26 +34,9 @@ class KaKaoLoginViewModel @Inject constructor(
             saveTokenUseCase.invoke(
                 request = TokenModel(accessToken = model.accessToken, refreshToken = model.refreshToken)
             ).collect {
-                resultResponse(it, { getTodayList() })
+                resultResponse(it, {})
             }
         }
-
         emitEventFlow(KaKaoLoginEvent.OnSuccessLogin)
-    }
-
-    private fun getTodayList() {
-        viewModelScope.launch {
-            getTodayListUseCase(request = GetTodayListRequestModel(page = 0, size = 1)).collect {
-                resultResponse(it, ::onSuccessGetTodayList)
-            }
-        }
-    }
-
-    private fun onSuccessGetTodayList(response: TodayListModel) {
-        updateState(
-            uiState.value.copy(
-                isExistTodayTodo = response.todays.isNotEmpty()
-            )
-        )
     }
 }
