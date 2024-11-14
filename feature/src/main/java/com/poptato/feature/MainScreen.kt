@@ -67,6 +67,7 @@ import com.poptato.navigation.backlogNavGraph
 import com.poptato.navigation.splashNavGraph
 import com.poptato.navigation.todayNavGraph
 import com.poptato.navigation.yesterdayListNavGraph
+import com.poptato.ui.common.CalendarBottomSheet
 import com.poptato.ui.common.CommonSnackBar
 import com.poptato.ui.common.DatePickerBottomSheet
 import com.poptato.ui.common.TodoBottomSheet
@@ -152,7 +153,6 @@ fun MainScreen() {
     DismissKeyboardOnClick {
         ModalBottomSheetLayout(
             sheetState = sheetState,
-            sheetGesturesEnabled = uiState.bottomSheetType == BottomSheetType.Main,
             sheetContent = {
                 AnimatedContent(
                     targetState = uiState.bottomSheetType,
@@ -161,18 +161,14 @@ fun MainScreen() {
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(324.dp)
-                        .background(Gray100),
+                        .background(Gray100)
+                        .navigationBarsPadding(),
                     label = ""
                 ) { currentSheet ->
                     when (currentSheet) {
                         BottomSheetType.Main -> {
                             TodoBottomSheet(
                                 item = uiState.selectedTodoItem,
-                                setDeadline = {
-                                    viewModel.onUpdatedDeadline(it)
-                                    scope.launch { viewModel.updateDeadlineFlow.emit(it) }
-                                },
                                 onClickShowDatePicker = { viewModel.updateBottomSheetType(BottomSheetType.FullDate) },
                                 onClickBtnDelete = {
                                     scope.launch {
@@ -195,15 +191,13 @@ fun MainScreen() {
                             )
                         }
                         BottomSheetType.FullDate -> {
-                            DatePickerBottomSheet(
+                            CalendarBottomSheet(
                                 onDismissRequest = { viewModel.updateBottomSheetType(BottomSheetType.Main) },
-                                bottomSheetType = BottomSheetType.FullDate,
-                                onFullDateSelected = { date ->
+                                onDateSelected = { date ->
                                     viewModel.onUpdatedDeadline(date)
-                                    scope.launch {
-                                        viewModel.updateDeadlineFlow.emit(date)
-                                    }
-                                }
+                                    scope.launch { viewModel.updateDeadlineFlow.emit(date) }
+                                },
+                                deadline = uiState.selectedTodoItem.deadline
                             )
                         }
                         BottomSheetType.Calendar -> TODO("캘린더 바텀시트 컴포저블을 여기에 추가")

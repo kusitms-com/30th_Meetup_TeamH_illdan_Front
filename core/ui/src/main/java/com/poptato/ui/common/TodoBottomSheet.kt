@@ -33,14 +33,13 @@ import com.poptato.design_system.Gray60
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.R
 import com.poptato.design_system.REPEAT_TASK_OPTION
-import com.poptato.design_system.delete
+import com.poptato.design_system.DELETE_ACTION
 import com.poptato.design_system.modify
 import com.poptato.domain.model.response.today.TodoItemModel
 
 @Composable
 fun TodoBottomSheet(
     item: TodoItemModel = TodoItemModel(),
-    setDeadline: (String?) -> Unit = {},
     onClickShowDatePicker: () -> Unit = {},
     onClickBtnDelete: (Long) -> Unit = {},
     onClickBtnModify: (Long) -> Unit = {},
@@ -56,10 +55,6 @@ fun TodoBottomSheet(
 
     TodoBottomSheetContent(
         item = item.copy(deadline = deadline, isBookmark = isBookmark),
-        removeDeadline = {
-            deadline = ""
-            setDeadline(null)
-        },
         onClickShowDatePicker = onClickShowDatePicker,
         onClickBtnDelete = onClickBtnDelete,
         onClickBtnModify = onClickBtnModify,
@@ -73,7 +68,6 @@ fun TodoBottomSheet(
 @Composable
 fun TodoBottomSheetContent(
     item: TodoItemModel = TodoItemModel(),
-    removeDeadline: () -> Unit = {},
     onClickShowDatePicker: () -> Unit = {},
     onClickBtnDelete: (Long) -> Unit = {},
     onClickBtnModify: (Long) -> Unit = {},
@@ -137,7 +131,7 @@ fun TodoBottomSheetContent(
             },
             deadline = item.deadline
         )
-        BottomSheetBtn(resourceId = R.drawable.ic_trash, buttonText = delete, textColor = Danger50, modifier = Modifier.clickable {
+        BottomSheetBtn(resourceId = R.drawable.ic_trash, buttonText = DELETE_ACTION, textColor = Danger50, modifier = Modifier.clickable {
             onClickBtnDelete(item.todoId)
         })
     }

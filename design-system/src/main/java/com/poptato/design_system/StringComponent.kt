@@ -7,7 +7,8 @@ const val History = "히스토리"
 const val Settings = "설정"
 const val Backlog = "백로그"
 const val modify = "수정하기"
-const val delete = "삭제하기"
+const val DELETE_ACTION = "삭제하기"
+const val DELETE = "삭제"
 const val dueDate = "마감기한"
 const val Confirm = "확인"
 const val CONFIRM_ACTION = "확인하기"
@@ -76,6 +77,7 @@ const val HistoryListEmpty = "아직 완료한 일이 없어요"
 // BottomSheet
 const val REPEAT_TASK_OPTION = "반복 할 일 설정"
 const val DEADLINE_OPTION = "마감기한 설정"
+const val YEAR_MONTH = "%s년 %s월"
 
 // Error
 const val ERROR_GENERIC_MESSAGE = "에러가 발생하였습니다"
