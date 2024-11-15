@@ -5,6 +5,7 @@ import com.poptato.domain.model.response.category.CategoryIconTotalListModel
 import com.poptato.domain.model.response.category.CategoryIconTypeListModel
 import com.poptato.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.StateFlow
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -38,6 +39,8 @@ class CategoryViewModel @Inject constructor(
             )
         )
     )
+
+    val isCategorySettingValid: Boolean = (uiState.value.categoryName.isNotBlank()) && (uiState.value.selectedIcon != null)
 
     init {
         getCategoryIconList()

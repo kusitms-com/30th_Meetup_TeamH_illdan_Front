@@ -97,7 +97,8 @@ fun NavGraphBuilder.backlogNavGraph(
 fun NavGraphBuilder.categoryNavGraph(
     navController: NavHostController,
     showCategoryIconBottomSheet: (CategoryIconTotalListModel) -> Unit,
-    selectedIconInBottomSheet: SharedFlow<CategoryIconItemModel>
+    selectedIconInBottomSheet: SharedFlow<CategoryIconItemModel>,
+    showDialog: () -> Unit
 ) {
     navigation(
         startDestination = NavRoutes.CategoryScreen.route,
@@ -107,7 +108,8 @@ fun NavGraphBuilder.categoryNavGraph(
             CategoryScreen(
                 goBackToBacklog = { navController.popBackStack() },
                 showIconBottomSheet = showCategoryIconBottomSheet,
-                selectedIconInBottomSheet = selectedIconInBottomSheet
+                selectedIconInBottomSheet = selectedIconInBottomSheet,
+                showDialog = showDialog
             )
         }
     }

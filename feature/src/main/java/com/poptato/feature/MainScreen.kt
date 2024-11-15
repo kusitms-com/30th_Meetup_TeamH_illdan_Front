@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.appcompat.widget.AlertDialogLayout
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.AnimatedVisibility
@@ -29,6 +30,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
@@ -44,6 +46,7 @@ import com.poptato.core.enums.BottomNavType
 import com.poptato.design_system.FINISH_APP_GUIDE
 import com.poptato.design_system.Gray100
 import com.poptato.domain.model.enums.BottomSheetType
+import com.poptato.domain.model.enums.ModalType
 import com.poptato.domain.model.response.category.CategoryIconTotalListModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.feature.component.BottomNavBar
@@ -59,6 +62,8 @@ import com.poptato.navigation.yesterdayListNavGraph
 import com.poptato.ui.common.CategoryBottomSheet
 import com.poptato.ui.common.CommonSnackBar
 import com.poptato.ui.common.DatePickerBottomSheet
+import com.poptato.ui.common.OneBtnTypeDialog
+import com.poptato.ui.common.OneBtnTypeDialogBtn
 import com.poptato.ui.common.TodoBottomSheet
 import com.poptato.ui.util.CommonEventManager
 import com.poptato.ui.util.DismissKeyboardOnClick
@@ -80,6 +85,7 @@ fun MainScreen() {
         initialValue = ModalBottomSheetValue.Hidden,
         skipHalfExpanded = true
     )
+    val isShowDialog = remember { mutableStateOf(false) }
     val showBottomSheet: (TodoItemModel) -> Unit = { item: TodoItemModel ->
         viewModel.onSelectedTodoItem(item)
         scope.launch { sheetState.show() }
@@ -102,6 +108,9 @@ fun MainScreen() {
     }
     val showSnackBar: (String) -> Unit = { message ->
         scope.launch { snackBarHost.showSnackbar(message = message) }
+    }
+    val showDialog: () -> Unit = {
+        isShowDialog.value = true
     }
 
     if (uiState.bottomNavType != BottomNavType.DEFAULT) {
@@ -141,6 +150,16 @@ fun MainScreen() {
     }
 
     DismissKeyboardOnClick {
+        if (isShowDialog.value) {
+            when (uiState.modalType) {
+                ModalType.OneBtn -> {
+                    OneBtnTypeDialog(
+                        onDismiss = { isShowDialog.value = false }
+                    )
+                }
+            }
+        }
+
         ModalBottomSheetLayout(
             sheetState = sheetState,
             sheetGesturesEnabled = uiState.bottomSheetType == BottomSheetType.Main || uiState.bottomSheetType == BottomSheetType.Category,
@@ -252,7 +271,7 @@ fun MainScreen() {
                         )
                     }
                 },
-                snackbarHost = { CommonSnackBar(hostState = snackBarHost) }
+                snackbarHost = { CommonSnackBar(hostState = snackBarHost) },
             ) { innerPadding ->
                 Box(
                     modifier = Modifier
@@ -298,7 +317,8 @@ fun MainScreen() {
                         categoryNavGraph(
                             navController = navController,
                             showCategoryIconBottomSheet = showCategoryIconBottomSheet,
-                            selectedIconInBottomSheet = viewModel.selectedIconInBottomSheet
+                            selectedIconInBottomSheet = viewModel.selectedIconInBottomSheet,
+                            showDialog = showDialog
                         )
                         todayNavGraph(navController = navController, showSnackBar = showSnackBar)
                         historyNavGraph(navController = navController)

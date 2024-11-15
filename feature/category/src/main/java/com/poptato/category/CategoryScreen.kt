@@ -61,7 +61,8 @@ import kotlinx.coroutines.flow.SharedFlow
 fun CategoryScreen(
     goBackToBacklog: () -> Unit = {},
     showIconBottomSheet: (CategoryIconTotalListModel) -> Unit = {},
-    selectedIconInBottomSheet: SharedFlow<CategoryIconItemModel>
+    selectedIconInBottomSheet: SharedFlow<CategoryIconItemModel>,
+    showDialog: () -> Unit = {}
 ) {
 
     val viewModel: CategoryViewModel = hiltViewModel()
@@ -79,7 +80,11 @@ fun CategoryScreen(
         interactionSource = interactionSource,
         onClickBackBtn = { goBackToBacklog() },
         onClickFinishBtn = {
-            viewModel.finishSettingCategory()
+            if (viewModel.isCategorySettingValid) {
+                viewModel.finishSettingCategory()
+            } else {
+                showDialog()
+            }
         },
         onValueChange = { newValue -> viewModel.onValueChange(newValue) },
         onClickSelectCategoryIcon = {
