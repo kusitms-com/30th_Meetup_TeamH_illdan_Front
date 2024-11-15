@@ -215,6 +215,7 @@ fun MainScreen() {
                                 categoryIconList = uiState.categoryIconList,
                                 onSelectCategoryIcon = {
                                     scope.launch {
+                                        viewModel.selectedIconInBottomSheet.emit(it)
                                         sheetState.hide()
                                     }
                                 }
@@ -296,7 +297,8 @@ fun MainScreen() {
                         )
                         categoryNavGraph(
                             navController = navController,
-                            showCategoryIconBottomSheet = showCategoryIconBottomSheet
+                            showCategoryIconBottomSheet = showCategoryIconBottomSheet,
+                            selectedIconInBottomSheet = viewModel.selectedIconInBottomSheet
                         )
                         todayNavGraph(navController = navController, showSnackBar = showSnackBar)
                         historyNavGraph(navController = navController)

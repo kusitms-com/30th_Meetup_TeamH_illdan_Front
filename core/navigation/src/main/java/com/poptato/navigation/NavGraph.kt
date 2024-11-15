@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.poptato.backlog.BacklogScreen
 import com.poptato.category.CategoryScreen
+import com.poptato.domain.model.response.category.CategoryIconItemModel
 import com.poptato.domain.model.response.category.CategoryIconTotalListModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.login.KaKaoLoginScreen
@@ -95,7 +96,8 @@ fun NavGraphBuilder.backlogNavGraph(
 
 fun NavGraphBuilder.categoryNavGraph(
     navController: NavHostController,
-    showCategoryIconBottomSheet: (CategoryIconTotalListModel) -> Unit
+    showCategoryIconBottomSheet: (CategoryIconTotalListModel) -> Unit,
+    selectedIconInBottomSheet: SharedFlow<CategoryIconItemModel>
 ) {
     navigation(
         startDestination = NavRoutes.CategoryScreen.route,
@@ -104,7 +106,8 @@ fun NavGraphBuilder.categoryNavGraph(
         composable(NavRoutes.CategoryScreen.route) {
             CategoryScreen(
                 goBackToBacklog = { navController.popBackStack() },
-                showIconBottomSheet = showCategoryIconBottomSheet
+                showIconBottomSheet = showCategoryIconBottomSheet,
+                selectedIconInBottomSheet = selectedIconInBottomSheet
             )
         }
     }

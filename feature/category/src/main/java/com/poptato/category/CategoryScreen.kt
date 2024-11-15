@@ -51,17 +51,27 @@ import com.poptato.design_system.Gray90
 import com.poptato.design_system.Gray95
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.R
+import com.poptato.domain.model.response.category.CategoryIconItemModel
 import com.poptato.domain.model.response.category.CategoryIconTotalListModel
+import kotlinx.coroutines.flow.SharedFlow
+import timber.log.Timber
 
 @Composable
 fun CategoryScreen(
     goBackToBacklog: () -> Unit = {},
-    showIconBottomSheet: (CategoryIconTotalListModel) -> Unit = {}
+    showIconBottomSheet: (CategoryIconTotalListModel) -> Unit = {},
+    selectedIconInBottomSheet: SharedFlow<CategoryIconItemModel>
 ) {
 
     val viewModel: CategoryViewModel = hiltViewModel()
     val uiState: CategoryPageState by viewModel.uiState.collectAsStateWithLifecycle()
     val interactionSource = remember { MutableInteractionSource() }
+
+    LaunchedEffect(selectedIconInBottomSheet) {
+        selectedIconInBottomSheet.collect {
+            Timber.d("[테스트] 전달된 아이콘 -> ${it.iconId}")
+        }
+    }
 
     CategoryContent(
         uiState = uiState,
