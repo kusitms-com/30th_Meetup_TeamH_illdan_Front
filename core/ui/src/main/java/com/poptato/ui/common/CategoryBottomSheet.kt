@@ -23,9 +23,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
 import com.poptato.design_system.Gray60
 import com.poptato.design_system.Gray80
 import com.poptato.design_system.Gray90
@@ -110,7 +110,8 @@ fun CategoryIconListForType(
         ) {
 
             categoryIcons.icons.forEach { item ->
-                Image(painter = painterResource(id = com.poptato.design_system.R.drawable.ic_history_calendar),
+                Image(
+                    painter = rememberAsyncImagePainter(model = item.iconImgUrl),
                     contentDescription = "",
                     modifier = Modifier
                         .size(32.dp)

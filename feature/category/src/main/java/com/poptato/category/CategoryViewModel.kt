@@ -20,13 +20,20 @@ class CategoryViewModel @Inject constructor(
             CategoryIconTypeListModel(
                 "생산성",
                 listOf(
-                    CategoryIconItemModel(1, ""), CategoryIconItemModel(2, ""), CategoryIconItemModel(3, "")
+                    CategoryIconItemModel(1, "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
+                    CategoryIconItemModel(2, "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
+                    CategoryIconItemModel(3, "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
+                    CategoryIconItemModel(4, "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
+                    CategoryIconItemModel(5, "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
+                    CategoryIconItemModel(6, "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
+                    CategoryIconItemModel(7, "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
+                    CategoryIconItemModel(8, "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
                 )
             ),
             CategoryIconTypeListModel(
                 "데일리",
                 listOf(
-                    CategoryIconItemModel(4, ""), CategoryIconItemModel(5, ""), CategoryIconItemModel(6, "")
+                    CategoryIconItemModel(4, "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
                 )
             )
         )
