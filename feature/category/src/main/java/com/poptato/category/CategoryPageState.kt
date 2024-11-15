@@ -5,7 +5,7 @@ import com.poptato.domain.model.response.category.CategoryIconTotalListModel
 import com.poptato.ui.base.PageState
 
 data class CategoryPageState(
-    val textInput: String = "",
+    val categoryName: String = "",
     val categoryIconList: CategoryIconTotalListModel = CategoryIconTotalListModel(),
     val selectedIcon: CategoryIconItemModel? = null
 ): PageState

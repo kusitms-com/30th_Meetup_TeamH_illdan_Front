@@ -78,6 +78,9 @@ fun CategoryScreen(
         uiState = uiState,
         interactionSource = interactionSource,
         onClickBackBtn = { goBackToBacklog() },
+        onClickFinishBtn = {
+            viewModel.finishSettingCategory()
+        },
         onValueChange = { newValue -> viewModel.onValueChange(newValue) },
         onClickSelectCategoryIcon = {
             showIconBottomSheet(uiState.categoryIconList)
@@ -90,8 +93,9 @@ fun CategoryContent(
     uiState: CategoryPageState = CategoryPageState(),
     interactionSource: MutableInteractionSource = MutableInteractionSource(),
     onClickBackBtn: () -> Unit = {},
+    onClickFinishBtn: () -> Unit = {},
     onValueChange: (String) -> Unit = {},
-    onClickSelectCategoryIcon: () -> Unit = {}
+    onClickSelectCategoryIcon: () -> Unit = {},
 ) {
     Column(
         modifier = Modifier
@@ -100,7 +104,8 @@ fun CategoryContent(
     ) {
         CategoryTitle(
             interactionSource = interactionSource,
-            onClickBackBtn = onClickBackBtn
+            onClickBackBtn = onClickBackBtn,
+            onClickFinishBtn = onClickFinishBtn
         )
 
         CategoryAddContent(
@@ -114,8 +119,9 @@ fun CategoryContent(
 
 @Composable
 fun CategoryTitle(
+    interactionSource: MutableInteractionSource,
     onClickBackBtn: () -> Unit = {},
-    interactionSource: MutableInteractionSource
+    onClickFinishBtn: () -> Unit = {}
 ) {
 
     Box(
@@ -153,18 +159,29 @@ fun CategoryTitle(
                 .padding(top = 24.dp)
                 .align(Alignment.CenterEnd)
         ) {
-            AddFinishBtn()
+            AddFinishBtn(
+                interactionSource = interactionSource,
+                onClickFinishBtn = onClickFinishBtn
+            )
         }
     }
 }
 
 @Composable
-fun AddFinishBtn() {
+fun AddFinishBtn(
+    interactionSource: MutableInteractionSource,
+    onClickFinishBtn: () -> Unit = {}
+) {
     Box(
         modifier = Modifier
             .wrapContentSize()
             .clip(RoundedCornerShape(8.dp))
             .background(Gray95)
+            .clickable(
+                indication = null,
+                interactionSource = interactionSource,
+                onClick = { onClickFinishBtn() }
+            )
     ) {
         Text(
             text = Complete,
@@ -197,7 +214,7 @@ fun CategoryAddContent(
                 .padding(end = 16.dp)
         ) {
             CategoryNameTextField(
-                textInput = uiState.textInput,
+                textInput = uiState.categoryName,
                 onValueChange = onValueChange
             )
         }

@@ -46,10 +46,9 @@ class CategoryViewModel @Inject constructor(
     fun onValueChange(newValue: String) {
         updateState(
             uiState.value.copy(
-                textInput = newValue
+                categoryName = newValue
             )
         )
-        Timber.d("[카테고리] 카테고리명 입력 -> ${uiState.value.textInput}")
     }
 
     private fun getCategoryIconList() {
@@ -67,5 +66,10 @@ class CategoryViewModel @Inject constructor(
                 selectedIcon = icon
             )
         )
+    }
+
+    fun finishSettingCategory() {
+        // TODO 카테고리 설정 서버통신 연결
+        Timber.d("[카테고리] 카테고리명: ${uiState.value.categoryName} && 아이콘: ${uiState.value.selectedIcon?.iconId}")
     }
 }
