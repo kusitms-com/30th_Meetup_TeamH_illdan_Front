@@ -1,5 +1,6 @@
 package com.poptato.category
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -41,6 +42,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.rememberAsyncImagePainter
 import com.poptato.design_system.CategoryAddTitle
 import com.poptato.design_system.CategoryNameInputTitle
 import com.poptato.design_system.Complete
@@ -54,7 +56,6 @@ import com.poptato.design_system.R
 import com.poptato.domain.model.response.category.CategoryIconItemModel
 import com.poptato.domain.model.response.category.CategoryIconTotalListModel
 import kotlinx.coroutines.flow.SharedFlow
-import timber.log.Timber
 
 @Composable
 fun CategoryScreen(
@@ -69,7 +70,7 @@ fun CategoryScreen(
 
     LaunchedEffect(selectedIconInBottomSheet) {
         selectedIconInBottomSheet.collect {
-            Timber.d("[테스트] 전달된 아이콘 -> ${it.iconId}")
+            viewModel.getSelectedIcon(it)
         }
     }
 
@@ -201,19 +202,38 @@ fun CategoryAddContent(
             )
         }
 
-        Icon(
-            painter = painterResource(id = R.drawable.ic_add_category_icon),
-            contentDescription = "add category icon",
-            tint = Color.Unspecified,
+        Box(
             modifier = Modifier
                 .size(40.dp)
                 .align(Alignment.CenterVertically)
-                .clickable(
-                    indication = null,
-                    interactionSource = interactionSource,
-                    onClick = { onClickSelectIcon() }
+        ) {
+            if (uiState.selectedIcon == null) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_add_category_icon),
+                    contentDescription = "add category icon",
+                    tint = Color.Unspecified,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clickable(
+                            indication = null,
+                            interactionSource = interactionSource,
+                            onClick = { onClickSelectIcon() }
+                        )
                 )
-        )
+            } else {
+                Image(
+                    painter = rememberAsyncImagePainter(model = uiState.selectedIcon.iconImgUrl),
+                    contentDescription = "selected icon",
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clickable(
+                            indication = null,
+                            interactionSource = interactionSource,
+                            onClick = { onClickSelectIcon() }
+                        )
+                )
+            }
+        }
     }
 }
 

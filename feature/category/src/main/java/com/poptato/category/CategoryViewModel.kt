@@ -60,4 +60,12 @@ class CategoryViewModel @Inject constructor(
             )
         )
     }
+
+    fun getSelectedIcon(icon: CategoryIconItemModel) {
+        updateState(
+            uiState.value.copy(
+                selectedIcon = icon
+            )
+        )
+    }
 }
