@@ -2,6 +2,7 @@ package com.poptato.ui.common
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,20 +31,26 @@ import com.poptato.design_system.Gray60
 import com.poptato.design_system.Gray80
 import com.poptato.design_system.Gray90
 import com.poptato.design_system.PoptatoTypo
+import com.poptato.domain.model.response.category.CategoryIconItemModel
 import com.poptato.domain.model.response.category.CategoryIconTotalListModel
 import com.poptato.domain.model.response.category.CategoryIconTypeListModel
 
 @Composable
 fun CategoryBottomSheet(
-    categoryIconList: CategoryIconTotalListModel = CategoryIconTotalListModel()
+    categoryIconList: CategoryIconTotalListModel = CategoryIconTotalListModel(),
+    onSelectCategoryIcon: (CategoryIconItemModel) -> Unit = {}
 ) {
 
-    CategoryBottomSheetContent(categoryIconList)
+    CategoryBottomSheetContent(
+        categoryIconList = categoryIconList,
+        onSelectCategoryIcon = onSelectCategoryIcon
+    )
 }
 
 @Composable
 fun CategoryBottomSheetContent(
-    categoryIconList: CategoryIconTotalListModel = CategoryIconTotalListModel()
+    categoryIconList: CategoryIconTotalListModel = CategoryIconTotalListModel(),
+    onSelectCategoryIcon: (CategoryIconItemModel) -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -62,7 +69,8 @@ fun CategoryBottomSheetContent(
         )
 
         CategoryIconListTotal(
-            categoryIconList = categoryIconList
+            categoryIconList = categoryIconList,
+            onSelectCategoryIcon = onSelectCategoryIcon
         )
     }
 }
@@ -70,13 +78,17 @@ fun CategoryBottomSheetContent(
 @Composable
 fun CategoryIconListTotal(
     categoryIconList: CategoryIconTotalListModel = CategoryIconTotalListModel(),
+    onSelectCategoryIcon: (CategoryIconItemModel) -> Unit = {}
 ) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
     ) {
         items(categoryIconList.icons, key = { it.iconType }) { iconTypes ->
-            CategoryIconListForType(iconTypes)
+            CategoryIconListForType(
+                categoryIcons = iconTypes,
+                onSelectCategoryIcon = onSelectCategoryIcon
+            )
 
             Spacer(modifier = Modifier.height(24.dp))
         }
@@ -86,7 +98,8 @@ fun CategoryIconListTotal(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun CategoryIconListForType(
-    categoryIcons: CategoryIconTypeListModel = CategoryIconTypeListModel()
+    categoryIcons: CategoryIconTypeListModel = CategoryIconTypeListModel(),
+    onSelectCategoryIcon: (CategoryIconItemModel) -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -112,9 +125,12 @@ fun CategoryIconListForType(
             categoryIcons.icons.forEach { item ->
                 Image(
                     painter = rememberAsyncImagePainter(model = item.iconImgUrl),
-                    contentDescription = "",
+                    contentDescription = "icon ${item.iconId}",
                     modifier = Modifier
                         .size(32.dp)
+                        .clickable {
+                            onSelectCategoryIcon(item)
+                        }
                 )
             }
         }

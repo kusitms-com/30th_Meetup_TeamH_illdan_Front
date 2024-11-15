@@ -212,7 +212,12 @@ fun MainScreen() {
                         }
                         BottomSheetType.Category -> {
                             CategoryBottomSheet(
-                                categoryIconList = uiState.categoryIconList
+                                categoryIconList = uiState.categoryIconList,
+                                onSelectCategoryIcon = {
+                                    scope.launch {
+                                        sheetState.hide()
+                                    }
+                                }
                             )
                         }
                     }
