@@ -1,5 +1,5 @@
 package com.poptato.domain.model.enums
 
-enum class ModalType{
+enum class DialogType{
     OneBtn
 }

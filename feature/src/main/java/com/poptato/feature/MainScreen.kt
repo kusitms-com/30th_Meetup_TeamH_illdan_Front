@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
-import androidx.appcompat.widget.AlertDialogLayout
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.AnimatedVisibility
@@ -46,7 +45,7 @@ import com.poptato.core.enums.BottomNavType
 import com.poptato.design_system.FINISH_APP_GUIDE
 import com.poptato.design_system.Gray100
 import com.poptato.domain.model.enums.BottomSheetType
-import com.poptato.domain.model.enums.ModalType
+import com.poptato.domain.model.enums.DialogType
 import com.poptato.domain.model.response.category.CategoryIconTotalListModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.feature.component.BottomNavBar
@@ -63,7 +62,6 @@ import com.poptato.ui.common.CategoryBottomSheet
 import com.poptato.ui.common.CommonSnackBar
 import com.poptato.ui.common.DatePickerBottomSheet
 import com.poptato.ui.common.OneBtnTypeDialog
-import com.poptato.ui.common.OneBtnTypeDialogBtn
 import com.poptato.ui.common.TodoBottomSheet
 import com.poptato.ui.util.CommonEventManager
 import com.poptato.ui.util.DismissKeyboardOnClick
@@ -151,8 +149,8 @@ fun MainScreen() {
 
     DismissKeyboardOnClick {
         if (isShowDialog.value) {
-            when (uiState.modalType) {
-                ModalType.OneBtn -> {
+            when (uiState.dialogType) {
+                DialogType.OneBtn -> {
                     OneBtnTypeDialog(
                         onDismiss = { isShowDialog.value = false }
                     )
