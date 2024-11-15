@@ -25,6 +25,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,8 +45,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import com.poptato.design_system.CategoryAddTitle
+import com.poptato.design_system.CategoryNameDialogTitle
 import com.poptato.design_system.CategoryNameInputTitle
 import com.poptato.design_system.Complete
+import com.poptato.design_system.Confirm
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
 import com.poptato.design_system.Gray70
@@ -53,8 +56,10 @@ import com.poptato.design_system.Gray90
 import com.poptato.design_system.Gray95
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.R
+import com.poptato.domain.model.enums.DialogType
 import com.poptato.domain.model.response.category.CategoryIconItemModel
 import com.poptato.domain.model.response.category.CategoryIconTotalListModel
+import com.poptato.domain.model.response.dialog.DialogContentModel
 import kotlinx.coroutines.flow.SharedFlow
 
 @Composable
@@ -62,12 +67,17 @@ fun CategoryScreen(
     goBackToBacklog: () -> Unit = {},
     showIconBottomSheet: (CategoryIconTotalListModel) -> Unit = {},
     selectedIconInBottomSheet: SharedFlow<CategoryIconItemModel>,
-    showDialog: () -> Unit = {}
+    showDialog: (DialogContentModel) -> Unit = {}
 ) {
 
     val viewModel: CategoryViewModel = hiltViewModel()
     val uiState: CategoryPageState by viewModel.uiState.collectAsStateWithLifecycle()
     val interactionSource = remember { MutableInteractionSource() }
+    val isCategorySettingValid by remember {
+        derivedStateOf {
+            uiState.categoryName.isNotBlank() && uiState.selectedIcon != null
+        }
+    }
 
     LaunchedEffect(selectedIconInBottomSheet) {
         selectedIconInBottomSheet.collect {
@@ -80,10 +90,16 @@ fun CategoryScreen(
         interactionSource = interactionSource,
         onClickBackBtn = { goBackToBacklog() },
         onClickFinishBtn = {
-            if (viewModel.isCategorySettingValid) {
+            if (isCategorySettingValid) {
                 viewModel.finishSettingCategory()
             } else {
-                showDialog()
+                showDialog(
+                    DialogContentModel(
+                        dialogType = DialogType.OneBtn,
+                        titleText = CategoryNameDialogTitle,
+                        btnText = Confirm
+                    )
+                )
             }
         },
         onValueChange = { newValue -> viewModel.onValueChange(newValue) },
