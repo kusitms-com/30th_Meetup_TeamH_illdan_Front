@@ -45,6 +45,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import com.poptato.design_system.CategoryAddTitle
+import com.poptato.design_system.CategoryIconDialogTitle
 import com.poptato.design_system.CategoryNameDialogTitle
 import com.poptato.design_system.CategoryNameInputTitle
 import com.poptato.design_system.Complete
@@ -96,7 +97,7 @@ fun CategoryScreen(
                 showDialog(
                     DialogContentModel(
                         dialogType = DialogType.OneBtn,
-                        titleText = CategoryNameDialogTitle,
+                        titleText = if (uiState.categoryName.isBlank()) CategoryNameDialogTitle else CategoryIconDialogTitle,
                         btnText = Confirm
                     )
                 )
