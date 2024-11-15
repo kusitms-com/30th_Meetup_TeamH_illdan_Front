@@ -20,20 +20,24 @@ import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray90
 import com.poptato.design_system.Gray95
 import com.poptato.design_system.PoptatoTypo
+import com.poptato.domain.model.response.dialog.DialogContentModel
 
 @Composable
 fun OneBtnTypeDialog(
     onDismiss: () -> Unit = {},
+    dialogContent: DialogContentModel = DialogContentModel()
 ) {
 
     OneBtnTypeDialogContent(
-        onDismiss = onDismiss
+        onDismiss = onDismiss,
+        dialogContent = dialogContent
     )
 }
 
 @Composable
 fun OneBtnTypeDialogContent(
-    onDismiss: () -> Unit = {}
+    onDismiss: () -> Unit = {},
+    dialogContent: DialogContentModel = DialogContentModel()
 ) {
     Dialog(onDismissRequest = onDismiss) {
         Card(
@@ -45,7 +49,7 @@ fun OneBtnTypeDialogContent(
         ) {
             Column {
                 Text(
-                    text = "dialog 테스트",
+                    text = dialogContent.titleText,
                     style = PoptatoTypo.lgSemiBold,
                     color = Gray00,
                     textAlign = TextAlign.Center,
@@ -54,16 +58,20 @@ fun OneBtnTypeDialogContent(
                         .align(Alignment.CenterHorizontally)
                 )
 
-                OneBtnTypeDialogBtn()
+                OneBtnTypeDialogBtn(
+                    dialogContent = dialogContent
+                )
             }
         }
     }
 }
 
 @Composable
-fun OneBtnTypeDialogBtn() {
+fun OneBtnTypeDialogBtn(
+    dialogContent: DialogContentModel = DialogContentModel()
+) {
     Text(
-        text = "btn 테스트",
+        text = dialogContent.btnText,
         style = PoptatoTypo.mdSemiBold,
         textAlign = TextAlign.Center,
         color = Gray00,

@@ -6,8 +6,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.poptato.backlog.BacklogScreen
 import com.poptato.category.CategoryScreen
+import com.poptato.domain.model.enums.DialogType
 import com.poptato.domain.model.response.category.CategoryIconItemModel
 import com.poptato.domain.model.response.category.CategoryIconTotalListModel
+import com.poptato.domain.model.response.dialog.DialogContentModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.login.KaKaoLoginScreen
 import com.poptato.mypage.MyPageScreen
@@ -98,7 +100,7 @@ fun NavGraphBuilder.categoryNavGraph(
     navController: NavHostController,
     showCategoryIconBottomSheet: (CategoryIconTotalListModel) -> Unit,
     selectedIconInBottomSheet: SharedFlow<CategoryIconItemModel>,
-    showDialog: () -> Unit
+    showDialog: (DialogContentModel) -> Unit
 ) {
     navigation(
         startDestination = NavRoutes.CategoryScreen.route,

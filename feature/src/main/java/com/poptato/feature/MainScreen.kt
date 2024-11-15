@@ -47,6 +47,7 @@ import com.poptato.design_system.Gray100
 import com.poptato.domain.model.enums.BottomSheetType
 import com.poptato.domain.model.enums.DialogType
 import com.poptato.domain.model.response.category.CategoryIconTotalListModel
+import com.poptato.domain.model.response.dialog.DialogContentModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.feature.component.BottomNavBar
 import com.poptato.navigation.NavRoutes
@@ -107,7 +108,8 @@ fun MainScreen() {
     val showSnackBar: (String) -> Unit = { message ->
         scope.launch { snackBarHost.showSnackbar(message = message) }
     }
-    val showDialog: () -> Unit = {
+    val showDialog: (DialogContentModel) -> Unit = {
+        viewModel.onSetDialogContent(it)
         isShowDialog.value = true
     }
 
@@ -149,10 +151,11 @@ fun MainScreen() {
 
     DismissKeyboardOnClick {
         if (isShowDialog.value) {
-            when (uiState.dialogType) {
+            when (uiState.dialogContent.dialogType) {
                 DialogType.OneBtn -> {
                     OneBtnTypeDialog(
-                        onDismiss = { isShowDialog.value = false }
+                        onDismiss = { isShowDialog.value = false },
+                        dialogContent = uiState.dialogContent
                     )
                 }
             }
