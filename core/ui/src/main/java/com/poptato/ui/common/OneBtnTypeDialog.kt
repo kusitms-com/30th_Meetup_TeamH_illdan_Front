@@ -1,6 +1,8 @@
 package com.poptato.ui.common
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -10,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -27,17 +30,20 @@ fun OneBtnTypeDialog(
     onDismiss: () -> Unit = {},
     dialogContent: DialogContentModel = DialogContentModel()
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
 
     OneBtnTypeDialogContent(
         onDismiss = onDismiss,
-        dialogContent = dialogContent
+        dialogContent = dialogContent,
+        interactionSource = interactionSource
     )
 }
 
 @Composable
 fun OneBtnTypeDialogContent(
     onDismiss: () -> Unit = {},
-    dialogContent: DialogContentModel = DialogContentModel()
+    dialogContent: DialogContentModel = DialogContentModel(),
+    interactionSource: MutableInteractionSource = MutableInteractionSource()
 ) {
     Dialog(onDismissRequest = onDismiss) {
         Card(
@@ -59,7 +65,9 @@ fun OneBtnTypeDialogContent(
                 )
 
                 OneBtnTypeDialogBtn(
-                    dialogContent = dialogContent
+                    dialogContent = dialogContent,
+                    onDismiss = onDismiss,
+                    interactionSource = interactionSource
                 )
             }
         }
@@ -68,7 +76,9 @@ fun OneBtnTypeDialogContent(
 
 @Composable
 fun OneBtnTypeDialogBtn(
-    dialogContent: DialogContentModel = DialogContentModel()
+    dialogContent: DialogContentModel = DialogContentModel(),
+    onDismiss: () -> Unit = {},
+    interactionSource: MutableInteractionSource
 ) {
     Text(
         text = dialogContent.btnText,
@@ -79,6 +89,11 @@ fun OneBtnTypeDialogBtn(
             .fillMaxWidth()
             .background(color = Gray90)
             .padding(vertical = 16.dp)
+            .clickable(
+                indication = null,
+                interactionSource = interactionSource,
+                onClick = { onDismiss() }
+            )
     )
 }
 
