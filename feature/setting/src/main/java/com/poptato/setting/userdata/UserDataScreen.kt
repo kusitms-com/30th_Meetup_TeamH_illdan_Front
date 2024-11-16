@@ -36,26 +36,30 @@ import com.poptato.design_system.Gray100
 import com.poptato.design_system.Gray40
 import com.poptato.design_system.Gray70
 import com.poptato.design_system.LogOut
+import com.poptato.design_system.LogOutDialogBackBtn
+import com.poptato.design_system.LogOutDialogDoBtn
+import com.poptato.design_system.LogOutDialogTitle
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.ProfileDetail
 import com.poptato.design_system.R
 import com.poptato.design_system.UserDataEmail
 import com.poptato.design_system.UserDataName
 import com.poptato.design_system.UserDelete
-import com.poptato.setting.logout.LogOutDialog
-import com.poptato.setting.logout.LogOutDialogState
+import com.poptato.domain.model.enums.DialogType
+import com.poptato.domain.model.response.dialog.DialogContentModel
 
 @Composable
 fun UserDataScreen(
     goBackToMyPage: () -> Unit = {},
     goBackToLogIn: () -> Unit = {},
     goToServiceDelete: () -> Unit = {},
+    showDialog: (DialogContentModel) -> Unit = {}
 ) {
 
     val viewModel: UserDataViewModel = hiltViewModel()
     val uiState: UserDataPageState by viewModel.uiState.collectAsStateWithLifecycle()
     val interactionSource = remember { MutableInteractionSource() }
-    val logOutDialogState = viewModel.logOutDialogState.value
+//    val logOutDialogState = viewModel.logOutDialogState.value
 
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collect { event ->
@@ -69,9 +73,18 @@ fun UserDataScreen(
 
     EditUserDataContent(
         uiState = uiState,
-        logOutDialogState = logOutDialogState,
+//        logOutDialogState = logOutDialogState,
         onClickBackBtn = { goBackToMyPage() },
-        onClickLogOutBtn = { viewModel.showLogOutDialog() },
+        onClickLogOutBtn = {
+            showDialog(
+                DialogContentModel(
+                    dialogType = DialogType.TwoBtn,
+                    titleText = LogOutDialogTitle,
+                    positiveBtnText = LogOutDialogDoBtn,
+                    cancelBtnText = LogOutDialogBackBtn
+                )
+            )
+        },
         onClickServiceDeleteBtn = { goToServiceDelete() },
         interactionSource = interactionSource
     )
@@ -80,7 +93,7 @@ fun UserDataScreen(
 @Composable
 fun EditUserDataContent(
     uiState: UserDataPageState = UserDataPageState(),
-    logOutDialogState: LogOutDialogState,
+//    logOutDialogState: LogOutDialogState,
     onClickBackBtn: () -> Unit = {},
     onClickLogOutBtn: () -> Unit = {},
     onClickServiceDeleteBtn: () -> Unit = {},
@@ -119,13 +132,13 @@ fun EditUserDataContent(
         )
     }
 
-    if (logOutDialogState.isShowDialog) {
-        LogOutDialog(
-            onDismiss = logOutDialogState.onDismissRequest,
-            onClickBack = logOutDialogState.onClickBackBtn,
-            onClickLogOut = logOutDialogState.onClickLogOutBtn
-        )
-    }
+//    if (logOutDialogState.isShowDialog) {
+//        LogOutDialog(
+//            onDismiss = logOutDialogState.onDismissRequest,
+//            onClickBack = logOutDialogState.onClickBackBtn,
+//            onClickLogOut = logOutDialogState.onClickLogOutBtn
+//        )
+//    }
 }
 
 @Composable
@@ -284,5 +297,5 @@ fun UserDelete(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun PreviewSetting() {
-    EditUserDataContent(logOutDialogState = LogOutDialogState())
+    EditUserDataContent()
 }

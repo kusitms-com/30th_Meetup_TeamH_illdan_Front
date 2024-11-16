@@ -312,7 +312,9 @@ fun MainScreen() {
                         splashNavGraph(navController = navController)
                         loginNavGraph(navController = navController, showSnackBar = showSnackBar)
                         yesterdayListNavGraph(navController = navController)
-                        myPageNavGraph(navController = navController)
+                        myPageNavGraph(
+                            navController = navController,
+                            showDialog = showDialog)
                         backlogNavGraph(
                             navController = navController,
                             showBottomSheet = showBottomSheet,

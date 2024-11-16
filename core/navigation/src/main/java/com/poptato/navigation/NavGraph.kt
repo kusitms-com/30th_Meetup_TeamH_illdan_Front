@@ -141,10 +141,12 @@ fun NavGraphBuilder.yesterdayListNavGraph(navController: NavHostController) {
     }
 }
 
-fun NavGraphBuilder.myPageNavGraph(navController: NavHostController) {
+fun NavGraphBuilder.myPageNavGraph(
+    navController: NavHostController,
+    showDialog: (DialogContentModel) -> Unit) {
     navigation(
         startDestination = NavRoutes.MyPageScreen.route,
-        route = NavRoutes.MyPageGraph.route
+        route = NavRoutes.MyPageGraph.route,
     ) {
         composable(NavRoutes.MyPageScreen.route) {
             MyPageScreen(
@@ -197,6 +199,7 @@ fun NavGraphBuilder.myPageNavGraph(navController: NavHostController) {
                 goBackToMyPage = { navController.popBackStack() },
                 goBackToLogIn = { navController.navigate(NavRoutes.KaKaoLoginScreen.route) },
                 goToServiceDelete = { navController.navigate(NavRoutes.ServiceDeleteScreen.route) },
+                showDialog = showDialog
             )
         }
     }
