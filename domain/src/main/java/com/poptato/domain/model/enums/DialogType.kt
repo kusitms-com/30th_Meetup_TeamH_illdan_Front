@@ -1,5 +1,5 @@
 package com.poptato.domain.model.enums
 
 enum class DialogType{
-    OneBtn
+    OneBtn, TwoBtn
 }

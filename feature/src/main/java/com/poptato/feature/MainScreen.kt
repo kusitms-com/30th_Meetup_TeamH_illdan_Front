@@ -64,6 +64,7 @@ import com.poptato.ui.common.CommonSnackBar
 import com.poptato.ui.common.DatePickerBottomSheet
 import com.poptato.ui.common.OneBtnTypeDialog
 import com.poptato.ui.common.TodoBottomSheet
+import com.poptato.ui.common.TwoBtnTypeDialog
 import com.poptato.ui.util.CommonEventManager
 import com.poptato.ui.util.DismissKeyboardOnClick
 import kotlinx.coroutines.delay
@@ -154,6 +155,12 @@ fun MainScreen() {
             when (uiState.dialogContent.dialogType) {
                 DialogType.OneBtn -> {
                     OneBtnTypeDialog(
+                        onDismiss = { isShowDialog.value = false },
+                        dialogContent = uiState.dialogContent
+                    )
+                }
+                DialogType.TwoBtn -> {
+                    TwoBtnTypeDialog(
                         onDismiss = { isShowDialog.value = false },
                         dialogContent = uiState.dialogContent
                     )
