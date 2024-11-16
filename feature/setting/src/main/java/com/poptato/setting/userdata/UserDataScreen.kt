@@ -59,7 +59,6 @@ fun UserDataScreen(
     val viewModel: UserDataViewModel = hiltViewModel()
     val uiState: UserDataPageState by viewModel.uiState.collectAsStateWithLifecycle()
     val interactionSource = remember { MutableInteractionSource() }
-//    val logOutDialogState = viewModel.logOutDialogState.value
 
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collect { event ->
@@ -73,7 +72,6 @@ fun UserDataScreen(
 
     EditUserDataContent(
         uiState = uiState,
-//        logOutDialogState = logOutDialogState,
         onClickBackBtn = { goBackToMyPage() },
         onClickLogOutBtn = {
             showDialog(
@@ -81,7 +79,8 @@ fun UserDataScreen(
                     dialogType = DialogType.TwoBtn,
                     titleText = LogOutDialogTitle,
                     positiveBtnText = LogOutDialogDoBtn,
-                    cancelBtnText = LogOutDialogBackBtn
+                    cancelBtnText = LogOutDialogBackBtn,
+                    positiveBtnAction = { viewModel.logOut() }
                 )
             )
         },
@@ -93,7 +92,6 @@ fun UserDataScreen(
 @Composable
 fun EditUserDataContent(
     uiState: UserDataPageState = UserDataPageState(),
-//    logOutDialogState: LogOutDialogState,
     onClickBackBtn: () -> Unit = {},
     onClickLogOutBtn: () -> Unit = {},
     onClickServiceDeleteBtn: () -> Unit = {},
@@ -131,14 +129,6 @@ fun EditUserDataContent(
             onClickAction = onClickServiceDeleteBtn
         )
     }
-
-//    if (logOutDialogState.isShowDialog) {
-//        LogOutDialog(
-//            onDismiss = logOutDialogState.onDismissRequest,
-//            onClickBack = logOutDialogState.onClickBackBtn,
-//            onClickLogOut = logOutDialogState.onClickLogOutBtn
-//        )
-//    }
 }
 
 @Composable

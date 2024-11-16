@@ -115,7 +115,10 @@ fun TwoBtnTypeDialogBtn(
                 .clickable(
                     indication = null,
                     interactionSource = interactionSource,
-                    onClick = {  }
+                    onClick = {
+                        dialogContent.positiveBtnAction()
+                        onDismiss()
+                    }
                 )
         )
     }

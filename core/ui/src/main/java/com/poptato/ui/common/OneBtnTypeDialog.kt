@@ -81,7 +81,7 @@ fun OneBtnTypeDialogBtn(
     interactionSource: MutableInteractionSource
 ) {
     Text(
-        text = dialogContent.btnText,
+        text = dialogContent.positiveBtnText,
         style = PoptatoTypo.mdSemiBold,
         textAlign = TextAlign.Center,
         color = Gray00,

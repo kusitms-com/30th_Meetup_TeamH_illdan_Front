@@ -98,7 +98,7 @@ fun CategoryScreen(
                     DialogContentModel(
                         dialogType = DialogType.OneBtn,
                         titleText = if (uiState.categoryName.isBlank()) CategoryNameDialogTitle else CategoryIconDialogTitle,
-                        btnText = Confirm
+                        positiveBtnText = Confirm
                     )
                 )
             }
