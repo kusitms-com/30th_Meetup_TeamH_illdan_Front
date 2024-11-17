@@ -51,9 +51,9 @@ class BacklogViewModel @Inject constructor(
     private var tempTodoId: Long? = null
 
     private val _categoryList: List<CategoryIconItemModel> = listOf(
-        CategoryIconItemModel(1, "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
-        CategoryIconItemModel(2, "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
-        CategoryIconItemModel(3, "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
+        CategoryIconItemModel(11, "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
+        CategoryIconItemModel(12, "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
+        CategoryIconItemModel(13, "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
     )
 
     init {
@@ -69,6 +69,11 @@ class BacklogViewModel @Inject constructor(
                 categoryList = _categoryList
             )
         )
+    }
+
+    fun getBacklogListInCategory(categoryId: Long) {
+        // TODO 선택한 카테고리에 대한 백로그 리스트 가져오는 것으로 수정
+        Timber.d("[카테고리] 선택 -> $categoryId")
     }
 
     private fun getBacklogList(page: Int, size: Int) {

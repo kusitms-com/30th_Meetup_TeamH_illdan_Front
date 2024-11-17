@@ -170,6 +170,9 @@ fun BacklogScreen(
             createBacklog = { newItem -> viewModel.createBacklog(newItem) },
             onItemSwiped = { itemToRemove -> viewModel.swipeBacklogItem(itemToRemove) },
             onClickYesterdayList = { goToYesterdayList() },
+            onSelectCategory = {
+                viewModel.getBacklogListInCategory(it)
+            },
             onClickCategoryAdd = { goToCategorySelect() },
             onClickBtnTodoSettings = {
                 showBottomSheet(uiState.backlogList[it])
@@ -201,6 +204,7 @@ fun BacklogContent(
     onValueChange: (String) -> Unit = {},
     createBacklog: (String) -> Unit = {},
     onClickYesterdayList: () -> Unit = {},
+    onSelectCategory: (Long) -> Unit = {},
     onClickCategoryAdd:() -> Unit = {},
     onItemSwiped: (TodoItemModel) -> Unit = {},
     onClickBtnTodoSettings: (Int) -> Unit = {},
@@ -220,7 +224,8 @@ fun BacklogContent(
         BacklogCategoryList(
             onClickCategoryAdd = onClickCategoryAdd,
             categoryList = uiState.categoryList,
-            interactionSource = interactionSource
+            interactionSource = interactionSource,
+            onSelectCategory = onSelectCategory
         )
 
         TopBar(
@@ -290,9 +295,10 @@ fun BacklogContent(
 
 @Composable
 fun BacklogCategoryList(
-    onClickCategoryAdd:() -> Unit = {},
-    categoryList: List<CategoryIconItemModel> = emptyList(),
     interactionSource: MutableInteractionSource,
+    categoryList: List<CategoryIconItemModel> = emptyList(),
+    onClickCategoryAdd:() -> Unit = {},
+    onSelectCategory: (Long) -> Unit = {}
 ) {
     Row(
         modifier = Modifier
@@ -303,12 +309,14 @@ fun BacklogCategoryList(
 
         CategoryListIcon(
             paddingStart = 16,
-            imgResource = painterResource(id = R.drawable.ic_category_all)
+            imgResource = painterResource(id = R.drawable.ic_category_all),
+            onClickCategory = { onSelectCategory(0) }
         )
 
         CategoryListIcon(
             paddingHorizontal = 12,
-            imgResource = painterResource(id = R.drawable.ic_category_star)
+            imgResource = painterResource(id = R.drawable.ic_category_star),
+            onClickCategory = { onSelectCategory(1) }
         )
 
         LazyRow(
@@ -318,13 +326,14 @@ fun BacklogCategoryList(
         ) {
             items(categoryList, key = { it.iconId }) { item ->
                 CategoryListIcon(
-                    imgResource = rememberAsyncImagePainter(model = item.iconImgUrl)
+                    imgResource = rememberAsyncImagePainter(model = item.iconImgUrl),
+                    onClickCategory = { onSelectCategory(item.iconId) }
                 )
             }
         }
 
         Icon(
-            painter = painterResource(id = R.drawable.ic_add_circle),
+            painter = painterResource(id = R.drawable.ic_add_category),
             contentDescription = "add backlog category",
             tint = Color.Unspecified,
             modifier = Modifier
@@ -336,6 +345,7 @@ fun BacklogCategoryList(
                     onClick = { onClickCategoryAdd() }
                 )
         )
+
     }
 }
 
@@ -343,7 +353,8 @@ fun BacklogCategoryList(
 fun CategoryListIcon(
     paddingStart: Int = 0,
     paddingHorizontal: Int = 0,
-    imgResource: Painter
+    imgResource: Painter,
+    onClickCategory: () -> Unit = {}
 ) {
     Box(
         modifier = Modifier
@@ -351,6 +362,7 @@ fun CategoryListIcon(
             .padding(horizontal = paddingHorizontal.dp)
             .size(40.dp)
             .border(width = 1.dp, color = Gray95, shape = CircleShape)
+            .clickable { onClickCategory() }
     ) {
         Icon(
             painter = imgResource,
