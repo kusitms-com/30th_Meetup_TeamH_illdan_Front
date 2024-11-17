@@ -2,6 +2,7 @@ package com.poptato.backlog
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -23,9 +24,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -68,6 +74,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.rememberAsyncImagePainter
 import com.poptato.core.util.move
 import com.poptato.design_system.BACKLOG_YESTERDAY_TASK_GUIDE
 import com.poptato.design_system.BacklogHint
@@ -88,6 +95,7 @@ import com.poptato.design_system.Primary60
 import com.poptato.design_system.R
 import com.poptato.domain.model.request.todo.ModifyTodoRequestModel
 import com.poptato.domain.model.request.todo.TodoContentModel
+import com.poptato.domain.model.response.category.CategoryIconItemModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.ui.common.BookmarkItem
 import com.poptato.ui.common.TopBar
@@ -207,7 +215,8 @@ fun BacklogContent(
             .background(Gray100)
     ) {
         BacklogCategoryList(
-            onClickCategoryAdd = onClickCategoryAdd
+            onClickCategoryAdd = onClickCategoryAdd,
+            categoryList = uiState.categoryList
         )
 
         TopBar(
@@ -278,22 +287,38 @@ fun BacklogContent(
 @Composable
 fun BacklogCategoryList(
     onClickCategoryAdd:() -> Unit = {},
+    categoryList: List<CategoryIconItemModel> = emptyList()
 ) {
-    Box(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
     ) {
-        Row {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_add_circle),
-                contentDescription = "add backlog category",
-                tint = Color.Unspecified,
-                modifier = Modifier
-                    .padding(vertical = 12.dp, horizontal = 6.dp)
-                    .clickable { onClickCategoryAdd() }
-            )
+
+        LazyRow(
+            modifier = Modifier
+                .wrapContentSize()
+                .padding(start = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(categoryList, key = { it.iconId }) { item ->
+                Image(
+                    painter = rememberAsyncImagePainter(model = item.iconImgUrl),
+                    contentDescription = "category icon",
+                    modifier = Modifier
+                        .size(24.dp)
+                )
+            }
         }
+
+        Icon(
+            painter = painterResource(id = R.drawable.ic_add_circle),
+            contentDescription = "add backlog category",
+            tint = Color.Unspecified,
+            modifier = Modifier
+                .padding(vertical = 12.dp, horizontal = 6.dp)
+                .clickable { onClickCategoryAdd() }
+        )
     }
 }
 
