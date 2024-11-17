@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.poptato.core.enums.DateType
@@ -248,6 +249,7 @@ fun DatePickerButtons(
     btnText: String = "",
     btnColor: Color = Color.Unspecified,
     textColor: Color = Color.Unspecified,
+    textStyle: TextStyle = PoptatoTypo.lgSemiBold,
     onClickBtn: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
@@ -261,7 +263,7 @@ fun DatePickerButtons(
     ) {
         Text(
             text = btnText,
-            style = PoptatoTypo.lgSemiBold,
+            style = textStyle,
             color = textColor
         )
     }

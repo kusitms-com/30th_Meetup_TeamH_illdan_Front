@@ -34,7 +34,13 @@ fun NavGraphBuilder.splashNavGraph(navController: NavHostController) {
                         }
                     }
                 },
-                goToBacklog = { navController.navigate(NavRoutes.BacklogGraph.route) }
+                goToBacklog = {
+                    navController.navigate(NavRoutes.BacklogScreen.route) {
+                        popUpTo(NavRoutes.SplashScreen.route) {
+                            inclusive = true
+                        }
+                    }
+                }
             )
         }
     }
