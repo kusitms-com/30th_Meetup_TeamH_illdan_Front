@@ -233,7 +233,8 @@ fun BacklogContent(
             titleText = com.poptato.design_system.TODO,
             subText = uiState.backlogList.size.toString(),
             subTextStyle = PoptatoTypo.xLSemiBold,
-            subTextColor = Primary60
+            subTextColor = Primary60,
+            isCategorySettingBtn = (uiState.selectedCategoryId.toInt() != 0 && uiState.selectedCategoryId.toInt() != 1)
         )
 
         Box(

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -36,7 +37,8 @@ fun TopBar(
     titleTextColor: Color = Gray00,
     subTextColor: Color = Gray40,
     modifier: Modifier = Modifier,
-    isTodayTopBar: Boolean = false
+    isTodayTopBar: Boolean = false,
+    isCategorySettingBtn: Boolean = false
 ) {
     Row(
         modifier = modifier
@@ -68,6 +70,18 @@ fun TopBar(
                 text = subText,
                 style = subTextStyle,
                 color = subTextColor
+            )
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        if (isCategorySettingBtn) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_setting),
+                contentDescription = "category setting",
+                tint = Color.Unspecified,
+                modifier = Modifier
+                    .size(20.dp)
             )
         }
     }
