@@ -300,10 +300,41 @@ fun BacklogCategoryList(
             .padding(top = 16.dp)
     ) {
 
+        Box(
+            modifier = Modifier
+                .padding(start = 16.dp)
+                .size(40.dp)
+                .border(width = 1.dp, color = Gray95, shape = CircleShape)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_category_all),
+                contentDescription = "category all",
+                tint = Color.Unspecified,
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .size(24.dp)
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .padding(horizontal = 12.dp)
+                .size(40.dp)
+                .border(width = 1.dp, color = Gray95, shape = CircleShape)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_category_star),
+                contentDescription = "category star",
+                tint = Color.Unspecified,
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .size(24.dp)
+            )
+        }
+
         LazyRow(
             modifier = Modifier
-                .wrapContentSize()
-                .padding(start = 16.dp),
+                .wrapContentSize(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(categoryList, key = { it.iconId }) { item ->
@@ -312,9 +343,10 @@ fun BacklogCategoryList(
                         .size(40.dp)
                         .border(width = 1.dp, color = Gray95, shape = CircleShape)
                 ) {
-                    Image(
+                    Icon(
                         painter = rememberAsyncImagePainter(model = item.iconImgUrl),
                         contentDescription = "category icon",
+                        tint = Color.Unspecified,
                         modifier = Modifier
                             .align(Alignment.Center)
                             .size(24.dp)
