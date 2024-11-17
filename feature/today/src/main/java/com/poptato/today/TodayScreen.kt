@@ -234,7 +234,8 @@ fun TodayTodoList(
                         scaleY = if (isDragged) 1.05f else 1f
                     }
                     .offset { IntOffset(offsetX.toInt(), 0) }
-                    .pointerInput(Unit) {
+                    .pointerInput(item.todoStatus) {
+                        if (item.todoStatus == TodoStatus.COMPLETED) return@pointerInput
                         detectHorizontalDragGestures(
                             onDragEnd = {
                                 if (offsetX > 200f) {

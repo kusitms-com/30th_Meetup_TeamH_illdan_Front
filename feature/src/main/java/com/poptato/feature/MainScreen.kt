@@ -5,14 +5,14 @@ import android.app.Activity
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
@@ -59,6 +60,7 @@ import com.poptato.navigation.myPageNavGraph
 import com.poptato.navigation.splashNavGraph
 import com.poptato.navigation.todayNavGraph
 import com.poptato.navigation.yesterdayListNavGraph
+import com.poptato.ui.common.CalendarBottomSheet
 import com.poptato.ui.common.CategoryBottomSheet
 import com.poptato.ui.common.CommonSnackBar
 import com.poptato.ui.common.DatePickerBottomSheet
@@ -95,7 +97,9 @@ fun MainScreen() {
         scope.launch { sheetState.show() }
     }
     val backPressHandler: () -> Unit = {
-        if (uiState.backPressedOnce) {
+        if (sheetState.isVisible) {
+            scope.launch { sheetState.hide() }
+        } else if (uiState.backPressedOnce) {
             (context as? Activity)?.finish()
         } else {
             viewModel.toggleBackPressed(true)
@@ -170,7 +174,6 @@ fun MainScreen() {
 
         ModalBottomSheetLayout(
             sheetState = sheetState,
-            sheetGesturesEnabled = uiState.bottomSheetType == BottomSheetType.Main || uiState.bottomSheetType == BottomSheetType.Category,
             sheetContent = {
                 AnimatedContent(
                     targetState = uiState.bottomSheetType,
@@ -183,20 +186,17 @@ fun MainScreen() {
                             if (uiState.bottomSheetType == BottomSheetType.Category) {
                                 Modifier.height(610.dp)
                             } else {
-                                Modifier.height(324.dp)
+                                Modifier.wrapContentHeight()
                             }
                         )
-                        .background(Gray100),
+                        .background(Gray100)
+                        .navigationBarsPadding(),
                     label = ""
                 ) { currentSheet ->
                     when (currentSheet) {
                         BottomSheetType.Main -> {
                             TodoBottomSheet(
                                 item = uiState.selectedTodoItem,
-                                setDeadline = {
-                                    viewModel.onUpdatedDeadline(it)
-                                    scope.launch { viewModel.updateDeadlineFlow.emit(it) }
-                                },
                                 onClickShowDatePicker = { viewModel.updateBottomSheetType(BottomSheetType.FullDate) },
                                 onClickBtnDelete = {
                                     scope.launch {
@@ -219,15 +219,13 @@ fun MainScreen() {
                             )
                         }
                         BottomSheetType.FullDate -> {
-                            DatePickerBottomSheet(
+                            CalendarBottomSheet(
                                 onDismissRequest = { viewModel.updateBottomSheetType(BottomSheetType.Main) },
-                                bottomSheetType = BottomSheetType.FullDate,
-                                onFullDateSelected = { date ->
+                                onDateSelected = { date ->
                                     viewModel.onUpdatedDeadline(date)
-                                    scope.launch {
-                                        viewModel.updateDeadlineFlow.emit(date)
-                                    }
-                                }
+                                    scope.launch { viewModel.updateDeadlineFlow.emit(date) }
+                                },
+                                deadline = uiState.selectedTodoItem.deadline
                             )
                         }
                         BottomSheetType.Calendar -> TODO("캘린더 바텀시트 컴포저블을 여기에 추가")
@@ -258,8 +256,30 @@ fun MainScreen() {
                 bottomBar = {
                     AnimatedVisibility(
                         visible = uiState.bottomNavType != BottomNavType.DEFAULT,
-                        enter = slideInHorizontally(animationSpec = tween(durationMillis = viewModel.animationDuration)),
-                        exit = slideOutHorizontally(animationSpec = tween(durationMillis = viewModel.animationDuration)),
+                        enter = fadeIn(
+                            animationSpec = tween(
+                                durationMillis = viewModel.animationDuration,
+                                easing = FastOutSlowInEasing
+                            )
+                        ) + scaleIn(
+                            initialScale = 0.9f,
+                            animationSpec = tween(
+                                durationMillis = viewModel.animationDuration,
+                                easing = FastOutSlowInEasing
+                            )
+                        ),
+                        exit = fadeOut(
+                            animationSpec = tween(
+                                durationMillis = viewModel.animationDuration,
+                                easing = LinearOutSlowInEasing
+                            )
+                        ) + scaleOut(
+                            targetScale = 0.9f,
+                            animationSpec = tween(
+                                durationMillis = viewModel.animationDuration,
+                                easing = LinearOutSlowInEasing
+                            )
+                        ),
                         modifier = Modifier.background(Gray100)
                     ) {
                         BottomNavBar(
@@ -289,23 +309,36 @@ fun MainScreen() {
                         modifier = Modifier.background(Gray100),
                         navController = navController,
                         startDestination = NavRoutes.SplashGraph.route,
-                        exitTransition = { ExitTransition.None },
+                        exitTransition = {
+                            fadeOut(
+                                animationSpec = tween(
+                                    durationMillis = viewModel.animationDuration,
+                                    easing = LinearOutSlowInEasing
+                                )
+                            )
+                        },
                         enterTransition = {
-                            slideIntoContainer(
-                                AnimatedContentTransitionScope.SlideDirection.Start,
-                                tween(viewModel.animationDuration)
+                            fadeIn(
+                                animationSpec = tween(
+                                    durationMillis = viewModel.animationDuration,
+                                    easing = FastOutSlowInEasing
+                                )
                             )
                         },
                         popEnterTransition = {
-                            slideIntoContainer(
-                                AnimatedContentTransitionScope.SlideDirection.End,
-                                tween(viewModel.animationDuration)
+                            fadeIn(
+                                animationSpec = tween(
+                                    durationMillis = viewModel.animationDuration,
+                                    easing = FastOutSlowInEasing
+                                )
                             )
                         },
                         popExitTransition = {
-                            slideOutOfContainer(
-                                AnimatedContentTransitionScope.SlideDirection.End,
-                                tween(viewModel.animationDuration)
+                            fadeOut(
+                                animationSpec = tween(
+                                    durationMillis = viewModel.animationDuration,
+                                    easing = LinearOutSlowInEasing
+                                )
                             )
                         }
                     ) {

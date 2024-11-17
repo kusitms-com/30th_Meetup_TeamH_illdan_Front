@@ -7,7 +7,8 @@ const val History = "히스토리"
 const val Settings = "설정"
 const val Backlog = "백로그"
 const val modify = "수정하기"
-const val delete = "삭제하기"
+const val DELETE_ACTION = "삭제하기"
+const val DELETE = "삭제"
 const val dueDate = "마감기한"
 const val Confirm = "확인"
 const val CONFIRM_ACTION = "확인하기"
@@ -18,6 +19,13 @@ const val Month = "월"
 const val Day = "일"
 const val BOOKMARK = "중요"
 const val TODO = "할 일"
+const val MON = "월"
+const val TUE = "화"
+const val WED = "수"
+const val THU = "목"
+const val FRI = "금"
+const val SAT = "토"
+const val SUN = "일"
 
 // KaKaoLogin
 const val BtnKaKaoLoginText = "카카오 로그인"
@@ -78,6 +86,11 @@ const val BtnGetTodoText = "할 일 가져오기"
 //history
 const val HistoryTitle = "기록"
 const val HistoryListEmpty = "아직 완료한 일이 없어요"
+
+// BottomSheet
+const val REPEAT_TASK_OPTION = "반복 할 일 설정"
+const val DEADLINE_OPTION = "마감기한 설정"
+const val YEAR_MONTH = "%s년 %s월"
 
 // Error
 const val ERROR_GENERIC_MESSAGE = "에러가 발생하였습니다"

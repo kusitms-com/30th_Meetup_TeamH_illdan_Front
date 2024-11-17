@@ -62,6 +62,7 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -533,17 +534,22 @@ fun BacklogItem(
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        Icon(
-            painter = painterResource(id = R.drawable.ic_three_dot),
-            contentDescription = "",
-            tint = Color.Unspecified,
+        Box(
             modifier = Modifier
-                .align(if (item.isBookmark || item.dDay != null) Alignment.Top else Alignment.CenterVertically)
-                .padding(top = 16.dp)
-                .clickable {
-                    onClickBtnTodoSettings(index)
-                }
-        )
+                .fillMaxHeight(),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_three_dot),
+                contentDescription = "",
+                tint = Color.Unspecified,
+                modifier = Modifier
+                    .padding(top = 20.dp)
+                    .clickable {
+                        onClickBtnTodoSettings(index)
+                    }
+            )
+        }
     }
 }
 
