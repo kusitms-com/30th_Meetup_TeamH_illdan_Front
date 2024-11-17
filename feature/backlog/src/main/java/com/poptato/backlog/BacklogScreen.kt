@@ -1,6 +1,7 @@
 package com.poptato.backlog
 
 import android.annotation.SuppressLint
+import android.graphics.drawable.shapes.OvalShape
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -34,6 +35,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -216,7 +218,8 @@ fun BacklogContent(
     ) {
         BacklogCategoryList(
             onClickCategoryAdd = onClickCategoryAdd,
-            categoryList = uiState.categoryList
+            categoryList = uiState.categoryList,
+            interactionSource = interactionSource
         )
 
         TopBar(
@@ -287,12 +290,14 @@ fun BacklogContent(
 @Composable
 fun BacklogCategoryList(
     onClickCategoryAdd:() -> Unit = {},
-    categoryList: List<CategoryIconItemModel> = emptyList()
+    categoryList: List<CategoryIconItemModel> = emptyList(),
+    interactionSource: MutableInteractionSource,
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
+            .padding(top = 16.dp)
     ) {
 
         LazyRow(
@@ -302,12 +307,19 @@ fun BacklogCategoryList(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(categoryList, key = { it.iconId }) { item ->
-                Image(
-                    painter = rememberAsyncImagePainter(model = item.iconImgUrl),
-                    contentDescription = "category icon",
+                Box(
                     modifier = Modifier
-                        .size(24.dp)
-                )
+                        .size(40.dp)
+                        .border(width = 1.dp, color = Gray95, shape = CircleShape)
+                ) {
+                    Image(
+                        painter = rememberAsyncImagePainter(model = item.iconImgUrl),
+                        contentDescription = "category icon",
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .size(24.dp)
+                    )
+                }
             }
         }
 
@@ -316,8 +328,13 @@ fun BacklogCategoryList(
             contentDescription = "add backlog category",
             tint = Color.Unspecified,
             modifier = Modifier
-                .padding(vertical = 12.dp, horizontal = 6.dp)
-                .clickable { onClickCategoryAdd() }
+                .padding(horizontal = 12.dp)
+                .size(40.dp)
+                .clickable(
+                    indication = null,
+                    interactionSource = interactionSource,
+                    onClick = { onClickCategoryAdd() }
+                )
         )
     }
 }
