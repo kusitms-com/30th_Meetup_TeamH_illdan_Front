@@ -13,6 +13,7 @@ import com.poptato.domain.model.request.todo.DragDropRequestModel
 import com.poptato.domain.model.request.todo.ModifyTodoRequestModel
 import com.poptato.domain.model.request.todo.UpdateDeadlineRequestModel
 import com.poptato.domain.model.response.backlog.BacklogListModel
+import com.poptato.domain.model.response.category.CategoryIconItemModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.domain.model.response.yesterday.YesterdayListModel
 import com.poptato.domain.usecase.backlog.CreateBacklogUseCase
@@ -49,9 +50,25 @@ class BacklogViewModel @Inject constructor(
     private var snapshotList: List<TodoItemModel> = emptyList()
     private var tempTodoId: Long? = null
 
+    private val _categoryList: List<CategoryIconItemModel> = listOf(
+        CategoryIconItemModel(1, "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
+        CategoryIconItemModel(2, "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
+        CategoryIconItemModel(3, "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
+    )
+
     init {
+        getCategoryList()
         getYesterdayList(0, 1)
         getBacklogList(0, 100)
+    }
+
+    private fun getCategoryList() {
+        // TODO 카테고리 리스트 서버통신 연결
+        updateState(
+            uiState.value.copy(
+                categoryList = _categoryList
+            )
+        )
     }
 
     private fun getBacklogList(page: Int, size: Int) {

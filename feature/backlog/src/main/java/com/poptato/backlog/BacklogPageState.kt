@@ -1,5 +1,6 @@
 package com.poptato.backlog
 
+import com.poptato.domain.model.response.category.CategoryIconItemModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.ui.base.PageState
 
@@ -13,5 +14,6 @@ data class BacklogPageState(
     val isYesterdayListEmpty: Boolean = true,
     val isNewItemCreated: Boolean = false,
     val currentPage: Int = 0,
-    val isFinishedInitialization: Boolean = false
+    val isFinishedInitialization: Boolean = false,
+    val categoryList: List<CategoryIconItemModel> = emptyList()
 ): PageState
