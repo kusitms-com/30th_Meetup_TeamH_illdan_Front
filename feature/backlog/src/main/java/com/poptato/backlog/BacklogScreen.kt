@@ -225,7 +225,8 @@ fun BacklogContent(
             onClickCategoryAdd = onClickCategoryAdd,
             categoryList = uiState.categoryList,
             interactionSource = interactionSource,
-            onSelectCategory = onSelectCategory
+            onSelectCategory = onSelectCategory,
+            selectedCategoryId = uiState.selectedCategoryId
         )
 
         TopBar(
@@ -298,8 +299,10 @@ fun BacklogCategoryList(
     interactionSource: MutableInteractionSource,
     categoryList: List<CategoryIconItemModel> = emptyList(),
     onClickCategoryAdd:() -> Unit = {},
-    onSelectCategory: (Long) -> Unit = {}
+    onSelectCategory: (Long) -> Unit = {},
+    selectedCategoryId: Long = 0
 ) {
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -310,12 +313,14 @@ fun BacklogCategoryList(
         CategoryListIcon(
             paddingStart = 16,
             imgResource = painterResource(id = R.drawable.ic_category_all),
+            isSelected = selectedCategoryId.toInt() == 0,
             onClickCategory = { onSelectCategory(0) }
         )
 
         CategoryListIcon(
             paddingHorizontal = 12,
             imgResource = painterResource(id = R.drawable.ic_category_star),
+            isSelected = selectedCategoryId.toInt() == 1,
             onClickCategory = { onSelectCategory(1) }
         )
 
@@ -327,6 +332,7 @@ fun BacklogCategoryList(
             items(categoryList, key = { it.iconId }) { item ->
                 CategoryListIcon(
                     imgResource = rememberAsyncImagePainter(model = item.iconImgUrl),
+                    isSelected = selectedCategoryId == item.iconId,
                     onClickCategory = { onSelectCategory(item.iconId) }
                 )
             }
@@ -354,6 +360,7 @@ fun CategoryListIcon(
     paddingStart: Int = 0,
     paddingHorizontal: Int = 0,
     imgResource: Painter,
+    isSelected: Boolean,
     onClickCategory: () -> Unit = {}
 ) {
     Box(
@@ -361,7 +368,7 @@ fun CategoryListIcon(
             .padding(start = paddingStart.dp)
             .padding(horizontal = paddingHorizontal.dp)
             .size(40.dp)
-            .border(width = 1.dp, color = Gray95, shape = CircleShape)
+            .border(width = 1.dp, color = if (isSelected) Gray00 else Gray95, shape = CircleShape)
             .clickable { onClickCategory() }
     ) {
         Icon(
