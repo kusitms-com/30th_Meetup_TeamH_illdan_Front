@@ -61,6 +61,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -300,37 +301,15 @@ fun BacklogCategoryList(
             .padding(top = 16.dp)
     ) {
 
-        Box(
-            modifier = Modifier
-                .padding(start = 16.dp)
-                .size(40.dp)
-                .border(width = 1.dp, color = Gray95, shape = CircleShape)
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_category_all),
-                contentDescription = "category all",
-                tint = Color.Unspecified,
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .size(24.dp)
-            )
-        }
+        CategoryListIcon(
+            paddingStart = 16,
+            imgResource = painterResource(id = R.drawable.ic_category_all)
+        )
 
-        Box(
-            modifier = Modifier
-                .padding(horizontal = 12.dp)
-                .size(40.dp)
-                .border(width = 1.dp, color = Gray95, shape = CircleShape)
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_category_star),
-                contentDescription = "category star",
-                tint = Color.Unspecified,
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .size(24.dp)
-            )
-        }
+        CategoryListIcon(
+            paddingHorizontal = 12,
+            imgResource = painterResource(id = R.drawable.ic_category_star)
+        )
 
         LazyRow(
             modifier = Modifier
@@ -338,20 +317,9 @@ fun BacklogCategoryList(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(categoryList, key = { it.iconId }) { item ->
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .border(width = 1.dp, color = Gray95, shape = CircleShape)
-                ) {
-                    Icon(
-                        painter = rememberAsyncImagePainter(model = item.iconImgUrl),
-                        contentDescription = "category icon",
-                        tint = Color.Unspecified,
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .size(24.dp)
-                    )
-                }
+                CategoryListIcon(
+                    imgResource = rememberAsyncImagePainter(model = item.iconImgUrl)
+                )
             }
         }
 
@@ -367,6 +335,30 @@ fun BacklogCategoryList(
                     interactionSource = interactionSource,
                     onClick = { onClickCategoryAdd() }
                 )
+        )
+    }
+}
+
+@Composable
+fun CategoryListIcon(
+    paddingStart: Int = 0,
+    paddingHorizontal: Int = 0,
+    imgResource: Painter
+) {
+    Box(
+        modifier = Modifier
+            .padding(start = paddingStart.dp)
+            .padding(horizontal = paddingHorizontal.dp)
+            .size(40.dp)
+            .border(width = 1.dp, color = Gray95, shape = CircleShape)
+    ) {
+        Icon(
+            painter = imgResource,
+            contentDescription = "category icon",
+            tint = Color.Unspecified,
+            modifier = Modifier
+                .align(Alignment.Center)
+                .size(24.dp)
         )
     }
 }
