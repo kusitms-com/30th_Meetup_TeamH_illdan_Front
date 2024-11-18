@@ -107,7 +107,7 @@ import com.poptato.design_system.modify
 import com.poptato.domain.model.enums.DialogType
 import com.poptato.domain.model.request.todo.ModifyTodoRequestModel
 import com.poptato.domain.model.request.todo.TodoContentModel
-import com.poptato.domain.model.response.category.CategoryIconItemModel
+import com.poptato.domain.model.response.category.CategoryItemModel
 import com.poptato.domain.model.response.dialog.DialogContentModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.ui.common.BookmarkItem
@@ -389,7 +389,7 @@ fun CategoryDropDownItem(
 @Composable
 fun BacklogCategoryList(
     interactionSource: MutableInteractionSource,
-    categoryList: List<CategoryIconItemModel> = emptyList(),
+    categoryList: List<CategoryItemModel> = emptyList(),
     onClickCategoryAdd: () -> Unit = {},
     onSelectCategory: (Long) -> Unit = {},
     selectedCategoryId: Long = 0
@@ -422,11 +422,11 @@ fun BacklogCategoryList(
                 .wrapContentSize(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(categoryList, key = { it.iconId }) { item ->
+            items(categoryList, key = { it.categoryId }) { item ->
                 CategoryListIcon(
-                    imgResource = rememberAsyncImagePainter(model = item.iconImgUrl),
-                    isSelected = selectedCategoryId == item.iconId,
-                    onClickCategory = { onSelectCategory(item.iconId) }
+                    imgResource = rememberAsyncImagePainter(model = item.categoryImgUrl),
+                    isSelected = selectedCategoryId == item.categoryId,
+                    onClickCategory = { onSelectCategory(item.categoryId) }
                 )
             }
         }
