@@ -355,7 +355,8 @@ fun MainScreen() {
                             deleteTodoFlow = viewModel.deleteTodoFlow,
                             activateItemFlow = viewModel.activateItemFlow,
                             updateBookmarkFlow = viewModel.updateBookmarkFlow,
-                            showSnackBar = showSnackBar
+                            showSnackBar = showSnackBar,
+                            showDialog = showDialog
                         )
                         categoryNavGraph(
                             navController = navController,

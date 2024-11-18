@@ -82,9 +82,13 @@ import com.poptato.design_system.BACKLOG_YESTERDAY_TASK_GUIDE
 import com.poptato.design_system.BacklogHint
 import com.poptato.design_system.COMPLETE_DELETE_TODO
 import com.poptato.design_system.CONFIRM_ACTION
+import com.poptato.design_system.Cancel
+import com.poptato.design_system.CategoryDeleteDropDownContent
+import com.poptato.design_system.CategoryDeleteDropDownTitle
 import com.poptato.design_system.DEADLINE
 import com.poptato.design_system.DEADLINE_DDAY
 import com.poptato.design_system.DEADLINE_PASSED
+import com.poptato.design_system.DELETE
 import com.poptato.design_system.DELETE_ACTION
 import com.poptato.design_system.Danger50
 import com.poptato.design_system.ERROR_GENERIC_MESSAGE
@@ -100,9 +104,11 @@ import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.Primary60
 import com.poptato.design_system.R
 import com.poptato.design_system.modify
+import com.poptato.domain.model.enums.DialogType
 import com.poptato.domain.model.request.todo.ModifyTodoRequestModel
 import com.poptato.domain.model.request.todo.TodoContentModel
 import com.poptato.domain.model.response.category.CategoryIconItemModel
+import com.poptato.domain.model.response.dialog.DialogContentModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.ui.common.BookmarkItem
 import com.poptato.ui.common.TopBar
@@ -119,7 +125,8 @@ fun BacklogScreen(
     deleteTodoFlow: SharedFlow<Long>,
     activateItemFlow: SharedFlow<Long>,
     updateBookmarkFlow: SharedFlow<Long>,
-    showSnackBar: (String) -> Unit
+    showSnackBar: (String) -> Unit,
+    showDialog: (DialogContentModel) -> Unit = {}
 ) {
     val viewModel: BacklogViewModel = hiltViewModel()
     val context = LocalContext.current
@@ -177,6 +184,18 @@ fun BacklogScreen(
                 viewModel.getBacklogListInCategory(it)
             },
             onClickCategoryAdd = { goToCategorySelect() },
+            onClickCategoryDeleteDropdown = {
+                showDialog(
+                    DialogContentModel(
+                        dialogType = DialogType.TwoBtn,
+                        titleText = CategoryDeleteDropDownTitle,
+                        dialogContentText = CategoryDeleteDropDownContent,
+                        positiveBtnText = DELETE,
+                        cancelBtnText = Cancel,
+                        positiveBtnAction = {}
+                    )
+                )
+            },
             onClickBtnTodoSettings = {
                 showBottomSheet(uiState.backlogList[it])
                 viewModel.onSelectedItem(uiState.backlogList[it])
@@ -211,6 +230,7 @@ fun BacklogContent(
     onClickYesterdayList: () -> Unit = {},
     onSelectCategory: (Long) -> Unit = {},
     onClickCategoryAdd: () -> Unit = {},
+    onClickCategoryDeleteDropdown: () -> Unit = {},
     onItemSwiped: (TodoItemModel) -> Unit = {},
     onClickBtnTodoSettings: (Int) -> Unit = {},
     interactionSource: MutableInteractionSource,
@@ -264,7 +284,8 @@ fun BacklogContent(
                 CategoryDropDownItem(
                     itemIcon = R.drawable.ic_trash,
                     itemText = DELETE_ACTION,
-                    textColor = Danger50
+                    textColor = Danger50,
+                    onClickItemDropdownItem = onClickCategoryDeleteDropdown
                 )
 
             }
@@ -332,7 +353,8 @@ fun BacklogContent(
 fun CategoryDropDownItem(
     itemIcon: Int,
     itemText: String,
-    textColor: Color
+    textColor: Color,
+    onClickItemDropdownItem: () -> Unit = {}
 ) {
     DropdownMenuItem(
         contentPadding = PaddingValues(0.dp),
@@ -354,7 +376,7 @@ fun CategoryDropDownItem(
                 modifier = Modifier
             )
         },
-        onClick = {}
+        onClick = { onClickItemDropdownItem() }
     )
 }
 

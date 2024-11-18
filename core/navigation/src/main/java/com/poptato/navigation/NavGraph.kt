@@ -81,7 +81,8 @@ fun NavGraphBuilder.backlogNavGraph(
     deleteTodoFlow: SharedFlow<Long>,
     activateItemFlow: SharedFlow<Long>,
     updateBookmarkFlow: SharedFlow<Long>,
-    showSnackBar: (String) -> Unit
+    showSnackBar: (String) -> Unit,
+    showDialog: (DialogContentModel) -> Unit
 ) {
     navigation(
         startDestination = NavRoutes.BacklogScreen.route,
@@ -96,7 +97,8 @@ fun NavGraphBuilder.backlogNavGraph(
                 deleteTodoFlow = deleteTodoFlow,
                 activateItemFlow = activateItemFlow,
                 updateBookmarkFlow = updateBookmarkFlow,
-                showSnackBar = showSnackBar
+                showSnackBar = showSnackBar,
+                showDialog = showDialog
             )
         }
     }
