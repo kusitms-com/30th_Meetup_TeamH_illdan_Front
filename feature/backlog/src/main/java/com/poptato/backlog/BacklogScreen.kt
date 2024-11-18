@@ -90,6 +90,7 @@ import com.poptato.domain.model.request.todo.TodoContentModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.ui.common.BookmarkItem
 import com.poptato.ui.common.TopBar
+import com.poptato.ui.util.LoadingManager
 import com.poptato.ui.util.rememberDragDropListState
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
@@ -150,6 +151,12 @@ fun BacklogScreen(
         }
     }
 
+    LaunchedEffect(uiState.isFinishedInitialization) {
+        if (uiState.isFinishedInitialization) {
+            LoadingManager.endLoading()
+        }
+    }
+
     if (uiState.isFinishedInitialization) {
         BacklogContent(
             uiState = uiState,
@@ -178,6 +185,8 @@ fun BacklogScreen(
             onDragEnd = { viewModel.onDragEnd() },
             onMove = { from, to -> viewModel.onMove(from, to) }
         )
+    } else {
+        LoadingManager.startLoading()
     }
 }
 
