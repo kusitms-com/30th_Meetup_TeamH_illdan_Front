@@ -1,9 +1,7 @@
 package com.poptato.backlog
 
 import android.annotation.SuppressLint
-import android.graphics.drawable.shapes.OvalShape
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -29,7 +27,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -40,6 +37,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -47,7 +46,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -71,14 +69,12 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
-import com.poptato.core.util.move
 import com.poptato.design_system.BACKLOG_YESTERDAY_TASK_GUIDE
 import com.poptato.design_system.BacklogHint
 import com.poptato.design_system.COMPLETE_DELETE_TODO
@@ -105,9 +101,6 @@ import com.poptato.ui.common.TopBar
 import com.poptato.ui.util.rememberDragDropListState
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
-import my.nanihadesuka.compose.LazyColumnScrollbar
-import my.nanihadesuka.compose.ScrollbarSettings
-import timber.log.Timber
 
 @Composable
 fun BacklogScreen(
@@ -125,6 +118,7 @@ fun BacklogScreen(
     val interactionSource = remember { MutableInteractionSource() }
     val uiState: BacklogPageState by viewModel.uiState.collectAsStateWithLifecycle()
     var activeItemId by remember { mutableStateOf<Long?>(null) }
+    var isDropDownMenuExpanded by remember { mutableStateOf(false) }
 
     LaunchedEffect(activateItemFlow) {
         activateItemFlow.collect { id ->
@@ -193,7 +187,9 @@ fun BacklogScreen(
             },
             resetNewItemFlag = { viewModel.updateNewItemFlag(false) },
             onDragEnd = { viewModel.onDragEnd() },
-            onMove = { from, to -> viewModel.onMove(from, to) }
+            onMove = { from, to -> viewModel.onMove(from, to) },
+            isDropDownMenuExpanded = isDropDownMenuExpanded,
+            onDropdownExpandedChange = { isDropDownMenuExpanded = it }
         )
     }
 }
@@ -214,7 +210,9 @@ fun BacklogContent(
     onTodoItemModified: (Long, String) -> Unit = {_,_ ->},
     resetNewItemFlag: () -> Unit = {},
     onDragEnd: (List<TodoItemModel>) -> Unit = {  },
-    onMove: (Int, Int) -> Unit
+    onMove: (Int, Int) -> Unit,
+    isDropDownMenuExpanded: Boolean = false,
+    onDropdownExpandedChange: (Boolean) -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -234,8 +232,27 @@ fun BacklogContent(
             subText = uiState.backlogList.size.toString(),
             subTextStyle = PoptatoTypo.xLSemiBold,
             subTextColor = Primary60,
-            isCategorySettingBtn = (uiState.selectedCategoryId.toInt() != 0 && uiState.selectedCategoryId.toInt() != 1)
+            isCategorySettingBtn = (uiState.selectedCategoryId.toInt() != 0 && uiState.selectedCategoryId.toInt() != 1),
+            isCategorySettingBtnSelected = { onDropdownExpandedChange(true) }
         )
+
+        DropdownMenu(
+            modifier = Modifier
+                .wrapContentSize(),
+            expanded = isDropDownMenuExpanded,
+            onDismissRequest = { onDropdownExpandedChange(false) }
+        ) {
+            DropdownMenuItem(onClick = { /*TODO*/ }) {
+                Text(
+                    text = "수정하기",
+                    )
+            }
+            DropdownMenuItem(onClick = { /*TODO*/ }) {
+                Text(
+                    text = "삭제하기",
+                )
+            }
+        }
 
         Box(
             modifier = Modifier.fillMaxSize()
