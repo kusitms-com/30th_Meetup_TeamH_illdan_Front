@@ -39,7 +39,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Divider
-import androidx.compose.material.Surface
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -60,7 +59,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
@@ -73,7 +71,6 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -149,6 +146,7 @@ fun BacklogScreen(
                 is BacklogEvent.OnFailedUpdateBacklogList -> {
                     showSnackBar(ERROR_GENERIC_MESSAGE)
                 }
+
                 is BacklogEvent.OnSuccessDeleteBacklog -> {
                     showSnackBar(COMPLETE_DELETE_TODO)
                 }
@@ -212,15 +210,15 @@ fun BacklogContent(
     createBacklog: (String) -> Unit = {},
     onClickYesterdayList: () -> Unit = {},
     onSelectCategory: (Long) -> Unit = {},
-    onClickCategoryAdd:() -> Unit = {},
+    onClickCategoryAdd: () -> Unit = {},
     onItemSwiped: (TodoItemModel) -> Unit = {},
     onClickBtnTodoSettings: (Int) -> Unit = {},
     interactionSource: MutableInteractionSource,
     activeItemId: Long?,
     onClearActiveItem: () -> Unit = {},
-    onTodoItemModified: (Long, String) -> Unit = {_,_ ->},
+    onTodoItemModified: (Long, String) -> Unit = { _, _ -> },
     resetNewItemFlag: () -> Unit = {},
-    onDragEnd: (List<TodoItemModel>) -> Unit = {  },
+    onDragEnd: (List<TodoItemModel>) -> Unit = { },
     onMove: (Int, Int) -> Unit,
     isDropDownMenuExpanded: Boolean = false,
     onDropdownExpandedChange: (Boolean) -> Unit = {}
@@ -253,56 +251,21 @@ fun BacklogContent(
                 containerColor = Gray95,
                 expanded = isDropDownMenuExpanded,
                 onDismissRequest = { onDropdownExpandedChange(false) },
-                offset = DpOffset(x = (-31).dp, y = 0.dp),
-
+                offset = DpOffset(x = (-31).dp, y = 0.dp)
             ) {
-                DropdownMenuItem(
-                    contentPadding = PaddingValues(0.dp),
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_pen),
-                            contentDescription = "category modify",
-                            tint = Color.Unspecified,
-                            modifier = Modifier
-                                .padding(start = 12.dp)
-                                .size(16.dp)
-                        )
-                    },
-                    text = {
-                        Text(
-                            text = modify,
-                            color = Gray30,
-                            style = PoptatoTypo.smMedium,
-                            modifier = Modifier
-                        )
-                    },
-                    onClick = { /*TODO*/ },
-
+                CategoryDropDownItem(
+                    itemIcon = R.drawable.ic_pen,
+                    itemText = modify,
+                    textColor = Gray30
                 )
 
                 Divider(color = Gray90)
 
-                DropdownMenuItem(
-                    contentPadding = PaddingValues(0.dp),
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_trash),
-                            contentDescription = "category delete",
-                            tint = Color.Unspecified,
-                            modifier = Modifier
-                                .padding(start = 12.dp)
-                                .size(16.dp)
-                        )
-                    },
-                    text = {
-                        Text(
-                            text = DELETE_ACTION,
-                            color = Danger50,
-                            style = PoptatoTypo.smMedium,
-                            modifier = Modifier
-                        )
-                    },
-                    onClick = { /*TODO*/ })
+                CategoryDropDownItem(
+                    itemIcon = R.drawable.ic_trash,
+                    itemText = DELETE_ACTION,
+                    textColor = Danger50
+                )
 
             }
         }
@@ -366,10 +329,40 @@ fun BacklogContent(
 }
 
 @Composable
+fun CategoryDropDownItem(
+    itemIcon: Int,
+    itemText: String,
+    textColor: Color
+) {
+    DropdownMenuItem(
+        contentPadding = PaddingValues(0.dp),
+        leadingIcon = {
+            Icon(
+                painter = painterResource(id = itemIcon),
+                contentDescription = "category icon",
+                tint = Color.Unspecified,
+                modifier = Modifier
+                    .padding(start = 12.dp)
+                    .size(16.dp)
+            )
+        },
+        text = {
+            Text(
+                text = itemText,
+                color = textColor,
+                style = PoptatoTypo.smMedium,
+                modifier = Modifier
+            )
+        },
+        onClick = {}
+    )
+}
+
+@Composable
 fun BacklogCategoryList(
     interactionSource: MutableInteractionSource,
     categoryList: List<CategoryIconItemModel> = emptyList(),
-    onClickCategoryAdd:() -> Unit = {},
+    onClickCategoryAdd: () -> Unit = {},
     onSelectCategory: (Long) -> Unit = {},
     selectedCategoryId: Long = 0
 ) {
@@ -461,7 +454,7 @@ fun BacklogTaskList(
     onClickBtnTodoSettings: (Int) -> Unit = {},
     activeItemId: Long?,
     onClearActiveItem: () -> Unit = {},
-    onTodoItemModified: (Long, String) -> Unit = {_,_ ->},
+    onTodoItemModified: (Long, String) -> Unit = { _, _ -> },
     isNewItemCreated: Boolean = false,
     resetNewItemFlag: () -> Unit = {},
     onDragEnd: (List<TodoItemModel>) -> Unit = { },
@@ -597,7 +590,7 @@ fun BacklogItem(
     modifier: Modifier = Modifier,
     onClickBtnTodoSettings: (Int) -> Unit = {},
     onClearActiveItem: () -> Unit = {},
-    onTodoItemModified: (Long, String) -> Unit = {_,_ ->}
+    onTodoItemModified: (Long, String) -> Unit = { _, _ -> }
 ) {
     Row(
         modifier = modifier
@@ -640,7 +633,9 @@ fun BacklogItem(
                 )
             }
 
-            if (!item.isBookmark && item.dDay == null) Spacer(modifier = Modifier.height(16.dp)) else Spacer(modifier = Modifier.height(8.dp))
+            if (!item.isBookmark && item.dDay == null) Spacer(modifier = Modifier.height(16.dp)) else Spacer(
+                modifier = Modifier.height(8.dp)
+            )
 
             if (isActive) {
 
@@ -670,7 +665,10 @@ fun BacklogItem(
                         onDone = {
                             keyboardController?.hide()
                             onClearActiveItem()
-                            if (item.content != textFieldValue.text) onTodoItemModified(item.todoId, textFieldValue.text)
+                            if (item.content != textFieldValue.text) onTodoItemModified(
+                                item.todoId,
+                                textFieldValue.text
+                            )
                         }
                     ),
                     cursorBrush = SolidColor(Gray00)
