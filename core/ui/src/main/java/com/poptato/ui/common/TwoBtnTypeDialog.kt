@@ -24,6 +24,7 @@ import com.poptato.design_system.Danger50
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray05
 import com.poptato.design_system.Gray100
+import com.poptato.design_system.Gray20
 import com.poptato.design_system.Gray95
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.domain.model.response.dialog.DialogContentModel
@@ -52,22 +53,42 @@ fun TwoBtnTypeDialogContent(
         Card(
             modifier = Modifier
                 .wrapContentHeight()
-                .width(328.dp)
-                .padding(16.dp),
+                .width(328.dp),
             shape = RoundedCornerShape(16.dp),
             backgroundColor = Gray100
         ) {
             Column {
-                Text(
-                    text = dialogContent.titleText,
-                    textAlign = TextAlign.Center,
-                    color = Gray00,
-                    style = PoptatoTypo.mdSemiBold,
-                    modifier = Modifier
-                        .padding(vertical = 40.dp)
-                        .align(Alignment.CenterHorizontally)
-                )
 
+                if (dialogContent.dialogContentText.isNotEmpty()) {
+                    Text(
+                        text = dialogContent.titleText,
+                        textAlign = TextAlign.Center,
+                        color = Gray00,
+                        style = PoptatoTypo.mdSemiBold,
+                        modifier = Modifier
+                            .padding(top = 32.dp)
+                            .align(Alignment.CenterHorizontally)
+                    )
+
+                    Text(
+                        text = dialogContent.dialogContentText,
+                        textAlign = TextAlign.Center,
+                        color = Gray20,
+                        style = PoptatoTypo.mdMedium,
+                        modifier = Modifier
+                            .padding(top = 4.dp, bottom = 32.dp)
+                            .align(Alignment.CenterHorizontally))
+                } else {
+                    Text(
+                        text = dialogContent.titleText,
+                        textAlign = TextAlign.Center,
+                        color = Gray00,
+                        style = PoptatoTypo.mdSemiBold,
+                        modifier = Modifier
+                            .padding(vertical = 40.dp)
+                            .align(Alignment.CenterHorizontally)
+                    )
+                }
 
                 TwoBtnTypeDialogBtn(
                     interactionSource = interactionSource,
