@@ -196,6 +196,10 @@ fun BacklogScreen(
                     )
                 )
             },
+            onClickCategoryModifyDropdown = {
+                isDropDownMenuExpanded = false
+                goToCategorySelect()
+            },
             onClickBtnTodoSettings = {
                 showBottomSheet(uiState.backlogList[it])
                 viewModel.onSelectedItem(uiState.backlogList[it])
@@ -231,6 +235,7 @@ fun BacklogContent(
     onSelectCategory: (Long) -> Unit = {},
     onClickCategoryAdd: () -> Unit = {},
     onClickCategoryDeleteDropdown: () -> Unit = {},
+    onClickCategoryModifyDropdown: () -> Unit = {},
     onItemSwiped: (TodoItemModel) -> Unit = {},
     onClickBtnTodoSettings: (Int) -> Unit = {},
     interactionSource: MutableInteractionSource,
@@ -276,7 +281,8 @@ fun BacklogContent(
                 CategoryDropDownItem(
                     itemIcon = R.drawable.ic_pen,
                     itemText = modify,
-                    textColor = Gray30
+                    textColor = Gray30,
+                    onClickItemDropdownItem = onClickCategoryModifyDropdown
                 )
 
                 Divider(color = Gray90)
@@ -396,6 +402,7 @@ fun BacklogCategoryList(
             .padding(top = 16.dp)
     ) {
 
+        // TODO 카테고리 리스트 서버통신 완료 후 LazyRow 아이템으로 플로우 변경
         CategoryListIcon(
             paddingStart = 16,
             imgResource = painterResource(id = R.drawable.ic_category_all),
