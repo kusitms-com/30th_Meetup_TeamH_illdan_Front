@@ -69,6 +69,7 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -227,30 +228,33 @@ fun BacklogContent(
             selectedCategoryId = uiState.selectedCategoryId
         )
 
-        TopBar(
-            titleText = com.poptato.design_system.TODO,
-            subText = uiState.backlogList.size.toString(),
-            subTextStyle = PoptatoTypo.xLSemiBold,
-            subTextColor = Primary60,
-            isCategorySettingBtn = (uiState.selectedCategoryId.toInt() != 0 && uiState.selectedCategoryId.toInt() != 1),
-            isCategorySettingBtnSelected = { onDropdownExpandedChange(true) }
-        )
+        Box {
+            TopBar(
+                titleText = com.poptato.design_system.TODO,
+                subText = uiState.backlogList.size.toString(),
+                subTextStyle = PoptatoTypo.xLSemiBold,
+                subTextColor = Primary60,
+                isCategorySettingBtn = (uiState.selectedCategoryId.toInt() != 0 && uiState.selectedCategoryId.toInt() != 1),
+                isCategorySettingBtnSelected = { onDropdownExpandedChange(true) }
+            )
 
-        DropdownMenu(
-            modifier = Modifier
-                .wrapContentSize(),
-            expanded = isDropDownMenuExpanded,
-            onDismissRequest = { onDropdownExpandedChange(false) }
-        ) {
-            DropdownMenuItem(onClick = { /*TODO*/ }) {
-                Text(
-                    text = "수정하기",
+            DropdownMenu(
+                modifier = Modifier
+                    .wrapContentSize(),
+                expanded = isDropDownMenuExpanded,
+                onDismissRequest = { onDropdownExpandedChange(false) },
+                offset = DpOffset(x = (-31).dp, y = 0.dp)
+            ) {
+                DropdownMenuItem(onClick = { /*TODO*/ }) {
+                    Text(
+                        text = "수정하기",
                     )
-            }
-            DropdownMenuItem(onClick = { /*TODO*/ }) {
-                Text(
-                    text = "삭제하기",
-                )
+                }
+                DropdownMenuItem(onClick = { /*TODO*/ }) {
+                    Text(
+                        text = "삭제하기",
+                    )
+                }
             }
         }
 
