@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -37,8 +38,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.Divider
+import androidx.compose.material.Surface
 import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -57,6 +60,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
@@ -69,6 +73,7 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -83,16 +88,21 @@ import com.poptato.design_system.CONFIRM_ACTION
 import com.poptato.design_system.DEADLINE
 import com.poptato.design_system.DEADLINE_DDAY
 import com.poptato.design_system.DEADLINE_PASSED
+import com.poptato.design_system.DELETE_ACTION
+import com.poptato.design_system.Danger50
 import com.poptato.design_system.ERROR_GENERIC_MESSAGE
 import com.poptato.design_system.EmptyBacklogTitle
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
+import com.poptato.design_system.Gray30
 import com.poptato.design_system.Gray70
 import com.poptato.design_system.Gray80
+import com.poptato.design_system.Gray90
 import com.poptato.design_system.Gray95
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.Primary60
 import com.poptato.design_system.R
+import com.poptato.design_system.modify
 import com.poptato.domain.model.request.todo.ModifyTodoRequestModel
 import com.poptato.domain.model.request.todo.TodoContentModel
 import com.poptato.domain.model.response.category.CategoryIconItemModel
@@ -239,22 +249,61 @@ fun BacklogContent(
             )
 
             DropdownMenu(
-                modifier = Modifier
-                    .wrapContentSize(),
+                shape = RoundedCornerShape(12.dp),
+                containerColor = Gray95,
                 expanded = isDropDownMenuExpanded,
                 onDismissRequest = { onDropdownExpandedChange(false) },
-                offset = DpOffset(x = (-31).dp, y = 0.dp)
+                offset = DpOffset(x = (-31).dp, y = 0.dp),
+
             ) {
-                DropdownMenuItem(onClick = { /*TODO*/ }) {
-                    Text(
-                        text = "수정하기",
-                    )
-                }
-                DropdownMenuItem(onClick = { /*TODO*/ }) {
-                    Text(
-                        text = "삭제하기",
-                    )
-                }
+                DropdownMenuItem(
+                    contentPadding = PaddingValues(0.dp),
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_pen),
+                            contentDescription = "category modify",
+                            tint = Color.Unspecified,
+                            modifier = Modifier
+                                .padding(start = 12.dp)
+                                .size(16.dp)
+                        )
+                    },
+                    text = {
+                        Text(
+                            text = modify,
+                            color = Gray30,
+                            style = PoptatoTypo.smMedium,
+                            modifier = Modifier
+                        )
+                    },
+                    onClick = { /*TODO*/ },
+
+                )
+
+                Divider(color = Gray90)
+
+                DropdownMenuItem(
+                    contentPadding = PaddingValues(0.dp),
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_trash),
+                            contentDescription = "category delete",
+                            tint = Color.Unspecified,
+                            modifier = Modifier
+                                .padding(start = 12.dp)
+                                .size(16.dp)
+                        )
+                    },
+                    text = {
+                        Text(
+                            text = DELETE_ACTION,
+                            color = Danger50,
+                            style = PoptatoTypo.smMedium,
+                            modifier = Modifier
+                        )
+                    },
+                    onClick = { /*TODO*/ })
+
             }
         }
 
