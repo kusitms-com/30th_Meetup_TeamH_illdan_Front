@@ -16,5 +16,6 @@ data class BacklogPageState(
     val currentPage: Int = 0,
     val isFinishedInitialization: Boolean = false,
     val categoryList: List<CategoryItemModel> = emptyList(),
-    val selectedCategoryId: Long = 0
+    val selectedCategoryId: Long = 0,
+    val selectedCategoryIndex: Int = -1,
 ): PageState

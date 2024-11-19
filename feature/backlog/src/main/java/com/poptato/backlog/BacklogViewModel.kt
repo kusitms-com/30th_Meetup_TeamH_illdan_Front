@@ -52,9 +52,11 @@ class BacklogViewModel @Inject constructor(
     private var tempTodoId: Long? = null
 
     private val _categoryList: List<CategoryItemModel> = listOf(
-        CategoryItemModel(11, "이름1", "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
-        CategoryItemModel(12, "이름2", "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
-        CategoryItemModel(13, "이름3", "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
+        CategoryItemModel(11, "전체", "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
+        CategoryItemModel(12, "중요", "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
+        CategoryItemModel(13, "이름1", "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
+        CategoryItemModel(14, "이름2", "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
+        CategoryItemModel(15, "이름3", "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
     )
 
     init {
@@ -72,11 +74,12 @@ class BacklogViewModel @Inject constructor(
         )
     }
 
-    fun getBacklogListInCategory(categoryId: Long) {
+    fun getBacklogListInCategory(categoryId: Long, categoryIndex: Int) {
         // TODO 선택한 카테고리에 대한 백로그 리스트 가져오는 것으로 수정
         updateState(
             uiState.value.copy(
-                selectedCategoryId = categoryId
+                selectedCategoryId = categoryId,
+                selectedCategoryIndex = categoryIndex
             )
         )
         Timber.d("[카테고리] 선택 -> $categoryId")
