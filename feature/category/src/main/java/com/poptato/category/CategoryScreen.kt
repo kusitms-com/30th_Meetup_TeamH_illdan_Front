@@ -60,15 +60,18 @@ import com.poptato.design_system.R
 import com.poptato.domain.model.enums.DialogType
 import com.poptato.domain.model.response.category.CategoryIconItemModel
 import com.poptato.domain.model.response.category.CategoryIconTotalListModel
+import com.poptato.domain.model.response.category.CategoryScreenContentModel
 import com.poptato.domain.model.response.dialog.DialogContentModel
 import kotlinx.coroutines.flow.SharedFlow
+import timber.log.Timber
 
 @Composable
 fun CategoryScreen(
     goBackToBacklog: () -> Unit = {},
     showIconBottomSheet: (CategoryIconTotalListModel) -> Unit = {},
     selectedIconInBottomSheet: SharedFlow<CategoryIconItemModel>,
-    showDialog: (DialogContentModel) -> Unit = {}
+    showDialog: (DialogContentModel) -> Unit = {},
+    screenContent: SharedFlow<CategoryScreenContentModel>
 ) {
 
     val viewModel: CategoryViewModel = hiltViewModel()
@@ -83,6 +86,12 @@ fun CategoryScreen(
     LaunchedEffect(selectedIconInBottomSheet) {
         selectedIconInBottomSheet.collect {
             viewModel.getSelectedIcon(it)
+        }
+    }
+
+    LaunchedEffect(screenContent) {
+        screenContent.collect {
+            Timber.d("[데이터 전달 테스트] -> $it")
         }
     }
 

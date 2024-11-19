@@ -48,6 +48,7 @@ import com.poptato.design_system.Gray100
 import com.poptato.domain.model.enums.BottomSheetType
 import com.poptato.domain.model.enums.DialogType
 import com.poptato.domain.model.response.category.CategoryIconTotalListModel
+import com.poptato.domain.model.response.category.CategoryScreenContentModel
 import com.poptato.domain.model.response.dialog.DialogContentModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.feature.component.BottomNavBar
@@ -116,6 +117,10 @@ fun MainScreen() {
     val showDialog: (DialogContentModel) -> Unit = {
         viewModel.onSetDialogContent(it)
         isShowDialog.value = true
+    }
+    val categoryScreenContent: (CategoryScreenContentModel) -> Unit = {
+        scope.launch { viewModel.categoryScreenContent.emit(it)
+        }
     }
 
     if (uiState.bottomNavType != BottomNavType.DEFAULT) {
@@ -356,13 +361,15 @@ fun MainScreen() {
                             activateItemFlow = viewModel.activateItemFlow,
                             updateBookmarkFlow = viewModel.updateBookmarkFlow,
                             showSnackBar = showSnackBar,
-                            showDialog = showDialog
+                            showDialog = showDialog,
+                            categoryScreenContent = categoryScreenContent
                         )
                         categoryNavGraph(
                             navController = navController,
                             showCategoryIconBottomSheet = showCategoryIconBottomSheet,
                             selectedIconInBottomSheet = viewModel.selectedIconInBottomSheet,
-                            showDialog = showDialog
+                            showDialog = showDialog,
+                            categoryScreenFromBacklog = viewModel.categoryScreenContent
                         )
                         todayNavGraph(navController = navController, showSnackBar = showSnackBar)
                         historyNavGraph(navController = navController)

@@ -108,6 +108,7 @@ import com.poptato.domain.model.enums.DialogType
 import com.poptato.domain.model.request.todo.ModifyTodoRequestModel
 import com.poptato.domain.model.request.todo.TodoContentModel
 import com.poptato.domain.model.response.category.CategoryItemModel
+import com.poptato.domain.model.response.category.CategoryScreenContentModel
 import com.poptato.domain.model.response.dialog.DialogContentModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.ui.common.BookmarkItem
@@ -119,7 +120,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun BacklogScreen(
     goToYesterdayList: () -> Unit = {},
-    goToCategorySelect: () -> Unit = {},
+    goToCategorySelect: (CategoryScreenContentModel) -> Unit = {},
     showBottomSheet: (TodoItemModel) -> Unit = {},
     updateDeadlineFlow: SharedFlow<String?>,
     deleteTodoFlow: SharedFlow<Long>,
@@ -183,7 +184,9 @@ fun BacklogScreen(
             onSelectCategory = {
                 viewModel.getBacklogListInCategory(it)
             },
-            onClickCategoryAdd = { goToCategorySelect() },
+            onClickCategoryAdd = { goToCategorySelect(
+                CategoryScreenContentModel("추가")
+            ) },
             onClickCategoryDeleteDropdown = {
                 showDialog(
                     DialogContentModel(
@@ -198,7 +201,9 @@ fun BacklogScreen(
             },
             onClickCategoryModifyDropdown = {
                 isDropDownMenuExpanded = false
-                goToCategorySelect()
+                goToCategorySelect(
+                    CategoryScreenContentModel("수정")
+                )
             },
             onClickBtnTodoSettings = {
                 showBottomSheet(uiState.backlogList[it])
