@@ -413,26 +413,28 @@ fun BacklogCategoryList(
             .padding(top = 16.dp)
     ) {
 
-        // TODO 카테고리 리스트 서버통신 완료 후 LazyRow 아이템으로 플로우 변경 및 삭제
-        CategoryListIcon(
-            paddingStart = 16,
-            imgResource = painterResource(id = R.drawable.ic_category_all),
-            isSelected = selectedCategoryId.toInt() == 0,
-            onClickCategory = { onSelectCategory(0, -1) }
-        )
-
-        CategoryListIcon(
-            paddingHorizontal = 12,
-            imgResource = painterResource(id = R.drawable.ic_category_star),
-            isSelected = selectedCategoryId.toInt() == 1,
-            onClickCategory = { onSelectCategory(1, -1) }
-        )
-
         LazyRow(
             modifier = Modifier
-                .wrapContentSize(),
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            item {
+                // TODO 카테고리 리스트 서버통신 완료 후 LazyRow 아이템으로 플로우 변경 및 삭제
+                CategoryListIcon(
+                    paddingStart = 16,
+                    imgResource = painterResource(id = R.drawable.ic_category_all),
+                    isSelected = selectedCategoryId.toInt() == 0,
+                    onClickCategory = { onSelectCategory(0, -1) }
+                )
+
+                CategoryListIcon(
+                    paddingStart = 12,
+                    imgResource = painterResource(id = R.drawable.ic_category_star),
+                    isSelected = selectedCategoryId.toInt() == 1,
+                    onClickCategory = { onSelectCategory(1, -1) }
+                )
+            }
+
             itemsIndexed(categoryList, key = { _, item -> item.categoryId }) { index, item ->
                 CategoryListIcon(
                     imgResource = rememberAsyncImagePainter(model = item.categoryImgUrl),
@@ -440,21 +442,23 @@ fun BacklogCategoryList(
                     onClickCategory = { onSelectCategory(item.categoryId, index) }
                 )
             }
-        }
 
-        Icon(
-            painter = painterResource(id = R.drawable.ic_add_category),
-            contentDescription = "add backlog category",
-            tint = Color.Unspecified,
-            modifier = Modifier
-                .padding(horizontal = 12.dp)
-                .size(40.dp)
-                .clickable(
-                    indication = null,
-                    interactionSource = interactionSource,
-                    onClick = { onClickCategoryAdd() }
+            item {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_add_category),
+                    contentDescription = "add backlog category",
+                    tint = Color.Unspecified,
+                    modifier = Modifier
+                        .padding(end = 12.dp)
+                        .size(40.dp)
+                        .clickable(
+                            indication = null,
+                            interactionSource = interactionSource,
+                            onClick = { onClickCategoryAdd() }
+                        )
                 )
-        )
+            }
+        }
 
     }
 }
