@@ -104,6 +104,7 @@ import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.Primary60
 import com.poptato.design_system.R
 import com.poptato.design_system.modify
+import com.poptato.domain.model.enums.CategoryScreenType
 import com.poptato.domain.model.enums.DialogType
 import com.poptato.domain.model.request.todo.ModifyTodoRequestModel
 import com.poptato.domain.model.request.todo.TodoContentModel
@@ -185,7 +186,9 @@ fun BacklogScreen(
                 viewModel.getBacklogListInCategory(it)
             },
             onClickCategoryAdd = { goToCategorySelect(
-                CategoryScreenContentModel("추가")
+                CategoryScreenContentModel(
+                    CategoryScreenType.Add
+                )
             ) },
             onClickCategoryDeleteDropdown = {
                 showDialog(
@@ -202,7 +205,10 @@ fun BacklogScreen(
             onClickCategoryModifyDropdown = {
                 isDropDownMenuExpanded = false
                 goToCategorySelect(
-                    CategoryScreenContentModel("수정")
+                    CategoryScreenContentModel(
+                        CategoryScreenType.Modify,
+                        uiState.categoryList[1] // TODO 수정
+                    )
                 )
             },
             onClickBtnTodoSettings = {
