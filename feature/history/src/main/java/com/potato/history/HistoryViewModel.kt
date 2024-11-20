@@ -72,7 +72,6 @@ class HistoryViewModel @Inject constructor(
         )
     }
 
-    // 날짜비교로 스티커 렌더링
     fun getEventTypeForDate(date: LocalDate, hasEvent: Boolean): HistoryEvent {
         return when {
             hasEvent && date.isBefore(LocalDate.now()) -> HistoryEvent.HasEvent
@@ -81,7 +80,6 @@ class HistoryViewModel @Inject constructor(
         }
     }
 
-    // get 캘린더 조회 API
     fun getCalendarList(){
         viewModelScope.launch {
             try {
@@ -106,7 +104,6 @@ class HistoryViewModel @Inject constructor(
         )
     }
 
-    // update selected date (default는 오늘 날짜) -> selected date로 기록 조회
     fun updateSelectedDate(selectedDate: String) {
         updateState(
             uiState.value.copy(
@@ -115,13 +112,12 @@ class HistoryViewModel @Inject constructor(
                 isLoadingMore = false,
             )
         )
-        // 선택된 날짜 기준으로 기록 조회
+
         viewModelScope.launch {
             getHistoryList()
         }
-        Timber.d("Selected date updated to: $selectedDate")
     }
-    // update current month (캘린더 보여주는 달) -> get 캘린더 + selected date로 기록 조회
+
     fun updateCurrentMonth(dir: MonthNav) {
         val updatedMonthStartDate = when (dir) {
             MonthNav.PREVIOUS -> uiState.value.currentMonthStartDate.minusMonths(1).withDayOfMonth(1)
@@ -138,6 +134,5 @@ class HistoryViewModel @Inject constructor(
             getCalendarList()
             getHistoryList()
         }
-        Timber.d("Current month updated to: $updatedMonthStartDate")
     }
 }

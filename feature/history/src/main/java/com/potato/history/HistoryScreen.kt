@@ -403,35 +403,3 @@ fun InfinityLazyColumn(
         content = content
     )
 }
-
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun PreviewHistoryScreen() {
-    val dummyUiState = getDummyHistoryPageState()
-
-    HistoryContent(
-        uiState = dummyUiState,
-        onLoadNextPage = {}, // 더미
-        onDateSelected = {},
-        onNextMonthClick = {},
-        onPreviousMonthClick = {}
-    )
-}
-
-private fun getDummyHistoryPageState(): HistoryPageState {
-    return HistoryPageState(
-        historyList = listOf(
-            HistoryItemModel(
-                todoId = 1,
-                content = "더미 콘텐츠 1",
-                date = "2024-11-18"
-            ),
-            HistoryItemModel(
-                todoId = 2,
-                content = "더미 콘텐츠 2",
-                date = "2024-11-18"
-            )
-        )
-    )
-}
