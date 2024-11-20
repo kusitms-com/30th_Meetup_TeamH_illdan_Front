@@ -1,6 +1,5 @@
 package com.poptato.ui.common
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,9 +23,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
+import coil.Coil
+import coil.ImageLoader
+import coil.compose.AsyncImage
+import coil.decode.SvgDecoder
 import com.poptato.design_system.Gray60
 import com.poptato.design_system.Gray80
 import com.poptato.design_system.Gray90
@@ -101,6 +105,15 @@ fun CategoryIconListForType(
     categoryIcons: CategoryIconTypeListModel = CategoryIconTypeListModel(),
     onSelectCategoryIcon: (CategoryIconItemModel) -> Unit = {}
 ) {
+
+    val context = LocalContext.current
+    val imageLoader = ImageLoader.Builder(context)
+        .components {
+            add(SvgDecoder.Factory())
+        }
+        .build()
+    Coil.setImageLoader(imageLoader)
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -119,18 +132,19 @@ fun CategoryIconListForType(
                 .fillMaxWidth()
                 .padding(top = 8.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.spacedBy(15.dp)
         ) {
 
             categoryIcons.icons.forEach { item ->
-                Image(
-                    painter = rememberAsyncImagePainter(model = item.iconImgUrl),
+                AsyncImage(
+                    model = item.iconImgUrl,
                     contentDescription = "icon ${item.iconId}",
                     modifier = Modifier
                         .size(32.dp)
                         .clickable {
                             onSelectCategoryIcon(item)
-                        }
+                        },
+                    contentScale = ContentScale.Crop
                 )
             }
         }
