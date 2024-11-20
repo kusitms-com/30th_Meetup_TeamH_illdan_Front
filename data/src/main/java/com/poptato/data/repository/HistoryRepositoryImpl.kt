@@ -11,7 +11,7 @@ import javax.inject.Inject
 class HistoryRepositoryImpl @Inject constructor(
     private val historyService: HistoryService
 ): HistoryRepository, BaseRepository() {
-    override suspend fun getHistoryList(page: Int, size: Int): Flow<Result<HistoryListModel>> {
-        return apiLaunch(apiCall = { historyService.getHistoryList(page, size) }, HistoryResponseMapper)
+    override suspend fun getHistoryList(page: Int, size: Int, date: String): Flow<Result<HistoryListModel>> {
+        return apiLaunch(apiCall = { historyService.getHistoryList(page, size, date) }, HistoryResponseMapper)
     }
 }

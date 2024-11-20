@@ -95,14 +95,16 @@ fun HistoryScreen(
 
     HistoryContent(
         uiState = uiState,
-        onLoadNextPage = { viewModel.getHistoryList() }
+        onLoadNextPage = { viewModel.getHistoryList() },
+        onSelectedDate = {viewModel.updateSelectedDate(uiState.selectedDate)}
     )
 }
 
 @Composable
 fun HistoryContent(
     uiState: HistoryPageState = HistoryPageState(),
-    onLoadNextPage: () -> Unit
+    onLoadNextPage: () -> Unit,
+    onSelectedDate: (String) -> Unit
 ) {
     val listState = rememberLazyListState()
     val currentMonthStartDate = remember { mutableStateOf(LocalDate.now().withDayOfMonth(1)) }
@@ -164,7 +166,7 @@ fun CalendarContent(
     currentMonthStartDate: LocalDate = LocalDate.now().withDayOfMonth(1),
     selectedDate: LocalDate = LocalDate.now(),
     onSelectedDate: (LocalDate) -> Unit = {},
-    eventDates: List<LocalDate>
+    eventDates: List<String>
 ) {
     val daysInMonth = currentMonthStartDate.lengthOfMonth()
     val firstDayOfWeek = (currentMonthStartDate.withDayOfMonth(1).dayOfWeek.value % 7) // 일요일 = 0
@@ -207,7 +209,7 @@ fun CalendarContent(
                     date = date,
                     isSelected = selectedDate == date,
                     isToday = today == date,
-                    hasEvent = eventDates.contains(date),
+                    hasEvent = eventDates.contains(date.toString()),
                     onClick = { onSelectedDate(date) }
                 )
             }
@@ -425,7 +427,8 @@ fun PreviewHistoryScreen() {
 
     HistoryContent(
         uiState = dummyUiState,
-        onLoadNextPage = {} // 더미
+        onLoadNextPage = {}, // 더미
+        onSelectedDate = {}
     )
 }
 

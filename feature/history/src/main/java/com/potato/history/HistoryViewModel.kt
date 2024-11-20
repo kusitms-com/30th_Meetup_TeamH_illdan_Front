@@ -37,7 +37,7 @@ class HistoryViewModel @Inject constructor(
             viewModelScope.launch {
                 try {
                     getHistoryListUseCase.invoke(
-                        request = HistoryListRequestModel(page = uiState.value.currentPage, size = uiState.value.pageSize)
+                        request = HistoryListRequestModel(page = uiState.value.currentPage, size = uiState.value.pageSize, date = uiState.value.selectedDate)
                     ).collect { result ->
                         resultResponse(result, ::onSuccessGetHistoryList)
                     }

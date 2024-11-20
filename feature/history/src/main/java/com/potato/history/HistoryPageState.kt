@@ -12,7 +12,7 @@ data class HistoryPageState(
     var currentPage: Int = 0,
     val pageSize: Int = 15,
     val currentMonthStartDate: LocalDate = LocalDate.now().withDayOfMonth(1),
-    val selectedDate: LocalDate = LocalDate.now(),
-    val eventDates: List<LocalDate> = emptyList(),
+    val selectedDate: String = LocalDate.now().toString(),
+    val eventDates: List<String> = emptyList(),
 
 ) : PageState

@@ -12,6 +12,7 @@ interface HistoryService {
     @GET(Endpoints.History.HISTORIES)
     suspend fun getHistoryList(
         @Query("page") page: Int,
-        @Query("size") size: Int
+        @Query("size") size: Int,
+        @Query("date") date: String,
     ): Response<ApiResponse<HistoryListResponse>>
 }
