@@ -1,13 +1,13 @@
 package com.poptato.data.mapper
 
 import com.poptato.data.base.Mapper
-import com.poptato.data.model.response.category.CategoryTotalListResponse
+import com.poptato.data.model.response.category.CategoryIconTotalListResponse
 import com.poptato.domain.model.response.category.CategoryIconItemModel
 import com.poptato.domain.model.response.category.CategoryIconTotalListModel
 import com.poptato.domain.model.response.category.CategoryIconTypeListModel
 
-object CategoryIconResponseMapper : Mapper<CategoryTotalListResponse, CategoryIconTotalListModel> {
-    override fun responseToModel(response: CategoryTotalListResponse?): CategoryIconTotalListModel {
+object CategoryIconResponseMapper : Mapper<CategoryIconTotalListResponse, CategoryIconTotalListModel> {
+    override fun responseToModel(response: CategoryIconTotalListResponse?): CategoryIconTotalListModel {
         return response?.let {
             CategoryIconTotalListModel(
                 icons = it.groupEmojis.map { typeItem ->
