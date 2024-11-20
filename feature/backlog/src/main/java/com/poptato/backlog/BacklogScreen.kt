@@ -200,6 +200,7 @@ fun BacklogScreen(
                         positiveBtnText = DELETE,
                         cancelBtnText = Cancel,
                         positiveBtnAction = {
+                            isDropDownMenuExpanded = false
                             viewModel.deleteCategory()
                         }
                     )
