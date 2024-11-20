@@ -2,14 +2,14 @@ package com.poptato.feature
 
 import com.poptato.core.enums.BottomNavType
 import com.poptato.domain.model.enums.BottomSheetType
+import com.poptato.domain.model.response.category.CategoryIconItemModel
+import com.poptato.domain.model.response.category.CategoryIconTotalListModel
+import com.poptato.domain.model.response.dialog.DialogContentModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.navigation.NavRoutes
 import com.poptato.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @HiltViewModel
@@ -19,6 +19,7 @@ class MainViewModel @Inject constructor() : BaseViewModel<MainPageState>(MainPag
     val activateItemFlow = MutableSharedFlow<Long>()
     val updateBookmarkFlow = MutableSharedFlow<Long>()
     val animationDuration = 300
+    val selectedIconInBottomSheet = MutableSharedFlow<CategoryIconItemModel>()
 
     fun setBottomNavType(route: String?) {
         val type = when (route) {
@@ -81,4 +82,21 @@ class MainViewModel @Inject constructor() : BaseViewModel<MainPageState>(MainPag
     fun toggleBackPressed(value: Boolean) { updateState(uiState.value.copy(backPressedOnce = value)) }
 
     fun updateBottomSheetType(type: BottomSheetType) { updateState(uiState.value.copy(bottomSheetType = type)) }
+
+    fun onSelectedCategoryIcon(categoryList: CategoryIconTotalListModel) {
+        updateState(
+            uiState.value.copy(
+                bottomSheetType = BottomSheetType.Category,
+                categoryIconList = categoryList
+            )
+        )
+    }
+
+    fun onSetDialogContent(dialogContent: DialogContentModel) {
+        updateState(
+            uiState.value.copy(
+                dialogContent = dialogContent
+            )
+        )
+    }
 }
