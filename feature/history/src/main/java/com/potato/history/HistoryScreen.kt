@@ -113,7 +113,7 @@ fun HistoryContent(
             onSelectedDate = { selectedDate.value = it }
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(30.dp))
 
         if (uiState.historyList.isEmpty()) {
             Box(
@@ -184,7 +184,7 @@ fun CalendarContent(
         LazyVerticalGrid(
             modifier = Modifier.fillMaxWidth(),
             columns = GridCells.Fixed(7),
-            horizontalArrangement = Arrangement.spacedBy(3.dp),
+            horizontalArrangement = Arrangement.spacedBy(0.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(firstDayOfWeek) {
@@ -198,7 +198,7 @@ fun CalendarContent(
                     date = date,
                     isSelected = selectedDate == date,
                     isToday = today == date,
-                    hasEvent = day % 5 == 0, // 수정 필요 => api로부터의 데이터
+                    hasEvent = day % 8 == 0, // 수정 필요 => api로부터의 데이터
                     onClick = { onSelectedDate(date) }
                 )
             }
@@ -288,10 +288,17 @@ fun CalendarDayItem(
                     painter = painterResource(id = R.drawable.ic_history_circle),
                     contentDescription = null,
                     modifier = Modifier.fillMaxWidth()
+                        .padding(1.dp)
                 )
-            } else if (hasEvent){
+            }else if(hasEvent){
                 Image(
                     painter = painterResource(id = R.drawable.ic_history_star),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }else if(date.isEqual(LocalDate.now())){
+                Image(
+                    painter = painterResource(id = R.drawable.ic_history_circle),
                     contentDescription = null,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -312,7 +319,7 @@ fun CalendarDayItem(
                 .background(
                     color = when {
                         isSelected -> Gray00
-                        else -> Gray100
+                        else -> Color.Transparent
                     },
                     shape = CircleShape
                 ),
