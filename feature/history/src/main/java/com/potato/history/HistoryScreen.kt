@@ -228,7 +228,7 @@ fun CalendarHeader(
             style = PoptatoTypo.mdMedium,
             color = Gray00
         )
-        IconButton(onClick = onNextMonthClick, modifier = Modifier.size(20.dp)) {
+        IconButton(onClick = onNextMonthClick, modifier = Modifier.size(20.dp), enabled = currentMonth < LocalDate.now().withDayOfMonth(1)) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_arrow_right_20),
                 contentDescription = "Next Month",
