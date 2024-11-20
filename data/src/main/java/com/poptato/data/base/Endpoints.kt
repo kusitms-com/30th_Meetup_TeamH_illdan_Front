@@ -46,5 +46,6 @@ object Endpoints {
 
     object Category {
         const val ICONS = "/emojis"
+        const val CATEGORY = "/category"
     }
 }
