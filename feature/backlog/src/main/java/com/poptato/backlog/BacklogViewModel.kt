@@ -7,6 +7,7 @@ import com.poptato.core.util.move
 import com.poptato.domain.model.request.ListRequestModel
 import com.poptato.domain.model.request.backlog.CreateBacklogRequestModel
 import com.poptato.domain.model.request.backlog.GetBacklogListRequestModel
+import com.poptato.domain.model.request.category.GetCategoryListRequestModel
 import com.poptato.domain.model.request.todo.TodoIdModel
 import com.poptato.domain.model.request.todo.DeadlineContentModel
 import com.poptato.domain.model.request.todo.DragDropRequestModel
@@ -15,10 +16,12 @@ import com.poptato.domain.model.request.todo.UpdateDeadlineRequestModel
 import com.poptato.domain.model.response.backlog.BacklogListModel
 import com.poptato.domain.model.response.category.CategoryIconItemModel
 import com.poptato.domain.model.response.category.CategoryItemModel
+import com.poptato.domain.model.response.category.CategoryListModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.domain.model.response.yesterday.YesterdayListModel
 import com.poptato.domain.usecase.backlog.CreateBacklogUseCase
 import com.poptato.domain.usecase.backlog.GetBacklogListUseCase
+import com.poptato.domain.usecase.category.GetCategoryListUseCase
 import com.poptato.domain.usecase.yesterday.GetYesterdayListUseCase
 import com.poptato.domain.usecase.todo.DeleteTodoUseCase
 import com.poptato.domain.usecase.todo.DragDropUseCase
@@ -36,6 +39,7 @@ import kotlin.random.Random
 
 @HiltViewModel
 class BacklogViewModel @Inject constructor(
+    private val getCategoryListUseCase: GetCategoryListUseCase,
     private val createBacklogUseCase: CreateBacklogUseCase,
     private val getBacklogListUseCase: GetBacklogListUseCase,
     private val getYesterdayListUseCase: GetYesterdayListUseCase,
@@ -51,14 +55,6 @@ class BacklogViewModel @Inject constructor(
     private var snapshotList: List<TodoItemModel> = emptyList()
     private var tempTodoId: Long? = null
 
-    private val _categoryList: List<CategoryItemModel> = listOf(
-        CategoryItemModel(11, "전체", "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
-        CategoryItemModel(12, "중요", "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
-        CategoryItemModel(13, "이름1", "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
-        CategoryItemModel(14, "이름2", "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
-        CategoryItemModel(15, "이름3", "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
-    )
-
     init {
         getCategoryList()
         getYesterdayList(0, 1)
@@ -66,10 +62,19 @@ class BacklogViewModel @Inject constructor(
     }
 
     private fun getCategoryList() {
-        // TODO 카테고리 리스트 서버통신 연결
+        viewModelScope.launch {
+            getCategoryListUseCase(request = GetCategoryListRequestModel(0, 8)).collect {
+                resultResponse(it, { data ->
+                    onSuccessGetCategoryList(data)
+                })
+            }
+        }
+    }
+
+    private fun onSuccessGetCategoryList(response: CategoryListModel) {
         updateState(
             uiState.value.copy(
-                categoryList = _categoryList
+                categoryList = response.categoryList
             )
         )
     }
