@@ -27,10 +27,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
@@ -61,7 +59,6 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -81,7 +78,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.Coil
 import coil.ImageLoader
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
 import com.poptato.design_system.BACKLOG_YESTERDAY_TASK_GUIDE
 import com.poptato.design_system.BacklogHint
@@ -423,26 +419,12 @@ fun BacklogCategoryList(
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-//            item {
-//                // TODO 카테고리 리스트 서버통신 완료 후 LazyRow 아이템으로 플로우 변경 및 삭제
-//                CategoryListIcon(
-//                    paddingStart = 16,
-//                    imgResource = painterResource(id = R.drawable.ic_category_all),
-//                    isSelected = selectedCategoryId.toInt() == 0,
-//                    onClickCategory = { onSelectCategory(0, -1) }
-//                )
-//
-//                CategoryListIcon(
-//                    paddingStart = 12,
-//                    imgResource = painterResource(id = R.drawable.ic_category_star),
-//                    isSelected = selectedCategoryId.toInt() == 1,
-//                    onClickCategory = { onSelectCategory(1, -1) }
-//                )
-//            }
+            val categoryFixedIcon: List<Int> = listOf(R.drawable.ic_category_all, R.drawable.ic_category_star)
 
             itemsIndexed(categoryList, key = { _, item -> item.categoryId }) { index, item ->
                 CategoryListIcon(
-//                    imgResource = rememberAsyncImagePainter(model = item.categoryImgUrl),
+                    imgResource = if (index == 0 || index == 1) categoryFixedIcon[index] else -1,
+                    paddingStart = if (index == 0) 16 else 0,
                     imgUrl = item.categoryImgUrl,
                     isSelected = selectedCategoryId == item.categoryId,
                     onClickCategory = { onSelectCategory(item.categoryId, index) }
@@ -473,7 +455,7 @@ fun BacklogCategoryList(
 fun CategoryListIcon(
     paddingStart: Int = 0,
     paddingHorizontal: Int = 0,
-//    imgResource: Painter,
+    imgResource: Int = -1,
     imgUrl: String = "",
     isSelected: Boolean,
     onClickCategory: () -> Unit = {}
@@ -495,17 +477,8 @@ fun CategoryListIcon(
             .border(width = 1.dp, color = if (isSelected) Gray00 else Gray95, shape = CircleShape)
             .clickable { onClickCategory() }
     ) {
-//        Icon(
-//            painter = imgResource,
-//            contentDescription = "category icon",
-//            tint = Color.Unspecified,
-//            modifier = Modifier
-//                .align(Alignment.Center)
-//                .size(24.dp)
-//        )
-
         AsyncImage(
-            model = imgUrl,
+            model = if (imgResource == -1) imgUrl else imgResource,
             contentDescription = "category icon",
             modifier = Modifier
                 .align(Alignment.Center)
