@@ -4,6 +4,7 @@ import com.poptato.data.base.BaseRepository
 import com.poptato.data.mapper.CategoryIconResponseMapper
 import com.poptato.data.mapper.CategoryIdResponseMapper
 import com.poptato.data.mapper.CategoryListResponseMapper
+import com.poptato.data.mapper.UnitResponseMapper
 import com.poptato.data.service.CategoryService
 import com.poptato.domain.model.request.category.CategoryIdModel
 import com.poptato.domain.model.request.category.CategoryRequestModel
@@ -35,6 +36,16 @@ class CategoryRepositoryImpl @Inject constructor(
         return apiLaunch(
             apiCall = { categoryService.getCategoryList(page, size) },
             CategoryListResponseMapper
+        )
+    }
+
+    override suspend fun modifyCategory(
+        categoryId: Long,
+        request: CategoryRequestModel
+    ): Flow<Result<Unit>> {
+        return apiLaunch(
+            apiCall = { categoryService.modifyCategory(categoryId, request) },
+            UnitResponseMapper
         )
     }
 }

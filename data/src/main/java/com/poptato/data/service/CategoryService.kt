@@ -2,8 +2,8 @@ package com.poptato.data.service
 
 import com.poptato.data.base.ApiResponse
 import com.poptato.data.base.Endpoints
-import com.poptato.data.model.response.category.CategoryIdResponse
 import com.poptato.data.model.response.category.CategoryIconTotalListResponse
+import com.poptato.data.model.response.category.CategoryIdResponse
 import com.poptato.data.model.response.category.CategoryListResponse
 import com.poptato.domain.model.request.category.CategoryRequestModel
 import retrofit2.Response
@@ -29,4 +29,10 @@ interface CategoryService {
         @Query("page") page: Int,
         @Query("size") size: Int
     ): Response<ApiResponse<CategoryListResponse>>
+
+    @PUT(Endpoints.Category.CATEGORY)
+    suspend fun modifyCategory(
+        @Path("category") category: Long,
+        @Body request: CategoryRequestModel
+    ): Response<ApiResponse<Unit>>
 }

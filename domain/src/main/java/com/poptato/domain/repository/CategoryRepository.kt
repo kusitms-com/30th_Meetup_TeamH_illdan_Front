@@ -11,4 +11,5 @@ interface CategoryRepository {
     suspend fun getCategoryIcon(): Flow<Result<CategoryIconTotalListModel>>
     suspend fun createCategory(request: CategoryRequestModel): Flow<Result<CategoryIdModel>>
     suspend fun getCategoryList(page: Int, size: Int): Flow<Result<CategoryListModel>>
+    suspend fun modifyCategory(categoryId: Long, request: CategoryRequestModel): Flow<Result<Unit>>
 }
