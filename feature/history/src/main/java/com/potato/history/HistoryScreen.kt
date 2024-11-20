@@ -65,6 +65,7 @@ import com.poptato.design_system.THU
 import com.poptato.design_system.TUE
 import com.poptato.design_system.WED
 import com.potato.history.model.HistoryGroupedItem
+import com.potato.history.model.MonthNav
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -78,7 +79,9 @@ fun HistoryScreen(
     HistoryContent(
         uiState = uiState,
         onLoadNextPage = { viewModel.getHistoryList() },
-        onDateSelected = { selectedDate -> viewModel.updateSelectedDate(selectedDate)}
+        onDateSelected = { selectedDate -> viewModel.updateSelectedDate(selectedDate)},
+        onPreviousMonthClick = {viewModel.updateCurrentMonth(MonthNav.PREVIOUS)},
+        onNextMonthClick = {viewModel.updateCurrentMonth(MonthNav.NEXT)}
     )
 }
 
@@ -86,10 +89,11 @@ fun HistoryScreen(
 fun HistoryContent(
     uiState: HistoryPageState = HistoryPageState(),
     onLoadNextPage: () -> Unit,
-    onDateSelected: (String) -> Unit
+    onDateSelected: (String) -> Unit,
+    onPreviousMonthClick: () -> Unit,
+    onNextMonthClick: () -> Unit,
 ) {
     val listState = rememberLazyListState()
-    val currentMonthStartDate = remember { mutableStateOf(LocalDate.now().withDayOfMonth(1)) }
 
     Column(
         modifier = Modifier
@@ -98,10 +102,12 @@ fun HistoryContent(
     ) {
 
         CalendarContent(
-            currentMonthStartDate = currentMonthStartDate.value,
+            currentMonthStartDate = uiState.currentMonthStartDate,
             selectedDate = uiState.selectedDate,
-            onSelectedDate = onDateSelected,
-            eventDates = uiState.eventDates
+            onDateSelected = onDateSelected,
+            eventDates = uiState.eventDates,
+            onPreviousMonthClick = onPreviousMonthClick,
+            onNextMonthClick = onNextMonthClick
         )
 
         Spacer(modifier = Modifier.height(30.dp))
@@ -143,8 +149,10 @@ fun HistoryContent(
 fun CalendarContent(
     currentMonthStartDate: LocalDate = LocalDate.now().withDayOfMonth(1),
     selectedDate: String = LocalDate.now().toString(),
-    onSelectedDate: (String) -> Unit = {},
-    eventDates: List<String>
+    onDateSelected: (String) -> Unit = {},
+    eventDates: List<String>,
+    onNextMonthClick: () -> Unit,
+    onPreviousMonthClick: () -> Unit
 ) {
     val daysInMonth = currentMonthStartDate.lengthOfMonth()
     val firstDayOfWeek = (currentMonthStartDate.withDayOfMonth(1).dayOfWeek.value % 7) // 일요일 = 0
@@ -160,8 +168,8 @@ fun CalendarContent(
 
         CalendarHeader(
             currentMonth = currentMonthStartDate,
-            onPreviousMonthClick = { onSelectedDate(currentMonthStartDate.minusMonths(1).toString()) },
-            onNextMonthClick = { onSelectedDate(currentMonthStartDate.plusMonths(1).toString()) }
+            onPreviousMonthClick = { onPreviousMonthClick() },
+            onNextMonthClick = { onNextMonthClick() }
         )
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -188,7 +196,7 @@ fun CalendarContent(
                     isSelected = selectedDate == date.toString(),
                     isToday = today == date,
                     hasEvent = eventDates.contains(date.toString()),
-                    onClick = { onSelectedDate(date.toString()) }
+                    onClick = { onDateSelected(date.toString()) }
                 )
             }
         }
@@ -405,7 +413,9 @@ fun PreviewHistoryScreen() {
     HistoryContent(
         uiState = dummyUiState,
         onLoadNextPage = {}, // 더미
-        onDateSelected = {}
+        onDateSelected = {},
+        onNextMonthClick = {},
+        onPreviousMonthClick = {}
     )
 }
 

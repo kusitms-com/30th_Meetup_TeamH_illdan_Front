@@ -10,6 +10,7 @@ import com.poptato.domain.usecase.backlog.GetBacklogListUseCase
 import com.poptato.domain.usecase.history.GetHistoryListUseCase
 import com.poptato.ui.base.BaseViewModel
 import com.potato.history.model.HistoryGroupedItem
+import com.potato.history.model.MonthNav
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -93,5 +94,21 @@ class HistoryViewModel @Inject constructor(
         Timber.d("Selected date updated to: $selectedDate")
     }
     // update current month (캘린더 보여주는 달) -> get 캘린더 + selected date로 기록 조회
+    fun updateCurrentMonth(dir: MonthNav) {
+        val updatedMonthStartDate = when (dir) {
+            MonthNav.PREVIOUS -> uiState.value.currentMonthStartDate.minusMonths(1).withDayOfMonth(1)
+            MonthNav.NEXT -> uiState.value.currentMonthStartDate.plusMonths(1).withDayOfMonth(1)
+        }
 
+        updateState(
+            uiState.value.copy(
+                currentMonthStartDate = updatedMonthStartDate
+            )
+        )
+
+        viewModelScope.launch {
+            getHistoryList()
+        }
+        Timber.d("Current month updated to: $updatedMonthStartDate")
+    }
 }
