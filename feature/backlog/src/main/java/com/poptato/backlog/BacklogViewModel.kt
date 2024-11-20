@@ -79,15 +79,14 @@ class BacklogViewModel @Inject constructor(
         )
     }
 
-    fun getBacklogListInCategory(categoryId: Long, categoryIndex: Int) {
+    fun getBacklogListInCategory(categoryIndex: Int) {
         // TODO 선택한 카테고리에 대한 백로그 리스트 가져오는 것으로 수정
         updateState(
             uiState.value.copy(
-                selectedCategoryId = categoryId,
                 selectedCategoryIndex = categoryIndex
             )
         )
-        Timber.d("[카테고리] 선택 -> $categoryId")
+        Timber.d("[카테고리] 선택 -> ${uiState.value.categoryList[categoryIndex]}")
     }
 
     private fun getBacklogList(categoryId: Long, page: Int, size: Int) {

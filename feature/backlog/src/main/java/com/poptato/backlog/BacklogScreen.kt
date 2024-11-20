@@ -183,8 +183,8 @@ fun BacklogScreen(
             createBacklog = { newItem -> viewModel.createBacklog(newItem) },
             onItemSwiped = { itemToRemove -> viewModel.swipeBacklogItem(itemToRemove) },
             onClickYesterdayList = { goToYesterdayList() },
-            onSelectCategory = { categoryId, index ->
-                viewModel.getBacklogListInCategory(categoryId, index)
+            onSelectCategory = { index ->
+                viewModel.getBacklogListInCategory(index)
             },
             onClickCategoryAdd = { goToCategorySelect(
                 CategoryScreenContentModel(
@@ -244,7 +244,7 @@ fun BacklogContent(
     onValueChange: (String) -> Unit = {},
     createBacklog: (String) -> Unit = {},
     onClickYesterdayList: () -> Unit = {},
-    onSelectCategory: (Long, Int) -> Unit = { _, _ -> },
+    onSelectCategory: (Int) -> Unit = {},
     onClickCategoryAdd: () -> Unit = {},
     onClickCategoryDeleteDropdown: () -> Unit = {},
     onClickCategoryModifyDropdown: () -> Unit = {},
@@ -270,7 +270,7 @@ fun BacklogContent(
             categoryList = uiState.categoryList,
             interactionSource = interactionSource,
             onSelectCategory = onSelectCategory,
-            selectedCategoryId = uiState.selectedCategoryId
+            selectedCategoryIndex = uiState.selectedCategoryIndex
         )
 
         Box {
@@ -279,7 +279,7 @@ fun BacklogContent(
                 subText = uiState.backlogList.size.toString(),
                 subTextStyle = PoptatoTypo.xLSemiBold,
                 subTextColor = Primary60,
-                isCategorySettingBtn = (uiState.selectedCategoryId.toInt() != 0 && uiState.selectedCategoryId.toInt() != 1),    // TODO 서버통신 후 selectedCategoryIndex로 변경
+                isCategorySettingBtn = (uiState.selectedCategoryIndex != 0 && uiState.selectedCategoryIndex != 1),
                 isCategorySettingBtnSelected = { onDropdownExpandedChange(true) }
             )
 
@@ -403,8 +403,8 @@ fun BacklogCategoryList(
     interactionSource: MutableInteractionSource,
     categoryList: List<CategoryItemModel> = emptyList(),
     onClickCategoryAdd: () -> Unit = {},
-    onSelectCategory: (Long, Int) -> Unit = { _, _ -> },
-    selectedCategoryId: Long = 0
+    onSelectCategory: (Int) -> Unit = {},
+    selectedCategoryIndex: Int = 0
 ) {
 
     Row(
@@ -426,8 +426,8 @@ fun BacklogCategoryList(
                     imgResource = if (index == 0 || index == 1) categoryFixedIcon[index] else -1,
                     paddingStart = if (index == 0) 16 else 0,
                     imgUrl = item.categoryImgUrl,
-                    isSelected = selectedCategoryId == item.categoryId,
-                    onClickCategory = { onSelectCategory(item.categoryId, index) }
+                    isSelected = selectedCategoryIndex == index,
+                    onClickCategory = { onSelectCategory(index) }
                 )
             }
 
