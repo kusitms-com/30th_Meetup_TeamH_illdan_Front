@@ -8,27 +8,25 @@ import com.poptato.domain.model.request.ListRequestModel
 import com.poptato.domain.model.request.backlog.CreateBacklogRequestModel
 import com.poptato.domain.model.request.backlog.GetBacklogListRequestModel
 import com.poptato.domain.model.request.category.GetCategoryListRequestModel
-import com.poptato.domain.model.request.todo.TodoIdModel
 import com.poptato.domain.model.request.todo.DeadlineContentModel
 import com.poptato.domain.model.request.todo.DragDropRequestModel
 import com.poptato.domain.model.request.todo.ModifyTodoRequestModel
+import com.poptato.domain.model.request.todo.TodoIdModel
 import com.poptato.domain.model.request.todo.UpdateDeadlineRequestModel
 import com.poptato.domain.model.response.backlog.BacklogListModel
-import com.poptato.domain.model.response.category.CategoryIconItemModel
-import com.poptato.domain.model.response.category.CategoryItemModel
 import com.poptato.domain.model.response.category.CategoryListModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.domain.model.response.yesterday.YesterdayListModel
 import com.poptato.domain.usecase.backlog.CreateBacklogUseCase
 import com.poptato.domain.usecase.backlog.GetBacklogListUseCase
 import com.poptato.domain.usecase.category.GetCategoryListUseCase
-import com.poptato.domain.usecase.yesterday.GetYesterdayListUseCase
 import com.poptato.domain.usecase.todo.DeleteTodoUseCase
 import com.poptato.domain.usecase.todo.DragDropUseCase
 import com.poptato.domain.usecase.todo.ModifyTodoUseCase
 import com.poptato.domain.usecase.todo.SwipeTodoUseCase
 import com.poptato.domain.usecase.todo.UpdateBookmarkUseCase
 import com.poptato.domain.usecase.todo.UpdateDeadlineUseCase
+import com.poptato.domain.usecase.yesterday.GetYesterdayListUseCase
 import com.poptato.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -80,13 +78,13 @@ class BacklogViewModel @Inject constructor(
     }
 
     fun getBacklogListInCategory(categoryIndex: Int) {
-        // TODO 선택한 카테고리에 대한 백로그 리스트 가져오는 것으로 수정
         updateState(
             uiState.value.copy(
                 selectedCategoryIndex = categoryIndex
             )
         )
-        Timber.d("[카테고리] 선택 -> ${uiState.value.categoryList[categoryIndex]}")
+
+        getBacklogList(uiState.value.categoryList[categoryIndex].categoryId, 0, 8)
     }
 
     private fun getBacklogList(categoryId: Long, page: Int, size: Int) {
