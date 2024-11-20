@@ -12,6 +12,7 @@ import com.poptato.ui.base.BaseViewModel
 import com.potato.history.model.HistoryGroupedItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import timber.log.Timber
 import java.util.Collections.copy
 import javax.inject.Inject
@@ -84,4 +85,20 @@ class HistoryViewModel @Inject constructor(
             )
         )
     }
+
+    // 날짜비교로 스티커 렌더링
+    fun getEventTypeForDate(date: LocalDate, hasEvent: Boolean): HistoryEvent {
+        return when {
+            hasEvent && date.isBefore(LocalDate.now()) -> HistoryEvent.HasEvent
+            date.isAfter(LocalDate.now()) || date.isEqual(LocalDate.now()) -> HistoryEvent.FutureEvent
+            else -> HistoryEvent.NoEvent
+        }
+    }
+
+    // get 캘린더 조회 API
+
+    // update selected date (default는 오늘 날짜) -> selected date로 기록 조회
+
+    // update current month (캘린더 보여주는 달) -> get 캘린더 + selected date로 기록 조회
+
 }

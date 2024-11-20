@@ -280,8 +280,13 @@ fun CalendarDayItem(
     isSelected: Boolean,
     isToday: Boolean,
     hasEvent: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    viewModel: HistoryViewModel = hiltViewModel(),
 ) {
+    val eventType = remember(date, hasEvent) {
+        viewModel.getEventTypeForDate(date, hasEvent)
+    }
+
     Column(
         modifier = Modifier
             .size(36.dp, 56.dp)
@@ -294,26 +299,30 @@ fun CalendarDayItem(
                 .size(36.dp),
             contentAlignment = Alignment.Center
         ) {
-            if(hasEvent && date.isBefore(LocalDate.now())){
-                Image(
-                    painter = painterResource(id = R.drawable.ic_history_star),
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }else if(date.isAfter(LocalDate.now()) || date.isEqual(LocalDate.now())){
-                Image(
-                    painter = painterResource(id = R.drawable.ic_history_circle),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(1.dp)
-                )
-            }else{
-                Image(
-                    painter = painterResource(id = R.drawable.ic_history_moon),
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxWidth()
-                )
+            when (eventType) {
+                HistoryEvent.HasEvent -> {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_history_star),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                HistoryEvent.FutureEvent -> {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_history_circle),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(1.dp)
+                    )
+                }
+                HistoryEvent.NoEvent -> {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_history_moon),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
         }
 
