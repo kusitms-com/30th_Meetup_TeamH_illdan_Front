@@ -156,7 +156,7 @@ class BacklogViewModel @Inject constructor(
         addTemporaryBacklog(content)
 
         viewModelScope.launch(Dispatchers.IO) {
-            createBacklogUseCase.invoke(request = CreateBacklogRequestModel(content)).collect {
+            createBacklogUseCase.invoke(request = CreateBacklogRequestModel(uiState.value.selectedCategoryId, content)).collect {
                 resultResponse(it, ::onSuccessCreateBacklog, { onFailedUpdateBacklogList() })
             }
         }
