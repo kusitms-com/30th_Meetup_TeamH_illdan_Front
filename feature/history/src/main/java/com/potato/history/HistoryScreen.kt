@@ -270,10 +270,6 @@ fun CalendarDayItem(
     onClick: () -> Unit,
     viewModel: HistoryViewModel = hiltViewModel(),
 ) {
-    val eventType = remember(date, hasEvent) {
-        viewModel.getEventTypeForDate(date, hasEvent)
-    }
-
     Column(
         modifier = Modifier
             .size(36.dp, 56.dp)
@@ -286,31 +282,14 @@ fun CalendarDayItem(
                 .size(36.dp),
             contentAlignment = Alignment.Center
         ) {
-            when (eventType) {
-                HistoryEvent.HasEvent -> {
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_history_star),
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-                HistoryEvent.FutureEvent -> {
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_history_circle),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(1.dp)
-                    )
-                }
-                HistoryEvent.NoEvent -> {
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_history_moon),
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            }
+            val imageResource = viewModel.getImageResourceForDate(date, hasEvent)
+
+            Image(
+                painter = painterResource(id = imageResource),
+                contentDescription = null,
+                modifier = Modifier.fillMaxWidth()
+            )
+
         }
 
         Spacer(modifier = Modifier.height(4.dp))

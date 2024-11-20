@@ -11,6 +11,7 @@ import com.poptato.domain.model.response.history.HistoryListModel
 import com.poptato.domain.usecase.backlog.GetBacklogListUseCase
 import com.poptato.domain.usecase.history.GetHistoryCalendarListUseCase
 import com.poptato.domain.usecase.history.GetHistoryListUseCase
+import com.poptato.history.R
 import com.poptato.ui.base.BaseViewModel
 import com.potato.history.model.HistoryGroupedItem
 import com.potato.history.model.MonthNav
@@ -72,11 +73,11 @@ class HistoryViewModel @Inject constructor(
         )
     }
 
-    fun getEventTypeForDate(date: LocalDate, hasEvent: Boolean): HistoryEvent {
+    fun getImageResourceForDate(date: LocalDate, hasEvent: Boolean): Int {
         return when {
-            hasEvent && date.isBefore(LocalDate.now()) -> HistoryEvent.HasEvent
-            date.isAfter(LocalDate.now()) || date.isEqual(LocalDate.now()) -> HistoryEvent.FutureEvent
-            else -> HistoryEvent.NoEvent
+            hasEvent && date.isBefore(LocalDate.now()) -> com.poptato.design_system.R.drawable.ic_history_star
+            date.isAfter(LocalDate.now()) || date.isEqual(LocalDate.now()) -> com.poptato.design_system.R.drawable.ic_history_circle
+            else -> com.poptato.design_system.R.drawable.ic_history_moon
         }
     }
 
