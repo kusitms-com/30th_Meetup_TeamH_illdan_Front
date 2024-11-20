@@ -65,6 +65,7 @@ import com.poptato.domain.model.response.category.CategoryIconTotalListModel
 import com.poptato.domain.model.response.category.CategoryScreenContentModel
 import com.poptato.domain.model.response.dialog.DialogContentModel
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.collect
 
 @Composable
 fun CategoryScreen(
@@ -93,6 +94,16 @@ fun CategoryScreen(
     LaunchedEffect(screenContent) {
         screenContent.collect {
             viewModel.getModifyIconItem(it)
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collect { event ->
+            when (event) {
+                is CategoryEvent.GoBackToBacklog -> {
+                    goBackToBacklog()
+                }
+            }
         }
     }
 

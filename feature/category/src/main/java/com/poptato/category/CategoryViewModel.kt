@@ -78,6 +78,7 @@ class CategoryViewModel @Inject constructor(
             createCategoryUseCase(request = CreateCategoryRequestModel(uiState.value.categoryName, uiState.value.selectedIcon?.iconId ?: -1)).collect {
                 resultResponse(it, { data ->
                     Timber.d("[카테고리] 카테고리 생성 서버통신 성공 -> $data")
+                    emitEventFlow(CategoryEvent.GoBackToBacklog)
                 }, { error ->
                     Timber.d("[카테고리] 카테고리 생성 서버통신 실패 -> $error")
                 })
