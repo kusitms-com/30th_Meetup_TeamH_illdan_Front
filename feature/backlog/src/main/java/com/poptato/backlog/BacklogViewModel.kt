@@ -19,6 +19,7 @@ import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.domain.model.response.yesterday.YesterdayListModel
 import com.poptato.domain.usecase.backlog.CreateBacklogUseCase
 import com.poptato.domain.usecase.backlog.GetBacklogListUseCase
+import com.poptato.domain.usecase.category.DeleteCategoryUseCase
 import com.poptato.domain.usecase.category.GetCategoryListUseCase
 import com.poptato.domain.usecase.todo.DeleteTodoUseCase
 import com.poptato.domain.usecase.todo.DragDropUseCase
@@ -38,6 +39,7 @@ import kotlin.random.Random
 @HiltViewModel
 class BacklogViewModel @Inject constructor(
     private val getCategoryListUseCase: GetCategoryListUseCase,
+    private val deleteCategoryUseCase: DeleteCategoryUseCase,
     private val createBacklogUseCase: CreateBacklogUseCase,
     private val getBacklogListUseCase: GetBacklogListUseCase,
     private val getYesterdayListUseCase: GetYesterdayListUseCase,
@@ -77,14 +79,27 @@ class BacklogViewModel @Inject constructor(
         )
     }
 
+    fun deleteCategory() {
+        viewModelScope.launch {
+            deleteCategoryUseCase(request = uiState.value.selectedCategoryId).collect {
+                resultResponse(it, {
+                    getCategoryList()
+                }, { error ->
+                    Timber.d("[카테고리] 삭제 서버통신 실패 -> $error")
+                })
+            }
+        }
+    }
+
     fun getBacklogListInCategory(categoryIndex: Int) {
         updateState(
             uiState.value.copy(
-                selectedCategoryIndex = categoryIndex
+                selectedCategoryIndex = categoryIndex,
+                selectedCategoryId = uiState.value.categoryList[categoryIndex].categoryId
             )
         )
 
-        getBacklogList(uiState.value.categoryList[categoryIndex].categoryId, 0, 8)
+        getBacklogList(uiState.value.selectedCategoryId, 0, 8)
     }
 
     private fun getBacklogList(categoryId: Long, page: Int, size: Int) {

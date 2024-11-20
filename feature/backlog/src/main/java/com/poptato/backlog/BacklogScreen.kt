@@ -199,7 +199,9 @@ fun BacklogScreen(
                         dialogContentText = CategoryDeleteDropDownContent,
                         positiveBtnText = DELETE,
                         cancelBtnText = Cancel,
-                        positiveBtnAction = {}
+                        positiveBtnAction = {
+                            viewModel.deleteCategory()
+                        }
                     )
                 )
             },
