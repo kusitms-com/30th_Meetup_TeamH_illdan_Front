@@ -48,4 +48,10 @@ class CategoryRepositoryImpl @Inject constructor(
             UnitResponseMapper
         )
     }
+
+    override suspend fun deleteCategory(categoryId: Long): Flow<Result<Unit>> {
+        return apiLaunch(
+            apiCall = { categoryService.deleteCategory(categoryId) }, UnitResponseMapper
+        )
+    }
 }

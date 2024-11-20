@@ -8,6 +8,7 @@ import com.poptato.data.model.response.category.CategoryListResponse
 import com.poptato.domain.model.request.category.CategoryRequestModel
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
@@ -34,5 +35,10 @@ interface CategoryService {
     suspend fun modifyCategory(
         @Path("categoryId") category: Long,
         @Body request: CategoryRequestModel
+    ): Response<ApiResponse<Unit>>
+
+    @DELETE(Endpoints.Category.MODIFY)
+    suspend fun deleteCategory(
+        @Path("categoryId") category: Long,
     ): Response<ApiResponse<Unit>>
 }
