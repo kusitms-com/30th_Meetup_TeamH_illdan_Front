@@ -121,6 +121,7 @@ fun NavGraphBuilder.categoryNavGraph(
         composable(NavRoutes.CategoryScreen.route) {
             CategoryScreen(
                 goBackToBacklog = { navController.popBackStack() },
+                goToBacklog = { navController.navigate(NavRoutes.BacklogScreen.route) },
                 showIconBottomSheet = showCategoryIconBottomSheet,
                 selectedIconInBottomSheet = selectedIconInBottomSheet,
                 showDialog = showDialog,

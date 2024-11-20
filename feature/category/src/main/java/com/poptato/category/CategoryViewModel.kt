@@ -91,7 +91,7 @@ class CategoryViewModel @Inject constructor(
         viewModelScope.launch {
             createCategoryUseCase(request = CategoryRequestModel(uiState.value.categoryName, uiState.value.selectedIcon?.iconId ?: -1)).collect {
                 resultResponse(it, {
-                    emitEventFlow(CategoryEvent.GoBackToBacklog)
+                    emitEventFlow(CategoryEvent.GoToBacklog)
                 }, { error ->
                     Timber.d("[카테고리] 카테고리 생성 서버통신 실패 -> $error")
                 })
@@ -103,7 +103,7 @@ class CategoryViewModel @Inject constructor(
         viewModelScope.launch {
             modifyCategoryUseCase(request = ModifyCategoryRequestModel(uiState.value.modifyCategoryId, CategoryRequestModel(uiState.value.categoryName, uiState.value.selectedIcon?.iconId ?: -1))).collect {
                 resultResponse(it, {
-                    emitEventFlow(CategoryEvent.GoBackToBacklog)
+                    emitEventFlow(CategoryEvent.GoToBacklog)
                 }, { error ->
                     Timber.d("[카테고리] 카테고리 수정 서버통신 실패 -> $error")
                 })

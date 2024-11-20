@@ -65,11 +65,11 @@ import com.poptato.domain.model.response.category.CategoryIconTotalListModel
 import com.poptato.domain.model.response.category.CategoryScreenContentModel
 import com.poptato.domain.model.response.dialog.DialogContentModel
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.collect
 
 @Composable
 fun CategoryScreen(
     goBackToBacklog: () -> Unit = {},
+    goToBacklog: () -> Unit = {},
     showIconBottomSheet: (CategoryIconTotalListModel) -> Unit = {},
     selectedIconInBottomSheet: SharedFlow<CategoryIconItemModel>,
     showDialog: (DialogContentModel) -> Unit = {},
@@ -100,8 +100,8 @@ fun CategoryScreen(
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collect { event ->
             when (event) {
-                is CategoryEvent.GoBackToBacklog -> {
-                    goBackToBacklog()
+                is CategoryEvent.GoToBacklog -> {
+                    goToBacklog()
                 }
             }
         }
