@@ -2,6 +2,7 @@ package com.poptato.yesterdaylist
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,9 +30,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.poptato.design_system.DEADLINE
+import com.poptato.design_system.DEADLINE_DDAY
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
 import com.poptato.design_system.Gray40
+import com.poptato.design_system.Gray70
 import com.poptato.design_system.Gray95
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.Primary60
@@ -40,7 +44,10 @@ import com.poptato.design_system.YesterdayAllCheckBtn
 import com.poptato.design_system.YesterdayListTitle
 import com.poptato.domain.model.enums.TodoStatus
 import com.poptato.domain.model.response.yesterday.YesterdayItemModel
+import com.poptato.ui.common.BookmarkItem
+import com.poptato.ui.common.DeadlineItem
 import com.poptato.ui.common.PoptatoCheckBox
+import com.poptato.ui.common.RepeatItem
 import timber.log.Timber
 
 @Composable
@@ -165,35 +172,56 @@ fun YesterdayTodoItem(
     item: YesterdayItemModel = YesterdayItemModel(),
     onCheckedChange: (Long, TodoStatus) -> Unit = {_, _ ->},
 ) {
-    Row(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
             .background(Gray95)
-            .padding(vertical = 16.dp)
-            .padding(start = 18.dp, end = 16.dp)
     ) {
-        PoptatoCheckBox(
-            isChecked = item.todoStatus == TodoStatus.COMPLETED,
-            onCheckedChange = { onCheckedChange(item.todoId, item.todoStatus) }
-        )
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .padding(top = if (item.bookmark || item.repeat || item.dday != null) 12.dp else 0.dp),
+            horizontalArrangement = Arrangement.Start
+        ) {
+            if (item.bookmark) {
+                BookmarkItem()
+                Spacer(modifier = Modifier.width(6.dp))
+            }
 
-        Spacer(modifier = Modifier.width(10.dp))
+            if (item.repeat) {
+                RepeatItem()
+                Spacer(modifier = Modifier.width(6.dp))
+            }
 
-        Text(
-            text = item.content,
-            color = Gray40,
-            style = PoptatoTypo.mdRegular,
-            modifier = Modifier.weight(1f)
-        )
+            if (item.dday != null) {
+                DeadlineItem(
+                    dday = item.dday
+                )
+            }
+        }
 
-        Spacer(modifier = Modifier.width(10.dp))
+        Row(
+            modifier = Modifier
+                .padding(start = 16.dp)
+                .padding(bottom = if (item.bookmark || item.repeat || item.dday != null) 12.dp else 16.dp)
+                .padding(top = if (item.bookmark || item.repeat || item.dday != null) 6.dp else 16.dp),
 
-        Icon(
-            painter = painterResource(id = R.drawable.ic_three_dot),
-            contentDescription = "",
-            tint = Color.Unspecified
-        )
+        ) {
+            PoptatoCheckBox(
+                isChecked = item.todoStatus == TodoStatus.COMPLETED,
+                onCheckedChange = { onCheckedChange(item.todoId, item.todoStatus) }
+            )
+
+            Spacer(modifier = Modifier.width(10.dp))
+
+            Text(
+                text = item.content,
+                color = Gray40,
+                style = PoptatoTypo.mdRegular,
+                modifier = Modifier.weight(1f)
+            )
+        }
     }
 }
 
