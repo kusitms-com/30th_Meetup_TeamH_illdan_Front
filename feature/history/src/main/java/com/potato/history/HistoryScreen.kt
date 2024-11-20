@@ -68,9 +68,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.poptato.core.util.reachedLastItem
+import com.poptato.design_system.FRI
 import com.poptato.design_system.Gray40
 import com.poptato.design_system.Gray90
+import com.poptato.design_system.MON
 import com.poptato.design_system.PoptatoTypo.xsMedium
+import com.poptato.design_system.SAT
+import com.poptato.design_system.SUN
+import com.poptato.design_system.THU
+import com.poptato.design_system.TUE
+import com.poptato.design_system.WED
 import com.potato.history.model.HistoryGroupedItem
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -98,7 +105,7 @@ fun HistoryContent(
     onLoadNextPage: () -> Unit
 ) {
     val listState = rememberLazyListState()
-    val currentMonth = remember { mutableStateOf(LocalDate.now().withDayOfMonth(1)) }
+    val currentMonthStartDate = remember { mutableStateOf(LocalDate.now().withDayOfMonth(1)) }
     val selectedDate = remember { mutableStateOf(LocalDate.now()) }
 
     Column(
@@ -108,7 +115,7 @@ fun HistoryContent(
     ) {
 
         CalendarContent(
-            currentMonth = currentMonth.value,
+            currentMonthStartDate = currentMonthStartDate.value,
             selectedDate = selectedDate.value,
             onSelectedDate = { selectedDate.value = it }
         )
@@ -153,12 +160,12 @@ fun HistoryContent(
 
 @Composable
 fun CalendarContent(
-    currentMonth: LocalDate = LocalDate.now().withDayOfMonth(1),
+    currentMonthStartDate: LocalDate = LocalDate.now().withDayOfMonth(1),
     selectedDate: LocalDate = LocalDate.now(),
     onSelectedDate: (LocalDate) -> Unit = {}
 ) {
-    val daysInMonth = currentMonth.lengthOfMonth()
-    val firstDayOfWeek = (currentMonth.withDayOfMonth(1).dayOfWeek.value % 7) // 일요일 = 0
+    val daysInMonth = currentMonthStartDate.lengthOfMonth()
+    val firstDayOfWeek = (currentMonthStartDate.withDayOfMonth(1).dayOfWeek.value % 7) // 일요일 = 0
     val today = LocalDate.now()
 
     Column(
@@ -170,9 +177,9 @@ fun CalendarContent(
         Spacer(modifier = Modifier.height(8.dp))
 
         CalendarHeader(
-            currentMonth = currentMonth,
-            onPreviousMonthClick = { onSelectedDate(currentMonth.minusMonths(1)) },
-            onNextMonthClick = { onSelectedDate(currentMonth.plusMonths(1)) }
+            currentMonth = currentMonthStartDate,
+            onPreviousMonthClick = { onSelectedDate(currentMonthStartDate.minusMonths(1)) },
+            onNextMonthClick = { onSelectedDate(currentMonthStartDate.plusMonths(1)) }
         )
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -192,7 +199,7 @@ fun CalendarContent(
             }
             
             items((1..daysInMonth).toList()) { day ->
-                val date = currentMonth.withDayOfMonth(day)
+                val date = currentMonthStartDate.withDayOfMonth(day)
                 CalendarDayItem(
                     day = day,
                     date = date,
@@ -249,7 +256,7 @@ fun DayOfWeekHeader() {
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        listOf("일", "월", "화", "수", "목", "금", "토").forEach { day ->
+        listOf(SUN, MON, TUE, WED, THU, FRI, SAT).forEach { day ->
             Text(
                 text = day,
                 style = PoptatoTypo.smMedium,
@@ -283,24 +290,18 @@ fun CalendarDayItem(
                 .size(36.dp),
             contentAlignment = Alignment.Center
         ) {
-            if(date.isAfter(LocalDate.now())){
-                Image(
-                    painter = painterResource(id = R.drawable.ic_history_circle),
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxWidth()
-                        .padding(1.dp)
-                )
-            }else if(hasEvent){
+            if(hasEvent && date.isBefore(LocalDate.now())){
                 Image(
                     painter = painterResource(id = R.drawable.ic_history_star),
                     contentDescription = null,
                     modifier = Modifier.fillMaxWidth()
                 )
-            }else if(date.isEqual(LocalDate.now())){
+            }else if(date.isAfter(LocalDate.now()) || date.isEqual(LocalDate.now())){
                 Image(
                     painter = painterResource(id = R.drawable.ic_history_circle),
                     contentDescription = null,
                     modifier = Modifier.fillMaxWidth()
+                        .padding(1.dp)
                 )
             }else{
                 Image(
