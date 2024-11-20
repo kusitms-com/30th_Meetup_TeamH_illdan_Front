@@ -117,7 +117,8 @@ fun HistoryContent(
         CalendarContent(
             currentMonthStartDate = currentMonthStartDate.value,
             selectedDate = selectedDate.value,
-            onSelectedDate = { selectedDate.value = it }
+            onSelectedDate = { selectedDate.value = it },
+            eventDates = uiState.eventDates
         )
 
         Spacer(modifier = Modifier.height(30.dp))
@@ -162,7 +163,8 @@ fun HistoryContent(
 fun CalendarContent(
     currentMonthStartDate: LocalDate = LocalDate.now().withDayOfMonth(1),
     selectedDate: LocalDate = LocalDate.now(),
-    onSelectedDate: (LocalDate) -> Unit = {}
+    onSelectedDate: (LocalDate) -> Unit = {},
+    eventDates: List<LocalDate>
 ) {
     val daysInMonth = currentMonthStartDate.lengthOfMonth()
     val firstDayOfWeek = (currentMonthStartDate.withDayOfMonth(1).dayOfWeek.value % 7) // 일요일 = 0
@@ -172,7 +174,7 @@ fun CalendarContent(
         modifier = Modifier
             .fillMaxWidth()
             .background(Gray100)
-            .padding(start = 24.dp, end = 24.dp)
+            .padding(start = 20.dp, end = 20.dp)
     ) {
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -205,7 +207,7 @@ fun CalendarContent(
                     date = date,
                     isSelected = selectedDate == date,
                     isToday = today == date,
-                    hasEvent = day % 8 == 0, // 수정 필요 => api로부터의 데이터
+                    hasEvent = eventDates.contains(date),
                     onClick = { onSelectedDate(date) }
                 )
             }
@@ -220,7 +222,9 @@ fun CalendarHeader(
     onNextMonthClick: () -> Unit
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth().height(24.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(24.dp)
             .padding(start = 20.dp, end = 20.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -300,7 +304,8 @@ fun CalendarDayItem(
                 Image(
                     painter = painterResource(id = R.drawable.ic_history_circle),
                     contentDescription = null,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .padding(1.dp)
                 )
             }else{
