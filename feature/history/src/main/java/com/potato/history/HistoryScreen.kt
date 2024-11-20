@@ -22,6 +22,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListScope
@@ -131,7 +132,6 @@ fun HistoryContent(
             ) {
                 items(uiState.historyList) { item ->
                     HistoryListItem(item = item)
-                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
 
@@ -164,7 +164,7 @@ fun CalendarContent(
             .background(Gray100)
             .padding(start = 20.dp, end = 20.dp)
     ) {
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
         CalendarHeader(
             currentMonth = currentMonthStartDate,
@@ -212,11 +212,11 @@ fun CalendarHeader(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 20.dp, end = 20.dp),
+            .padding(start = 30.dp, end = 30.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = onPreviousMonthClick) {
+        IconButton(onClick = onPreviousMonthClick, modifier = Modifier.size(20.dp)) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_arrow_left_20),
                 contentDescription = "Previous Month",
@@ -228,7 +228,7 @@ fun CalendarHeader(
             style = PoptatoTypo.mdMedium,
             color = Gray00
         )
-        IconButton(onClick = onNextMonthClick) {
+        IconButton(onClick = onNextMonthClick, modifier = Modifier.size(20.dp)) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_arrow_right_20),
                 contentDescription = "Next Month",
@@ -251,7 +251,7 @@ fun DayOfWeekHeader() {
             Text(
                 text = day,
                 style = PoptatoTypo.smMedium,
-                fontSize = 10.sp,
+                fontSize = 11.sp,
                 color = Gray80,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.weight(1f)
@@ -345,7 +345,7 @@ fun HistoryListItem(item: HistoryItemModel) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 8.dp)
+            .padding(top = 8.dp, bottom = 8.dp)
             .background(Color.Unspecified, shape = MaterialTheme.shapes.small),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -380,7 +380,7 @@ private fun LazyListState.onLoadMoreWhenLastItemVisible(action: () -> Unit) {
 
 @Composable
 fun InfinityLazyColumn(
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier.padding(start = 24.dp, end = 24.dp),
     state: LazyListState = rememberLazyListState(),
     reverseLayout: Boolean = false,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,

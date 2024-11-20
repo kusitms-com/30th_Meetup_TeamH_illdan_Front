@@ -2,11 +2,14 @@ package com.potato.history
 
 import androidx.lifecycle.viewModelScope
 import com.poptato.domain.model.request.backlog.GetBacklogListRequestModel
+import com.poptato.domain.model.request.history.HistoryCalendarRequestModel
 import com.poptato.domain.model.request.history.HistoryListRequestModel
 import com.poptato.domain.model.response.backlog.BacklogListModel
+import com.poptato.domain.model.response.history.HistoryCalendarListModel
 import com.poptato.domain.model.response.history.HistoryItemModel
 import com.poptato.domain.model.response.history.HistoryListModel
 import com.poptato.domain.usecase.backlog.GetBacklogListUseCase
+import com.poptato.domain.usecase.history.GetHistoryCalendarListUseCase
 import com.poptato.domain.usecase.history.GetHistoryListUseCase
 import com.poptato.ui.base.BaseViewModel
 import com.potato.history.model.HistoryGroupedItem
@@ -21,11 +24,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
-    private val getHistoryListUseCase: GetHistoryListUseCase
+    private val getHistoryListUseCase: GetHistoryListUseCase,
+    private val getHistoryCalendarListUseCase: GetHistoryCalendarListUseCase
 ) : BaseViewModel<HistoryPageState>(HistoryPageState()) {
 
     init {
         getHistoryList()
+        getCalendarList()
     }
 
     fun getHistoryList() {
@@ -77,6 +82,29 @@ class HistoryViewModel @Inject constructor(
     }
 
     // get 캘린더 조회 API
+    fun getCalendarList(){
+        viewModelScope.launch {
+            try {
+                getHistoryCalendarListUseCase.invoke(
+                    request = HistoryCalendarRequestModel(
+                        year = uiState.value.currentMonthStartDate.year.toString(),
+                        month = uiState.value.currentMonthStartDate.monthValue)
+                ).collect { result ->
+                    resultResponse(result, ::onSuccessGetCalendarList)
+                }
+            } catch (e: Exception) {
+                Timber.e("Failed to load history list: $e")
+            }
+        }
+    }
+
+    private fun onSuccessGetCalendarList(response: HistoryCalendarListModel){
+        updateState(
+            uiState.value.copy(
+                eventDates = response.dates
+            )
+        )
+    }
 
     // update selected date (default는 오늘 날짜) -> selected date로 기록 조회
     fun updateSelectedDate(selectedDate: String) {
@@ -107,6 +135,7 @@ class HistoryViewModel @Inject constructor(
         )
 
         viewModelScope.launch {
+            getCalendarList()
             getHistoryList()
         }
         Timber.d("Current month updated to: $updatedMonthStartDate")
