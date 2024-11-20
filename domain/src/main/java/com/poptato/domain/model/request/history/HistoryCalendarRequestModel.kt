@@ -1,4 +1,6 @@
 package com.poptato.domain.model.request.history
 
-class HistoryCalendarRequestModel {
-}
+data class HistoryCalendarRequestModel (
+    val year: String,
+    val month: Int,
+)
