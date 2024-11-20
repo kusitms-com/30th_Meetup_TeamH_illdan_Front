@@ -43,4 +43,8 @@ object Endpoints {
     object Today {
         const val TODAYS = "/todays"
     }
+
+    object Category {
+        const val ICONS = "/emojis"
+    }
 }
