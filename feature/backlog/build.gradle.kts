@@ -14,4 +14,6 @@ dependencies {
     implementation(projects.designSystem)
 
     implementation(libs.lazycolumn.scrollbar)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.svg)
 }

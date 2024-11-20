@@ -63,6 +63,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -77,7 +78,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.Coil
+import coil.ImageLoader
+import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
+import coil.decode.SvgDecoder
 import com.poptato.design_system.BACKLOG_YESTERDAY_TASK_GUIDE
 import com.poptato.design_system.BacklogHint
 import com.poptato.design_system.COMPLETE_DELETE_TODO
@@ -418,26 +423,27 @@ fun BacklogCategoryList(
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            item {
-                // TODO 카테고리 리스트 서버통신 완료 후 LazyRow 아이템으로 플로우 변경 및 삭제
-                CategoryListIcon(
-                    paddingStart = 16,
-                    imgResource = painterResource(id = R.drawable.ic_category_all),
-                    isSelected = selectedCategoryId.toInt() == 0,
-                    onClickCategory = { onSelectCategory(0, -1) }
-                )
-
-                CategoryListIcon(
-                    paddingStart = 12,
-                    imgResource = painterResource(id = R.drawable.ic_category_star),
-                    isSelected = selectedCategoryId.toInt() == 1,
-                    onClickCategory = { onSelectCategory(1, -1) }
-                )
-            }
+//            item {
+//                // TODO 카테고리 리스트 서버통신 완료 후 LazyRow 아이템으로 플로우 변경 및 삭제
+//                CategoryListIcon(
+//                    paddingStart = 16,
+//                    imgResource = painterResource(id = R.drawable.ic_category_all),
+//                    isSelected = selectedCategoryId.toInt() == 0,
+//                    onClickCategory = { onSelectCategory(0, -1) }
+//                )
+//
+//                CategoryListIcon(
+//                    paddingStart = 12,
+//                    imgResource = painterResource(id = R.drawable.ic_category_star),
+//                    isSelected = selectedCategoryId.toInt() == 1,
+//                    onClickCategory = { onSelectCategory(1, -1) }
+//                )
+//            }
 
             itemsIndexed(categoryList, key = { _, item -> item.categoryId }) { index, item ->
                 CategoryListIcon(
-                    imgResource = rememberAsyncImagePainter(model = item.categoryImgUrl),
+//                    imgResource = rememberAsyncImagePainter(model = item.categoryImgUrl),
+                    imgUrl = item.categoryImgUrl,
                     isSelected = selectedCategoryId == item.categoryId,
                     onClickCategory = { onSelectCategory(item.categoryId, index) }
                 )
@@ -467,10 +473,20 @@ fun BacklogCategoryList(
 fun CategoryListIcon(
     paddingStart: Int = 0,
     paddingHorizontal: Int = 0,
-    imgResource: Painter,
+//    imgResource: Painter,
+    imgUrl: String = "",
     isSelected: Boolean,
     onClickCategory: () -> Unit = {}
 ) {
+
+    val context = LocalContext.current
+    val imageLoader = ImageLoader.Builder(context)
+        .components {
+            add(SvgDecoder.Factory())
+        }
+        .build()
+    Coil.setImageLoader(imageLoader)
+
     Box(
         modifier = Modifier
             .padding(start = paddingStart.dp)
@@ -479,13 +495,22 @@ fun CategoryListIcon(
             .border(width = 1.dp, color = if (isSelected) Gray00 else Gray95, shape = CircleShape)
             .clickable { onClickCategory() }
     ) {
-        Icon(
-            painter = imgResource,
+//        Icon(
+//            painter = imgResource,
+//            contentDescription = "category icon",
+//            tint = Color.Unspecified,
+//            modifier = Modifier
+//                .align(Alignment.Center)
+//                .size(24.dp)
+//        )
+
+        AsyncImage(
+            model = imgUrl,
             contentDescription = "category icon",
-            tint = Color.Unspecified,
             modifier = Modifier
                 .align(Alignment.Center)
-                .size(24.dp)
+                .size(24.dp),
+            contentScale = ContentScale.Crop
         )
     }
 }
