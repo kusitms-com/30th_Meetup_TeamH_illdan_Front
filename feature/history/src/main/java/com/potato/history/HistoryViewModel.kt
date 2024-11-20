@@ -11,6 +11,7 @@ import com.poptato.domain.usecase.history.GetHistoryListUseCase
 import com.poptato.ui.base.BaseViewModel
 import com.potato.history.model.HistoryGroupedItem
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import timber.log.Timber
@@ -101,11 +102,15 @@ class HistoryViewModel @Inject constructor(
     fun updateSelectedDate(selectedDate: String) {
         updateState(
             uiState.value.copy(
-                selectedDate = selectedDate
+                selectedDate = selectedDate,
+                currentPage = 0,
+                isLoadingMore = false,
             )
         )
         // 선택된 날짜 기준으로 기록 조회
-        getHistoryList()
+        viewModelScope.launch {
+            getHistoryList()
+        }
         Timber.d("Selected date updated to: $selectedDate")
     }
     // update current month (캘린더 보여주는 달) -> get 캘린더 + selected date로 기록 조회
