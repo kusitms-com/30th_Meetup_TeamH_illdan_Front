@@ -1,5 +1,6 @@
 package com.poptato.yesterdaylist
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -25,17 +26,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.poptato.design_system.DEADLINE
-import com.poptato.design_system.DEADLINE_DDAY
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
 import com.poptato.design_system.Gray40
-import com.poptato.design_system.Gray70
 import com.poptato.design_system.Gray95
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.Primary60
@@ -92,10 +91,30 @@ fun YesterdayContent(
                 onClickCloseBtn = onClickCloseBtn
             )
 
+            Box {
+                Text(
+                    text = YesterdayListTitle,
+                    style = PoptatoTypo.xxLSemiBold,
+                    color = Gray00,
+                    modifier = Modifier
+                        .padding(start = 16.dp)
+                )
+
+                Image(
+                    painter = painterResource(id = R.drawable.ic_yesterday_bg),
+                    contentDescription = "",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(118.dp),
+                    contentScale = ContentScale.Crop
+                )
+            }
+
             Box(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
+                    .padding(top = 8.dp)
             ) {
                 YesterdayTodoList(
                     list = uiState.yesterdayList,
@@ -120,14 +139,6 @@ fun TitleTopBar(
             .fillMaxWidth()
             .padding(start = 16.dp, end = 16.dp)
     ) {
-        Text(
-            text = YesterdayListTitle,
-            style = PoptatoTypo.mdMedium,
-            color = Gray00,
-            modifier = Modifier
-                .padding(vertical = 16.dp)
-                .align(Alignment.Center)
-        )
 
         Icon(
             painter = painterResource(id = R.drawable.ic_close_no_bg),
@@ -135,6 +146,7 @@ fun TitleTopBar(
             tint = Color.Unspecified,
             modifier = Modifier
                 .align(Alignment.CenterEnd)
+                .padding(top = 24.dp, bottom = 8.dp)
                 .size(width = 24.dp, height = 24.dp)
                 .clickable { onClickCloseBtn() }
         )
@@ -151,7 +163,7 @@ fun YesterdayTodoList(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 16.dp),
     ) {
 
         items(list, key = { it.todoId }) { item ->
