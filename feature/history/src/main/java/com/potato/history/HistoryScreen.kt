@@ -21,68 +21,50 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
-import com.poptato.design_system.Gray20
 import com.poptato.design_system.Gray70
 import com.poptato.design_system.Gray80
 import com.poptato.design_system.Gray95
 import com.poptato.design_system.HistoryListEmpty
-import com.poptato.design_system.HistoryTitle
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.R
 import com.poptato.domain.model.response.history.HistoryItemModel
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.poptato.core.util.reachedLastItem
 import com.poptato.design_system.FRI
 import com.poptato.design_system.Gray40
-import com.poptato.design_system.Gray90
 import com.poptato.design_system.MON
-import com.poptato.design_system.PoptatoTypo.xsMedium
 import com.poptato.design_system.SAT
 import com.poptato.design_system.SUN
 import com.poptato.design_system.THU
 import com.poptato.design_system.TUE
 import com.poptato.design_system.WED
 import com.potato.history.model.HistoryGroupedItem
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import timber.log.Timber
-import java.time.DateTimeException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -96,7 +78,7 @@ fun HistoryScreen(
     HistoryContent(
         uiState = uiState,
         onLoadNextPage = { viewModel.getHistoryList() },
-        onSelectedDate = {viewModel.updateSelectedDate(uiState.selectedDate)}
+        onDateSelected = { selectedDate -> viewModel.updateSelectedDate(selectedDate)}
     )
 }
 
@@ -104,11 +86,10 @@ fun HistoryScreen(
 fun HistoryContent(
     uiState: HistoryPageState = HistoryPageState(),
     onLoadNextPage: () -> Unit,
-    onSelectedDate: (String) -> Unit
+    onDateSelected: (String) -> Unit
 ) {
     val listState = rememberLazyListState()
     val currentMonthStartDate = remember { mutableStateOf(LocalDate.now().withDayOfMonth(1)) }
-    val selectedDate = remember { mutableStateOf(LocalDate.now()) }
 
     Column(
         modifier = Modifier
@@ -118,8 +99,8 @@ fun HistoryContent(
 
         CalendarContent(
             currentMonthStartDate = currentMonthStartDate.value,
-            selectedDate = selectedDate.value,
-            onSelectedDate = { selectedDate.value = it },
+            selectedDate = uiState.selectedDate,
+            onSelectedDate = onDateSelected,
             eventDates = uiState.eventDates
         )
 
@@ -164,8 +145,8 @@ fun HistoryContent(
 @Composable
 fun CalendarContent(
     currentMonthStartDate: LocalDate = LocalDate.now().withDayOfMonth(1),
-    selectedDate: LocalDate = LocalDate.now(),
-    onSelectedDate: (LocalDate) -> Unit = {},
+    selectedDate: String = LocalDate.now().toString(),
+    onSelectedDate: (String) -> Unit = {},
     eventDates: List<String>
 ) {
     val daysInMonth = currentMonthStartDate.lengthOfMonth()
@@ -182,8 +163,8 @@ fun CalendarContent(
 
         CalendarHeader(
             currentMonth = currentMonthStartDate,
-            onPreviousMonthClick = { onSelectedDate(currentMonthStartDate.minusMonths(1)) },
-            onNextMonthClick = { onSelectedDate(currentMonthStartDate.plusMonths(1)) }
+            onPreviousMonthClick = { onSelectedDate(currentMonthStartDate.minusMonths(1).toString()) },
+            onNextMonthClick = { onSelectedDate(currentMonthStartDate.plusMonths(1).toString()) }
         )
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -207,10 +188,10 @@ fun CalendarContent(
                 CalendarDayItem(
                     day = day,
                     date = date,
-                    isSelected = selectedDate == date,
+                    isSelected = selectedDate == date.toString(),
                     isToday = today == date,
                     hasEvent = eventDates.contains(date.toString()),
-                    onClick = { onSelectedDate(date) }
+                    onClick = { onSelectedDate(date.toString()) }
                 )
             }
         }
@@ -226,7 +207,6 @@ fun CalendarHeader(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(24.dp)
             .padding(start = 20.dp, end = 20.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -428,7 +408,7 @@ fun PreviewHistoryScreen() {
     HistoryContent(
         uiState = dummyUiState,
         onLoadNextPage = {}, // 더미
-        onSelectedDate = {}
+        onDateSelected = {}
     )
 }
 

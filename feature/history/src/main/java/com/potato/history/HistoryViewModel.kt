@@ -98,7 +98,16 @@ class HistoryViewModel @Inject constructor(
     // get 캘린더 조회 API
 
     // update selected date (default는 오늘 날짜) -> selected date로 기록 조회
-
+    fun updateSelectedDate(selectedDate: String) {
+        updateState(
+            uiState.value.copy(
+                selectedDate = selectedDate
+            )
+        )
+        // 선택된 날짜 기준으로 기록 조회
+        getHistoryList()
+        Timber.d("Selected date updated to: $selectedDate")
+    }
     // update current month (캘린더 보여주는 달) -> get 캘린더 + selected date로 기록 조회
 
 }
