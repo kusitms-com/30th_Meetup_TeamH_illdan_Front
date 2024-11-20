@@ -62,7 +62,7 @@ class BacklogViewModel @Inject constructor(
     init {
         getCategoryList()
         getYesterdayList(0, 1)
-        getBacklogList(0, 100)
+        getBacklogList(-1, 0, 100)
     }
 
     private fun getCategoryList() {
@@ -85,9 +85,9 @@ class BacklogViewModel @Inject constructor(
         Timber.d("[카테고리] 선택 -> $categoryId")
     }
 
-    private fun getBacklogList(page: Int, size: Int) {
+    private fun getBacklogList(categoryId: Long, page: Int, size: Int) {
         viewModelScope.launch {
-            getBacklogListUseCase.invoke(request = GetBacklogListRequestModel(page = page, size = size)).collect {
+            getBacklogListUseCase.invoke(request = GetBacklogListRequestModel(categoryId = categoryId, page = page, size = size)).collect {
                 resultResponse(it, ::onSuccessGetBacklogList)
             }
         }
@@ -163,7 +163,7 @@ class BacklogViewModel @Inject constructor(
         }
         updateList(updatedList)
 
-        getBacklogList(page = 0, size = uiState.value.backlogList.size)
+        getBacklogList(categoryId = -1, page = 0, size = uiState.value.backlogList.size)
     }
 
     private fun onFailedUpdateBacklogList() {

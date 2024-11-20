@@ -11,6 +11,6 @@ class GetBacklogListUseCase @Inject constructor(
     private val backlogRepository: BacklogRepository
 ) : UseCase<GetBacklogListRequestModel, Result<BacklogListModel>>() {
     override suspend fun invoke(request: GetBacklogListRequestModel): Flow<Result<BacklogListModel>> {
-        return backlogRepository.getBacklogList(page = request.page, size = request.size)
+        return backlogRepository.getBacklogList(categoryId = request.categoryId, page = request.page, size = request.size)
     }
 }
