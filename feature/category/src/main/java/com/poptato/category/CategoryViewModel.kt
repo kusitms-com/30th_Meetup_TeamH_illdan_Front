@@ -1,12 +1,15 @@
 package com.poptato.category
 
 import androidx.lifecycle.viewModelScope
+import com.poptato.domain.model.enums.CategoryScreenType
 import com.poptato.domain.model.request.category.CategoryRequestModel
+import com.poptato.domain.model.request.category.ModifyCategoryRequestModel
 import com.poptato.domain.model.response.category.CategoryIconItemModel
 import com.poptato.domain.model.response.category.CategoryIconTotalListModel
 import com.poptato.domain.model.response.category.CategoryScreenContentModel
 import com.poptato.domain.usecase.category.CreateCategoryUseCase
 import com.poptato.domain.usecase.category.GetCategoryIconListUseCase
+import com.poptato.domain.usecase.category.ModifyCategoryUseCase
 import com.poptato.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -16,7 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class CategoryViewModel @Inject constructor(
     private val getCategoryIconListUseCase: GetCategoryIconListUseCase,
-    private val createCategoryUseCase: CreateCategoryUseCase
+    private val createCategoryUseCase: CreateCategoryUseCase,
+    private val modifyCategoryUseCase: ModifyCategoryUseCase
 ): BaseViewModel<CategoryPageState>(
     CategoryPageState()
 ) {
@@ -68,19 +72,40 @@ class CategoryViewModel @Inject constructor(
             uiState.value.copy(
                 screenType = item.screenType,
                 categoryName = item.categoryItem.categoryName,
-                categoryIconImgUrl = item.categoryItem.categoryImgUrl
+                selectedIcon = CategoryIconItemModel(item.categoryItem.iconId, item.categoryItem.categoryImgUrl),
+                categoryIconImgUrl = item.categoryItem.categoryImgUrl,
+                modifyCategoryId = item.categoryItem.categoryId
             )
         )
     }
 
     fun finishSettingCategory() {
+        if (uiState.value.screenType == CategoryScreenType.Add) {
+            createCategory()
+        } else {
+            modifyCategory()
+        }
+    }
+
+    private fun createCategory() {
         viewModelScope.launch {
             createCategoryUseCase(request = CategoryRequestModel(uiState.value.categoryName, uiState.value.selectedIcon?.iconId ?: -1)).collect {
-                resultResponse(it, { data ->
-                    Timber.d("[카테고리] 카테고리 생성 서버통신 성공 -> $data")
+                resultResponse(it, {
                     emitEventFlow(CategoryEvent.GoBackToBacklog)
                 }, { error ->
                     Timber.d("[카테고리] 카테고리 생성 서버통신 실패 -> $error")
+                })
+            }
+        }
+    }
+
+    private fun modifyCategory() {
+        viewModelScope.launch {
+            modifyCategoryUseCase(request = ModifyCategoryRequestModel(uiState.value.modifyCategoryId, CategoryRequestModel(uiState.value.categoryName, uiState.value.selectedIcon?.iconId ?: -1))).collect {
+                resultResponse(it, {
+                    emitEventFlow(CategoryEvent.GoBackToBacklog)
+                }, { error ->
+                    Timber.d("[카테고리] 카테고리 수정 서버통신 실패 -> $error")
                 })
             }
         }

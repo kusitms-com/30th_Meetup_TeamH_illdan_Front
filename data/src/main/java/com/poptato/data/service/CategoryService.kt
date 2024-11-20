@@ -30,9 +30,9 @@ interface CategoryService {
         @Query("size") size: Int
     ): Response<ApiResponse<CategoryListResponse>>
 
-    @PUT(Endpoints.Category.CATEGORY)
+    @PUT(Endpoints.Category.MODIFY)
     suspend fun modifyCategory(
-        @Path("category") category: Long,
+        @Path("categoryId") category: Long,
         @Body request: CategoryRequestModel
     ): Response<ApiResponse<Unit>>
 }

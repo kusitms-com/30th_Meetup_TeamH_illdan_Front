@@ -48,5 +48,6 @@ object Endpoints {
         const val ICONS = "/emojis"
         const val CATEGORY = "/category"
         const val LIST = "$CATEGORY/list"
+        const val MODIFY = "$CATEGORY/{categoryId}"
     }
 }
