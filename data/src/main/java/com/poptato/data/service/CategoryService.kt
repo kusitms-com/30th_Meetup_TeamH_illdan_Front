@@ -5,11 +5,13 @@ import com.poptato.data.base.Endpoints
 import com.poptato.data.model.response.category.CategoryIdResponse
 import com.poptato.data.model.response.category.CategoryIconTotalListResponse
 import com.poptato.data.model.response.category.CategoryListResponse
-import com.poptato.domain.model.request.category.CreateCategoryRequestModel
+import com.poptato.domain.model.request.category.CategoryRequestModel
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface CategoryService {
@@ -19,7 +21,7 @@ interface CategoryService {
 
     @POST(Endpoints.Category.CATEGORY)
     suspend fun createCategory(
-        @Body request: CreateCategoryRequestModel
+        @Body request: CategoryRequestModel
     ): Response<ApiResponse<CategoryIdResponse>>
 
     @GET(Endpoints.Category.LIST)

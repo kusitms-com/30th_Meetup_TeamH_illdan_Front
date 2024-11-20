@@ -1,7 +1,7 @@
 package com.poptato.category
 
 import androidx.lifecycle.viewModelScope
-import com.poptato.domain.model.request.category.CreateCategoryRequestModel
+import com.poptato.domain.model.request.category.CategoryRequestModel
 import com.poptato.domain.model.response.category.CategoryIconItemModel
 import com.poptato.domain.model.response.category.CategoryIconTotalListModel
 import com.poptato.domain.model.response.category.CategoryScreenContentModel
@@ -75,7 +75,7 @@ class CategoryViewModel @Inject constructor(
 
     fun finishSettingCategory() {
         viewModelScope.launch {
-            createCategoryUseCase(request = CreateCategoryRequestModel(uiState.value.categoryName, uiState.value.selectedIcon?.iconId ?: -1)).collect {
+            createCategoryUseCase(request = CategoryRequestModel(uiState.value.categoryName, uiState.value.selectedIcon?.iconId ?: -1)).collect {
                 resultResponse(it, { data ->
                     Timber.d("[카테고리] 카테고리 생성 서버통신 성공 -> $data")
                     emitEventFlow(CategoryEvent.GoBackToBacklog)

@@ -6,7 +6,7 @@ import com.poptato.data.mapper.CategoryIdResponseMapper
 import com.poptato.data.mapper.CategoryListResponseMapper
 import com.poptato.data.service.CategoryService
 import com.poptato.domain.model.request.category.CategoryIdModel
-import com.poptato.domain.model.request.category.CreateCategoryRequestModel
+import com.poptato.domain.model.request.category.CategoryRequestModel
 import com.poptato.domain.model.response.category.CategoryIconTotalListModel
 import com.poptato.domain.model.response.category.CategoryListModel
 import com.poptato.domain.repository.CategoryRepository
@@ -24,7 +24,7 @@ class CategoryRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun createCategory(request: CreateCategoryRequestModel): Flow<Result<CategoryIdModel>> {
+    override suspend fun createCategory(request: CategoryRequestModel): Flow<Result<CategoryIdModel>> {
         return apiLaunch(
             apiCall = { categoryService.createCategory(request) },
             CategoryIdResponseMapper
