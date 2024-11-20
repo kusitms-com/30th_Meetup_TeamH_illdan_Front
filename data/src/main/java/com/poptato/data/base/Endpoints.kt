@@ -20,6 +20,7 @@ object Endpoints {
 
     object History {
         const val HISTORIES = "/histories"
+        const val CALENDAR = "/calendar"
     }
 
     object Todo {
