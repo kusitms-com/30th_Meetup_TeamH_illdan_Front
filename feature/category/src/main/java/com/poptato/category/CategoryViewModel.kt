@@ -1,17 +1,20 @@
 package com.poptato.category
 
+import androidx.lifecycle.viewModelScope
 import com.poptato.domain.model.response.category.CategoryIconItemModel
 import com.poptato.domain.model.response.category.CategoryIconTotalListModel
 import com.poptato.domain.model.response.category.CategoryIconTypeListModel
 import com.poptato.domain.model.response.category.CategoryScreenContentModel
+import com.poptato.domain.usecase.category.GetCategoryIconListUseCase
 import com.poptato.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class CategoryViewModel @Inject constructor(
-
+    private val getCategoryIconListUseCase: GetCategoryIconListUseCase
 ): BaseViewModel<CategoryPageState>(
     CategoryPageState()
 ) {
@@ -53,10 +56,22 @@ class CategoryViewModel @Inject constructor(
     }
 
     private fun getCategoryIconList() {
-        // TODO 서버통신 연결
+        viewModelScope.launch {
+            getCategoryIconListUseCase(request = Unit).collect {
+                resultResponse(it, { data ->
+                    onSuccessGetCategoryIconList(data)
+                    Timber.d("[카테고리] 아이콘 리스트 서버통신 성공 -> $data")
+                }, { error ->
+                    Timber.d("[카테고리] 아이콘 리스트 서버통신 실패 -> ${error.message}")
+                })
+            }
+        }
+    }
+
+    private fun onSuccessGetCategoryIconList(response: CategoryIconTotalListModel) {
         updateState(
             uiState.value.copy(
-                categoryIconList = _categoryIconList
+                categoryIconList = response
             )
         )
     }

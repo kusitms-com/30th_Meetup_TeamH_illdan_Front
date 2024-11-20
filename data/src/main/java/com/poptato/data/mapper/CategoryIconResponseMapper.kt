@@ -12,11 +12,11 @@ object CategoryIconResponseMapper : Mapper<CategoryTotalListResponse, CategoryIc
             CategoryIconTotalListModel(
                 icons = it.groupEmojis.map { typeItem ->
                     CategoryIconTypeListModel(
-                        iconType = typeItem.iconType,
-                        icons = typeItem.icons.map { item ->
+                        iconType = typeItem.key,
+                        icons = typeItem.value.map { item ->
                             CategoryIconItemModel(
-                                iconId = item.iconId,
-                                iconImgUrl = item.iconImgUrl
+                                iconId = item.emojiId,
+                                iconImgUrl = item.imageUrl
                             )
                         }
                     )
