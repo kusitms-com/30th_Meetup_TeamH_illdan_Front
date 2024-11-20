@@ -123,12 +123,9 @@ fun HistoryContent(
                 state = listState,
                 loadMore = onLoadNextPage
             ) {
-                items(uiState.historyList) { groupedItem ->
-                    groupedItem.items.forEach { item ->
-                        HistoryListItem(item = item)
-                    }
+                items(uiState.historyList) { item ->
+                    HistoryListItem(item = item)
                     Spacer(modifier = Modifier.height(16.dp))
-
                 }
             }
 
@@ -415,20 +412,15 @@ fun PreviewHistoryScreen() {
 private fun getDummyHistoryPageState(): HistoryPageState {
     return HistoryPageState(
         historyList = listOf(
-            HistoryGroupedItem(
-                date = "2024-11-18",
-                items = listOf(
-                    HistoryItemModel(
-                        todoId = 1,
-                        content = "더미 콘텐츠 1",
-                        date = "2024-11-18"
-                    ),
-                    HistoryItemModel(
-                        todoId = 2,
-                        content = "더미 콘텐츠 2",
-                        date = "2024-11-18"
-                    )
-                )
+            HistoryItemModel(
+                todoId = 1,
+                content = "더미 콘텐츠 1",
+                date = "2024-11-18"
+            ),
+            HistoryItemModel(
+                todoId = 2,
+                content = "더미 콘텐츠 2",
+                date = "2024-11-18"
             )
         )
     )

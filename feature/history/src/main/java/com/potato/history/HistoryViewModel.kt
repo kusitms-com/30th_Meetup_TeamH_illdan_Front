@@ -56,30 +56,9 @@ class HistoryViewModel @Inject constructor(
 
     private fun onSuccessGetHistoryList(response: HistoryListModel) {
         val newItems = response.histories
-        val groupedItems = newItems.groupBy { it.date }.map { (date, items) ->
-            HistoryGroupedItem(date, items)
-        }
-        val currentGroupedItems = uiState.value.historyList.toMutableList()
-        val lastExistingDate = currentGroupedItems.lastOrNull()?.date
-        val firstNewDate = groupedItems.firstOrNull()?.date
-
-        if (lastExistingDate != null && lastExistingDate == firstNewDate) {
-            val existingGroup = currentGroupedItems.lastOrNull()
-            val newGroup = groupedItems.firstOrNull()
-
-            if (existingGroup != null && newGroup != null) {
-                val mergedItems = existingGroup.items + newGroup.items
-                val updatedGroup = existingGroup.copy(items = mergedItems)
-                currentGroupedItems[currentGroupedItems.lastIndex] = updatedGroup
-            }
-
-            currentGroupedItems.addAll(groupedItems.drop(1))
-        } else {
-            currentGroupedItems.addAll(groupedItems)
-        }
         updateState(
             uiState.value.copy(
-                historyList = currentGroupedItems,
+                historyList = newItems,
                 isLoadingMore = false,
                 totalPageCount = response.totalPageCount,
                 currentPage = uiState.value.currentPage + 1
