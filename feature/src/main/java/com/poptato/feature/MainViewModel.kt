@@ -55,11 +55,14 @@ class MainViewModel @Inject constructor() : BaseViewModel<MainPageState>(MainPag
     }
 
     fun onSelectedTodoItem(item: TodoItemModel, category: List<CategoryItemModel>) {
+        val isAllOrStar: Boolean = item.categoryId.toInt() == -1 || item.categoryId.toInt() == 0
+        val categoryItemModel = if (isAllOrStar) null else category.firstOrNull { it.categoryId == item.categoryId }
+
         updateState(
             uiState.value.copy(
                 selectedTodoItem = item,
                 categoryList = category,
-                selectedTodoCategoryItem = category.firstOrNull { it.categoryId == item.categoryId }
+                selectedTodoCategoryItem = categoryItemModel
             )
         )
         emitEventFlow(MainEvent.ShowTodoBottomSheet)

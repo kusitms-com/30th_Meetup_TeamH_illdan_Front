@@ -58,7 +58,9 @@ fun CategoryBottomSheet(
         selectedCategory = selectedCategory,
         onClickCategory = { selectedCategory = it },
         onClickDeleteBtn = { onCategorySelected(null) },
-        onClickFinishBtn = { onCategorySelected(selectedCategory) },
+        onClickFinishBtn = {
+            if (selectedCategory.toInt() == -1) onCategorySelected(null) else onCategorySelected(selectedCategory)
+        },
         onDismiss = onDismiss
     )
 }
