@@ -4,7 +4,7 @@ package com.poptato.design_system
 const val Today = "오늘"
 const val List = "목록"
 const val History = "히스토리"
-const val Settings = "설정"
+const val Settings = "설정하기"
 const val Backlog = "백로그"
 const val modify = "수정하기"
 const val DELETE_ACTION = "삭제하기"

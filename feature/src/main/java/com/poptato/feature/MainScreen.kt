@@ -203,6 +203,7 @@ fun MainScreen() {
                         BottomSheetType.Main -> {
                             TodoBottomSheet(
                                 item = uiState.selectedTodoItem,
+                                categoryItem = uiState.selectedTodoCategoryItem,
                                 onClickShowDatePicker = { viewModel.updateBottomSheetType(BottomSheetType.FullDate) },
                                 onClickBtnDelete = {
                                     scope.launch {

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,29 +20,41 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.Coil
+import coil.ImageLoader
+import coil.compose.AsyncImage
+import coil.decode.SvgDecoder
 import com.poptato.design_system.Category
 import com.poptato.design_system.DEADLINE_OPTION
+import com.poptato.design_system.DELETE_ACTION
 import com.poptato.design_system.Danger50
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
 import com.poptato.design_system.Gray30
 import com.poptato.design_system.Gray60
+import com.poptato.design_system.Gray90
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.R
 import com.poptato.design_system.REPEAT_TASK_OPTION
-import com.poptato.design_system.DELETE_ACTION
+import com.poptato.design_system.Settings
 import com.poptato.design_system.modify
+import com.poptato.domain.model.response.category.CategoryItemModel
 import com.poptato.domain.model.response.today.TodoItemModel
 
 @Composable
 fun TodoBottomSheet(
     item: TodoItemModel = TodoItemModel(),
+    categoryItem: CategoryItemModel = CategoryItemModel(),
     onClickShowDatePicker: () -> Unit = {},
     onClickBtnDelete: (Long) -> Unit = {},
     onClickBtnModify: (Long) -> Unit = {},
@@ -57,6 +70,7 @@ fun TodoBottomSheet(
 
     TodoBottomSheetContent(
         item = item.copy(deadline = deadline, isBookmark = isBookmark),
+        categoryItem = categoryItem,
         onClickShowDatePicker = onClickShowDatePicker,
         onClickBtnDelete = onClickBtnDelete,
         onClickBtnModify = onClickBtnModify,
@@ -70,6 +84,7 @@ fun TodoBottomSheet(
 @Composable
 fun TodoBottomSheetContent(
     item: TodoItemModel = TodoItemModel(),
+    categoryItem: CategoryItemModel = CategoryItemModel(),
     onClickShowDatePicker: () -> Unit = {},
     onClickBtnDelete: (Long) -> Unit = {},
     onClickBtnModify: (Long) -> Unit = {},
@@ -136,7 +151,12 @@ fun TodoBottomSheetContent(
             },
             deadline = item.deadline
         )
-        BottomSheetBtn(resourceId = R.drawable.ic_add_category_icon, buttonText = Category, textColor = Gray30)
+        BottomSheetBtn(
+            resourceId = R.drawable.ic_add_category_icon,
+            buttonText = Category,
+            textColor = Gray30,
+            category = categoryItem
+        )
     }
 }
 
@@ -148,9 +168,19 @@ fun BottomSheetBtn(
     buttonText: String,
     textColor: Color,
     deadline: String = "",
-    category: String = "",
+    category: CategoryItemModel = CategoryItemModel(),
     modifier: Modifier = Modifier
 ) {
+
+    val context = LocalContext.current
+    val imageLoader = ImageLoader.Builder(context)
+        .components {
+            add(SvgDecoder.Factory())
+        }
+        .build()
+    Coil.setImageLoader(imageLoader)
+
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -160,7 +190,38 @@ fun BottomSheetBtn(
         Spacer(modifier = Modifier.width(8.dp))
         Text(text = buttonText, style = PoptatoTypo.mdMedium, color = textColor)
         Spacer(modifier = Modifier.weight(1f))
-        if (deadline.isNotEmpty()) Text(text = deadline, style = PoptatoTypo.mdMedium, color = Gray00)
+        if (buttonText == DEADLINE_OPTION && deadline.isNotEmpty()) {
+            Text(text = deadline, style = PoptatoTypo.mdMedium, color = Gray00)
+        } else if (buttonText == DEADLINE_OPTION && deadline.isEmpty()) {
+            Text(text = Settings, style = PoptatoTypo.mdRegular, color = Gray60)
+        }
+
+        if (buttonText == Category && category.categoryName.isNotEmpty()) {
+            Row(
+                modifier = modifier
+                    .clip(RoundedCornerShape(32.dp))
+                    .background(Gray90)
+                    .padding(horizontal = 10.dp, vertical = 4.dp),
+            ) {
+                AsyncImage(
+                    model = category.categoryImgUrl,
+                    contentDescription = "category icon",
+                    modifier = Modifier
+                        .size(20.dp),
+                    contentScale = ContentScale.Crop
+                )
+
+                Spacer(modifier = Modifier.width(4.dp))
+
+                Text(
+                    text = category.categoryName,
+                    style = PoptatoTypo.mdMedium,
+                    color = Gray00
+                )
+            }
+        } else if (buttonText == Category && category.categoryName.isEmpty()) {
+            Text(text = Settings, style = PoptatoTypo.mdRegular, color = Gray60)
+        }
     }
 }
 
