@@ -237,7 +237,9 @@ class BacklogViewModel @Inject constructor(
     }
 
     fun updateCategory(todoId: Long, categoryId: Long?) {
-        Timber.d("[수정 테스트] $todoId $categoryId")
+        Timber.d("[수정 테스트] ${uiState.value.backlogList} -> $todoId $categoryId")
+//        val newList = uiState.value.backlogList.filter { it.todoId != todoId }
+//        updateList(newList)
 
         viewModelScope.launch {
             updateTodoCategoryUseCase(request = UpdateTodoCategoryModel(
@@ -245,6 +247,8 @@ class BacklogViewModel @Inject constructor(
                 todoCategoryModel = TodoCategoryIdModel(categoryId)
             )).collect {
                 resultResponse(it, {
+//                    updateSnapshotList(uiState.value.backlogList)
+                    getBacklogList(categoryId = uiState.value.selectedCategoryId, page = 0, size = uiState.value.backlogList.size)
                 }, { error ->
                     Timber.d("[카테고리] 수정 서버통신 실패 -> $error")
                 })
