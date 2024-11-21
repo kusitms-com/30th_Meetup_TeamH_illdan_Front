@@ -171,16 +171,6 @@ fun BottomSheetBtn(
     category: CategoryItemModel = CategoryItemModel(),
     modifier: Modifier = Modifier
 ) {
-
-    val context = LocalContext.current
-    val imageLoader = ImageLoader.Builder(context)
-        .components {
-            add(SvgDecoder.Factory())
-        }
-        .build()
-    Coil.setImageLoader(imageLoader)
-
-
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -196,32 +186,55 @@ fun BottomSheetBtn(
             Text(text = Settings, style = PoptatoTypo.mdRegular, color = Gray60)
         }
 
-        if (buttonText == Category && category.categoryName.isNotEmpty()) {
-            Row(
-                modifier = modifier
-                    .clip(RoundedCornerShape(32.dp))
-                    .background(Gray90)
-                    .padding(horizontal = 10.dp, vertical = 4.dp),
-            ) {
-                AsyncImage(
-                    model = category.categoryImgUrl,
-                    contentDescription = "category icon",
-                    modifier = Modifier
-                        .size(20.dp),
-                    contentScale = ContentScale.Crop
-                )
+        CategoryTodoItem(buttonText = buttonText, category = category, modifier = modifier)
+    }
+}
 
-                Spacer(modifier = Modifier.width(4.dp))
+@SuppressLint("ModifierParameter")
+@Composable
+fun CategoryTodoItem(
+    buttonText: String,
+    category: CategoryItemModel = CategoryItemModel(),
+    modifier: Modifier = Modifier
+) {
 
-                Text(
-                    text = category.categoryName,
-                    style = PoptatoTypo.mdMedium,
-                    color = Gray00
-                )
-            }
-        } else if (buttonText == Category && category.categoryName.isEmpty()) {
-            Text(text = Settings, style = PoptatoTypo.mdRegular, color = Gray60)
+    val categoryFixedIcon: List<Int> = listOf(R.drawable.ic_category_all, R.drawable.ic_category_star)
+    val categoryId: Int = category.categoryId.toInt()
+    val categoryIndex: Int = if (categoryId == -1 || categoryId == 0) categoryId + 1 else -1
+
+    val context = LocalContext.current
+    val imageLoader = ImageLoader.Builder(context)
+        .components {
+            add(SvgDecoder.Factory())
         }
+        .build()
+    Coil.setImageLoader(imageLoader)
+
+    if (buttonText == Category && category.categoryName.isNotEmpty()) {
+        Row(
+            modifier = modifier
+                .clip(RoundedCornerShape(32.dp))
+                .background(Gray90)
+                .padding(horizontal = 10.dp, vertical = 4.dp),
+        ) {
+            AsyncImage(
+                model = if (categoryIndex == 0 || categoryIndex == 1) categoryFixedIcon[categoryIndex] else category.categoryImgUrl,
+                contentDescription = "category icon",
+                modifier = Modifier
+                    .size(20.dp),
+                contentScale = ContentScale.Crop
+            )
+
+            Spacer(modifier = Modifier.width(4.dp))
+
+            Text(
+                text = category.categoryName,
+                style = PoptatoTypo.mdMedium,
+                color = Gray00
+            )
+        }
+    } else if (buttonText == Category && category.categoryName.isEmpty()) {
+        Text(text = Settings, style = PoptatoTypo.mdRegular, color = Gray60)
     }
 }
 
