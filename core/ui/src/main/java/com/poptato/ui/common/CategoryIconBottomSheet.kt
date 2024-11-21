@@ -40,7 +40,7 @@ import com.poptato.domain.model.response.category.CategoryIconTotalListModel
 import com.poptato.domain.model.response.category.CategoryIconTypeListModel
 
 @Composable
-fun CategoryBottomSheet(
+fun CategoryIconBottomSheet(
     categoryIconList: CategoryIconTotalListModel = CategoryIconTotalListModel(),
     onSelectCategoryIcon: (CategoryIconItemModel) -> Unit = {}
 ) {
