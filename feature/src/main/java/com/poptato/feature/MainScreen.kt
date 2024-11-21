@@ -279,7 +279,15 @@ fun MainScreen() {
 
                         BottomSheetType.CategoryList -> {
                             CategoryBottomSheet(
-                                categoryList = uiState.categoryList
+                                categoryId = uiState.selectedTodoCategoryItem.categoryId,
+                                categoryList = uiState.categoryList,
+                                onDismiss = {
+                                    viewModel.updateBottomSheetType(BottomSheetType.Main)
+                                },
+                                onCategorySelected = {
+                                    viewModel.onUpdatedCategory(it)
+                                    scope.launch { viewModel.updateCategoryFlow.emit(it) }
+                                }
                             )
                         }
                     }
@@ -392,6 +400,7 @@ fun MainScreen() {
                             deleteTodoFlow = viewModel.deleteTodoFlow,
                             activateItemFlow = viewModel.activateItemFlow,
                             updateBookmarkFlow = viewModel.updateBookmarkFlow,
+                            updateCategoryFlow = viewModel.updateCategoryFlow,
                             showSnackBar = showSnackBar,
                             showDialog = showDialog,
                             categoryScreenContent = categoryScreenContent

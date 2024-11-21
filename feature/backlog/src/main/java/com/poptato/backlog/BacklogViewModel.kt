@@ -232,6 +232,11 @@ class BacklogViewModel @Inject constructor(
         )
     }
 
+    fun updateCategory(todoId: Long, categoryId: Long?) {
+        // TODO 카테고리 수정 서버통신
+        Timber.d("[수정 테스트] $todoId $categoryId")
+    }
+
     fun setDeadline(deadline: String?, id: Long) {
         updateDeadlineInUI(deadline = deadline, id = id)
 

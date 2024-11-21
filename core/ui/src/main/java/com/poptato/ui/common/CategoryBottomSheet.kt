@@ -58,7 +58,8 @@ fun CategoryBottomSheet(
         selectedCategory = selectedCategory,
         onClickCategory = { selectedCategory = it },
         onClickDeleteBtn = { onCategorySelected(null) },
-        onClickFinishBtn = {}
+        onClickFinishBtn = { onCategorySelected(selectedCategory) },
+        onDismiss = onDismiss
     )
 }
 
@@ -68,7 +69,8 @@ fun CategoryListBottomSheetContent(
     selectedCategory: Long? = null,
     onClickCategory: (Long) -> Unit = {},
     onClickDeleteBtn: () -> Unit = {},
-    onClickFinishBtn: () -> Unit = {}
+    onClickFinishBtn: () -> Unit = {},
+    onDismiss: () -> Unit = {},
 ) {
     Column(
         modifier = Modifier
@@ -93,7 +95,11 @@ fun CategoryListBottomSheetContent(
             }
         }
 
-        CategoryModifyBtnContent()
+        CategoryModifyBtnContent(
+            onClickDeleteBtn = onClickDeleteBtn,
+            onClickFinishBtn = onClickFinishBtn,
+            onDismiss = onDismiss
+        )
     }
 }
 
@@ -102,7 +108,7 @@ fun CategoryBottomSheetItem(
     iconImg: String = "",
     categoryName: String = "",
     isSelected: Boolean = false,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
 ) {
     Row(
         modifier = Modifier
@@ -146,6 +152,9 @@ fun CategoryBottomSheetItem(
 
 @Composable
 fun CategoryModifyBtnContent(
+    onClickDeleteBtn: () -> Unit = {},
+    onClickFinishBtn: () -> Unit = {},
+    onDismiss: () -> Unit = {},
 ) {
     Spacer(modifier = Modifier.height(16.dp))
 
@@ -162,6 +171,8 @@ fun CategoryModifyBtnContent(
             textStyle = PoptatoTypo.mdMedium,
             modifier = Modifier.weight(1f),
             onClickBtn = {
+                onClickDeleteBtn()
+                onDismiss()
             }
         )
 
@@ -174,6 +185,8 @@ fun CategoryModifyBtnContent(
             textStyle = PoptatoTypo.mdSemiBold,
             modifier = Modifier.weight(1f),
             onClickBtn = {
+                onClickFinishBtn()
+                onDismiss()
             }
         )
     }

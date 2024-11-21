@@ -82,6 +82,7 @@ fun NavGraphBuilder.backlogNavGraph(
     deleteTodoFlow: SharedFlow<Long>,
     activateItemFlow: SharedFlow<Long>,
     updateBookmarkFlow: SharedFlow<Long>,
+    updateCategoryFlow: SharedFlow<Long?>,
     showSnackBar: (String) -> Unit,
     showDialog: (DialogContentModel) -> Unit,
     categoryScreenContent: (CategoryScreenContentModel) -> Unit
@@ -101,6 +102,7 @@ fun NavGraphBuilder.backlogNavGraph(
                 deleteTodoFlow = deleteTodoFlow,
                 activateItemFlow = activateItemFlow,
                 updateBookmarkFlow = updateBookmarkFlow,
+                updateCategoryFlow = updateCategoryFlow,
                 showSnackBar = showSnackBar,
                 showDialog = showDialog
             )

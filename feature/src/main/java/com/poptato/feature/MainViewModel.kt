@@ -20,6 +20,7 @@ class MainViewModel @Inject constructor() : BaseViewModel<MainPageState>(MainPag
     val deleteTodoFlow = MutableSharedFlow<Long>()
     val activateItemFlow = MutableSharedFlow<Long>()
     val updateBookmarkFlow = MutableSharedFlow<Long>()
+    val updateCategoryFlow = MutableSharedFlow<Long?>()
     val animationDuration = 300
     val selectedIconInBottomSheet = MutableSharedFlow<CategoryIconItemModel>()
     val categoryScreenContent = MutableSharedFlow<CategoryScreenContentModel>(replay = 1)
@@ -62,6 +63,14 @@ class MainViewModel @Inject constructor() : BaseViewModel<MainPageState>(MainPag
             )
         )
         emitEventFlow(MainEvent.ShowTodoBottomSheet)
+    }
+
+    fun onUpdatedCategory(selectedId: Long?) {
+        updateState(
+            uiState.value.copy(
+                selectedTodoCategoryItem = uiState.value.categoryList.filter { it.categoryId == selectedId }[0]
+            )
+        )
     }
 
     fun onUpdatedDeadline(date: String?) {

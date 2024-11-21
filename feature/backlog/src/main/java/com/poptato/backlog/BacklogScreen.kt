@@ -128,6 +128,7 @@ fun BacklogScreen(
     deleteTodoFlow: SharedFlow<Long>,
     activateItemFlow: SharedFlow<Long>,
     updateBookmarkFlow: SharedFlow<Long>,
+    updateCategoryFlow: SharedFlow<Long?>,
     showSnackBar: (String) -> Unit,
     showDialog: (DialogContentModel) -> Unit = {}
 ) {
@@ -176,6 +177,12 @@ fun BacklogScreen(
         }
     }
 
+    LaunchedEffect(updateCategoryFlow) {
+        updateCategoryFlow.collect {
+            viewModel.updateCategory(uiState.selectedItem.todoId, it)
+        }
+    }
+
     if (uiState.isFinishedInitialization) {
         BacklogContent(
             uiState = uiState,
@@ -186,11 +193,13 @@ fun BacklogScreen(
             onSelectCategory = { index ->
                 viewModel.getBacklogListInCategory(index)
             },
-            onClickCategoryAdd = { goToCategorySelect(
-                CategoryScreenContentModel(
-                    CategoryScreenType.Add
+            onClickCategoryAdd = {
+                goToCategorySelect(
+                    CategoryScreenContentModel(
+                        CategoryScreenType.Add
+                    )
                 )
-            ) },
+            },
             onClickCategoryDeleteDropdown = {
                 showDialog(
                     DialogContentModel(
@@ -425,7 +434,8 @@ fun BacklogCategoryList(
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            val categoryFixedIcon: List<Int> = listOf(R.drawable.ic_category_all, R.drawable.ic_category_star)
+            val categoryFixedIcon: List<Int> =
+                listOf(R.drawable.ic_category_all, R.drawable.ic_category_star)
 
             itemsIndexed(categoryList, key = { _, item -> item.categoryId }) { index, item ->
                 CategoryListIcon(
