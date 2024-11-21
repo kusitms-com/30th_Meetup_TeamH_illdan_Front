@@ -16,13 +16,19 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -35,20 +41,34 @@ import com.poptato.design_system.Gray90
 import com.poptato.design_system.Gray95
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.Primary60
+import com.poptato.design_system.R
 import com.poptato.domain.model.response.category.CategoryItemModel
 
 @Composable
 fun CategoryBottomSheet(
+    categoryId: Long = -1,
     categoryList: List<CategoryItemModel> = emptyList(),
+    onDismiss: () -> Unit = {},
+    onCategorySelected: (Long?) -> Unit = {}
 ) {
+    var selectedCategory by remember { mutableLongStateOf(categoryId) }
+
     CategoryListBottomSheetContent(
-        categoryList = categoryList
+        categoryList = categoryList,
+        selectedCategory = selectedCategory,
+        onClickCategory = { selectedCategory = it },
+        onClickDeleteBtn = { onCategorySelected(null) },
+        onClickFinishBtn = {}
     )
 }
 
 @Composable
 fun CategoryListBottomSheetContent(
     categoryList: List<CategoryItemModel> = emptyList(),
+    selectedCategory: Long? = null,
+    onClickCategory: (Long) -> Unit = {},
+    onClickDeleteBtn: () -> Unit = {},
+    onClickFinishBtn: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -65,7 +85,9 @@ fun CategoryListBottomSheetContent(
                 if (index != 0 && index != 1) {
                     CategoryBottomSheetItem(
                         iconImg = item.categoryImgUrl,
-                        categoryName = item.categoryName
+                        categoryName = item.categoryName,
+                        isSelected = item.categoryId == selectedCategory,
+                        onClick = { onClickCategory(item.categoryId) }
                     )
                 }
             }
@@ -78,14 +100,20 @@ fun CategoryListBottomSheetContent(
 @Composable
 fun CategoryBottomSheetItem(
     iconImg: String = "",
-    categoryName: String = ""
+    categoryName: String = "",
+    isSelected: Boolean = false,
+    onClick: () -> Unit = {}
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
+            .background(if (isSelected) Gray90 else Gray95)
             .padding(vertical = 12.dp)
-            .padding(horizontal = 24.dp),
+            .padding(horizontal = 24.dp)
+            .clickable {
+                onClick()
+            },
     ) {
         AsyncImage(
             model = iconImg,
@@ -102,6 +130,17 @@ fun CategoryBottomSheetItem(
             modifier = Modifier
                 .padding(start = 8.dp)
         )
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        if (isSelected) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_check),
+                contentDescription = "check icon",
+                tint = Color.Unspecified
+            )
+        }
+
     }
 }
 
