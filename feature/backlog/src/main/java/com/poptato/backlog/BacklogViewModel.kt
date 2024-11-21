@@ -11,8 +11,10 @@ import com.poptato.domain.model.request.category.GetCategoryListRequestModel
 import com.poptato.domain.model.request.todo.DeadlineContentModel
 import com.poptato.domain.model.request.todo.DragDropRequestModel
 import com.poptato.domain.model.request.todo.ModifyTodoRequestModel
+import com.poptato.domain.model.request.todo.TodoCategoryIdModel
 import com.poptato.domain.model.request.todo.TodoIdModel
 import com.poptato.domain.model.request.todo.UpdateDeadlineRequestModel
+import com.poptato.domain.model.request.todo.UpdateTodoCategoryModel
 import com.poptato.domain.model.response.backlog.BacklogListModel
 import com.poptato.domain.model.response.category.CategoryListModel
 import com.poptato.domain.model.response.today.TodoItemModel
@@ -27,6 +29,7 @@ import com.poptato.domain.usecase.todo.ModifyTodoUseCase
 import com.poptato.domain.usecase.todo.SwipeTodoUseCase
 import com.poptato.domain.usecase.todo.UpdateBookmarkUseCase
 import com.poptato.domain.usecase.todo.UpdateDeadlineUseCase
+import com.poptato.domain.usecase.todo.UpdateTodoCategoryUseCase
 import com.poptato.domain.usecase.yesterday.GetYesterdayListUseCase
 import com.poptato.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -48,7 +51,8 @@ class BacklogViewModel @Inject constructor(
     private val dragDropUseCase: DragDropUseCase,
     private val updateDeadlineUseCase: UpdateDeadlineUseCase,
     private val updateBookmarkUseCase: UpdateBookmarkUseCase,
-    private val swipeTodoUseCase: SwipeTodoUseCase
+    private val swipeTodoUseCase: SwipeTodoUseCase,
+    private val updateTodoCategoryUseCase: UpdateTodoCategoryUseCase
 ) : BaseViewModel<BacklogPageState>(
     BacklogPageState()
 ) {
@@ -233,8 +237,19 @@ class BacklogViewModel @Inject constructor(
     }
 
     fun updateCategory(todoId: Long, categoryId: Long?) {
-        // TODO 카테고리 수정 서버통신
         Timber.d("[수정 테스트] $todoId $categoryId")
+
+        viewModelScope.launch {
+            updateTodoCategoryUseCase(request = UpdateTodoCategoryModel(
+                todoId = todoId,
+                todoCategoryModel = TodoCategoryIdModel(categoryId)
+            )).collect {
+                resultResponse(it, {
+                }, { error ->
+                    Timber.d("[카테고리] 수정 서버통신 실패 -> $error")
+                })
+            }
+        }
     }
 
     fun setDeadline(deadline: String?, id: Long) {
