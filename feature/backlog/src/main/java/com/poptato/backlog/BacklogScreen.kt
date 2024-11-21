@@ -123,7 +123,7 @@ import kotlinx.coroutines.launch
 fun BacklogScreen(
     goToYesterdayList: () -> Unit = {},
     goToCategorySelect: (CategoryScreenContentModel) -> Unit = {},
-    showBottomSheet: (TodoItemModel) -> Unit = {},
+    showBottomSheet: (TodoItemModel, CategoryItemModel) -> Unit = { _, _ -> },
     updateDeadlineFlow: SharedFlow<String?>,
     deleteTodoFlow: SharedFlow<Long>,
     activateItemFlow: SharedFlow<Long>,
@@ -216,7 +216,10 @@ fun BacklogScreen(
                 )
             },
             onClickBtnTodoSettings = {
-                showBottomSheet(uiState.backlogList[it])
+                showBottomSheet(
+                    uiState.backlogList[it],
+                    uiState.categoryList[uiState.selectedCategoryIndex]
+                )
                 viewModel.onSelectedItem(uiState.backlogList[it])
             },
             interactionSource = interactionSource,

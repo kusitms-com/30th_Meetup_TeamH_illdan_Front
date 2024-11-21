@@ -48,6 +48,7 @@ import com.poptato.design_system.Gray100
 import com.poptato.domain.model.enums.BottomSheetType
 import com.poptato.domain.model.enums.DialogType
 import com.poptato.domain.model.response.category.CategoryIconTotalListModel
+import com.poptato.domain.model.response.category.CategoryItemModel
 import com.poptato.domain.model.response.category.CategoryScreenContentModel
 import com.poptato.domain.model.response.dialog.DialogContentModel
 import com.poptato.domain.model.response.today.TodoItemModel
@@ -89,8 +90,8 @@ fun MainScreen() {
         skipHalfExpanded = true
     )
     val isShowDialog = remember { mutableStateOf(false) }
-    val showBottomSheet: (TodoItemModel) -> Unit = { item: TodoItemModel ->
-        viewModel.onSelectedTodoItem(item)
+    val showBottomSheet: (TodoItemModel, CategoryItemModel) -> Unit = { item: TodoItemModel, category: CategoryItemModel ->
+        viewModel.onSelectedTodoItem(item, category)
         scope.launch { sheetState.show() }
     }
     val showCategoryIconBottomSheet: (CategoryIconTotalListModel) -> Unit = { categoryList: CategoryIconTotalListModel ->

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -24,6 +25,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.poptato.design_system.Category
 import com.poptato.design_system.DEADLINE_OPTION
 import com.poptato.design_system.Danger50
 import com.poptato.design_system.Gray00
@@ -121,6 +123,9 @@ fun TodoBottomSheetContent(
         BottomSheetBtn(resourceId = R.drawable.ic_pen, buttonText = modify, textColor = Gray30, modifier = Modifier.clickable {
             onClickBtnModify(item.todoId)
         })
+        BottomSheetBtn(resourceId = R.drawable.ic_trash, buttonText = DELETE_ACTION, textColor = Danger50, modifier = Modifier.clickable {
+            onClickBtnDelete(item.todoId)
+        })
         BottomSheetBtn(resourceId = R.drawable.ic_refresh, buttonText = REPEAT_TASK_OPTION, textColor = Gray30)
         BottomSheetBtn(
             resourceId = R.drawable.ic_calendar,
@@ -131,9 +136,7 @@ fun TodoBottomSheetContent(
             },
             deadline = item.deadline
         )
-        BottomSheetBtn(resourceId = R.drawable.ic_trash, buttonText = DELETE_ACTION, textColor = Danger50, modifier = Modifier.clickable {
-            onClickBtnDelete(item.todoId)
-        })
+        BottomSheetBtn(resourceId = R.drawable.ic_add_category_icon, buttonText = Category, textColor = Gray30)
     }
 }
 
@@ -145,6 +148,7 @@ fun BottomSheetBtn(
     buttonText: String,
     textColor: Color,
     deadline: String = "",
+    category: String = "",
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -152,7 +156,7 @@ fun BottomSheetBtn(
             .fillMaxWidth()
             .padding(vertical = 12.dp, horizontal = 24.dp)
     ) {
-        Icon(painter = painterResource(id = resourceId), contentDescription = null, tint = resourceColor)
+        Icon(painter = painterResource(id = resourceId), contentDescription = null, tint = resourceColor, modifier = Modifier.size(20.dp))
         Spacer(modifier = Modifier.width(8.dp))
         Text(text = buttonText, style = PoptatoTypo.mdMedium, color = textColor)
         Spacer(modifier = Modifier.weight(1f))
