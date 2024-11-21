@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,20 +38,22 @@ fun CategoryListBottomSheetContent(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .height(392.dp)
+            .height(368.dp)
             .background(Gray100)
     ) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(264.dp)
                 .padding(top = 24.dp, bottom = 16.dp)
+                .height(264.dp),
         ) {
             itemsIndexed(categoryList, key = { _, item -> item.categoryId }) { index, item ->
-                CategoryBottomSheetItem(
-                    iconImg = item.categoryImgUrl,
-                    categoryName = item.categoryName
-                )
+                if (index != 0 && index != 1) {
+                    CategoryBottomSheetItem(
+                        iconImg = item.categoryImgUrl,
+                        categoryName = item.categoryName
+                    )
+                }
             }
         }
     }
