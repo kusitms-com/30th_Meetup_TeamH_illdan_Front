@@ -59,7 +59,7 @@ class MainViewModel @Inject constructor() : BaseViewModel<MainPageState>(MainPag
             uiState.value.copy(
                 selectedTodoItem = item,
                 categoryList = category,
-                selectedTodoCategoryItem = category.filter { it.categoryId == item.categoryId }[0]
+                selectedTodoCategoryItem = category.firstOrNull { it.categoryId == item.categoryId }
             )
         )
         emitEventFlow(MainEvent.ShowTodoBottomSheet)
@@ -68,7 +68,7 @@ class MainViewModel @Inject constructor() : BaseViewModel<MainPageState>(MainPag
     fun onUpdatedCategory(selectedId: Long?) {
         updateState(
             uiState.value.copy(
-                selectedTodoCategoryItem = uiState.value.categoryList.filter { it.categoryId == selectedId }[0]
+                selectedTodoCategoryItem = uiState.value.categoryList.firstOrNull { it.categoryId == selectedId }
             )
         )
     }

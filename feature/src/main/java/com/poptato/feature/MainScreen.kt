@@ -279,7 +279,7 @@ fun MainScreen() {
 
                         BottomSheetType.CategoryList -> {
                             CategoryBottomSheet(
-                                categoryId = uiState.selectedTodoCategoryItem.categoryId,
+                                categoryId = uiState.selectedTodoCategoryItem?.categoryId ?: -1,
                                 categoryList = uiState.categoryList,
                                 onDismiss = {
                                     viewModel.updateBottomSheetType(BottomSheetType.Main)

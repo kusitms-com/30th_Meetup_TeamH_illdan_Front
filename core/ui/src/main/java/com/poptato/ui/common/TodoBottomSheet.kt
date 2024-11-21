@@ -53,7 +53,7 @@ import com.poptato.domain.model.response.today.TodoItemModel
 @Composable
 fun TodoBottomSheet(
     item: TodoItemModel = TodoItemModel(),
-    categoryItem: CategoryItemModel = CategoryItemModel(),
+    categoryItem: CategoryItemModel? = CategoryItemModel(),
     onClickShowDatePicker: () -> Unit = {},
     onClickBtnDelete: (Long) -> Unit = {},
     onClickBtnModify: (Long) -> Unit = {},
@@ -85,7 +85,7 @@ fun TodoBottomSheet(
 @Composable
 fun TodoBottomSheetContent(
     item: TodoItemModel = TodoItemModel(),
-    categoryItem: CategoryItemModel = CategoryItemModel(),
+    categoryItem: CategoryItemModel? = CategoryItemModel(),
     onClickShowDatePicker: () -> Unit = {},
     onClickBtnDelete: (Long) -> Unit = {},
     onClickBtnModify: (Long) -> Unit = {},
@@ -173,7 +173,7 @@ fun BottomSheetBtn(
     buttonText: String,
     textColor: Color,
     deadline: String = "",
-    category: CategoryItemModel = CategoryItemModel(),
+    category: CategoryItemModel? = CategoryItemModel(),
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -187,7 +187,7 @@ fun BottomSheetBtn(
         Spacer(modifier = Modifier.weight(1f))
         if (buttonText == DEADLINE_OPTION && deadline.isNotEmpty()) {
             Text(text = deadline, style = PoptatoTypo.mdMedium, color = Gray00)
-        } else if (buttonText == DEADLINE_OPTION && deadline.isEmpty()) {
+        } else if (buttonText == DEADLINE_OPTION) {
             Text(text = Settings, style = PoptatoTypo.mdRegular, color = Gray60)
         }
 
@@ -199,13 +199,11 @@ fun BottomSheetBtn(
 @Composable
 fun CategoryTodoItem(
     buttonText: String,
-    category: CategoryItemModel = CategoryItemModel(),
+    category: CategoryItemModel? = CategoryItemModel(),
     modifier: Modifier = Modifier
 ) {
 
     val categoryFixedIcon: List<Int> = listOf(R.drawable.ic_category_all, R.drawable.ic_category_star)
-    val categoryId: Int = category.categoryId.toInt()
-    val categoryIndex: Int = if (categoryId == -1 || categoryId == 0) categoryId + 1 else -1
 
     val context = LocalContext.current
     val imageLoader = ImageLoader.Builder(context)
@@ -215,7 +213,10 @@ fun CategoryTodoItem(
         .build()
     Coil.setImageLoader(imageLoader)
 
-    if (buttonText == Category && category.categoryName.isNotEmpty()) {
+    if (buttonText == Category && category != null) {
+        val categoryId: Int = category.categoryId.toInt()
+        val categoryIndex: Int = if (categoryId == -1 || categoryId == 0) categoryId + 1 else -1
+
         Row(
             modifier = modifier
                 .clip(RoundedCornerShape(32.dp))
@@ -238,7 +239,7 @@ fun CategoryTodoItem(
                 color = Gray00
             )
         }
-    } else if (buttonText == Category && category.categoryName.isEmpty()) {
+    } else if (buttonText == Category) {
         Text(text = Settings, style = PoptatoTypo.mdRegular, color = Gray60)
     }
 }

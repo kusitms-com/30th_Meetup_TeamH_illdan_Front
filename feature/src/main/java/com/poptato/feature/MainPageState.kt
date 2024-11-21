@@ -11,7 +11,7 @@ import com.poptato.ui.base.PageState
 data class MainPageState(
     val bottomNavType: BottomNavType = BottomNavType.DEFAULT,
     val selectedTodoItem: TodoItemModel = TodoItemModel(),
-    val selectedTodoCategoryItem: CategoryItemModel = CategoryItemModel(),
+    val selectedTodoCategoryItem: CategoryItemModel? = CategoryItemModel(),
     val categoryList: List<CategoryItemModel> = emptyList(),
     val bottomSheetType: BottomSheetType = BottomSheetType.Main,
     val backPressedOnce: Boolean = false,
