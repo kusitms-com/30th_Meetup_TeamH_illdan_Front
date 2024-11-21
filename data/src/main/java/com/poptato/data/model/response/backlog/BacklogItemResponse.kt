@@ -9,6 +9,8 @@ data class BacklogItemResponse(
     val content: String = "",
     @SerializedName("bookmark")
     val isBookmark: Boolean = false,
+    @SerializedName("repeat")
+    val repeat: Boolean = false,
     @SerializedName("deadline")
     val deadline: String? = null,
     @SerializedName("dday")

@@ -5,6 +5,8 @@ import com.poptato.data.base.Endpoints
 import com.poptato.domain.model.request.todo.TodoIdModel
 import com.poptato.domain.model.request.todo.DeadlineContentModel
 import com.poptato.domain.model.request.todo.DragDropRequestModel
+import com.poptato.domain.model.request.todo.TodoCategoryIdModel
+import com.poptato.domain.model.request.todo.UpdateTodoCategoryModel
 import com.poptato.domain.model.request.todo.TodoContentModel
 import retrofit2.Response
 import retrofit2.http.Body
@@ -48,5 +50,11 @@ interface TodoService {
     @PATCH(Endpoints.Todo.COMPLETION)
     suspend fun updateTodoCompletion(
         @Path("todoId") todoId: Long
+    ): Response<ApiResponse<Unit>>
+
+    @PATCH(Endpoints.Todo.UPDATECATEGIRY)
+    suspend fun updateTodoCategory(
+        @Path("todoId") todoId: Long,
+        @Body request: TodoCategoryIdModel
     ): Response<ApiResponse<Unit>>
 }

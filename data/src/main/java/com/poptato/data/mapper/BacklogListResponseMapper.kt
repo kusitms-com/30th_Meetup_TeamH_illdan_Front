@@ -15,11 +15,13 @@ object BacklogListResponseMapper: Mapper<BacklogListResponse, BacklogListModel> 
                         todoId = item.todoId,
                         content = item.content,
                         isBookmark = item.isBookmark,
+                        isRepeat = item.repeat,
                         deadline = item.deadline ?: "",
                         dDay = item.dDay
                     )
                 },
-                totalPageCount = it.totalPageCount
+                totalPageCount = it.totalPageCount,
+                categoryName = it.categoryName
             )
         } ?: BacklogListModel()
     }

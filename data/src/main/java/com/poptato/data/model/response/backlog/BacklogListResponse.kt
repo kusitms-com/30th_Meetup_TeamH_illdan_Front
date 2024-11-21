@@ -8,5 +8,7 @@ data class BacklogListResponse(
     @SerializedName("backlogs")
     val backlogs: List<BacklogItemResponse> = emptyList(),
     @SerializedName("totalPageCount")
-    val totalPageCount: Int = -1
+    val totalPageCount: Int = -1,
+    @SerializedName("categoryName")
+    val categoryName: String = ""
 )

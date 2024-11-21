@@ -1,14 +1,12 @@
 package com.poptato.ui.common
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -16,143 +14,216 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.Coil
-import coil.ImageLoader
 import coil.compose.AsyncImage
-import coil.decode.SvgDecoder
-import com.poptato.design_system.Gray60
-import com.poptato.design_system.Gray80
+import com.poptato.design_system.Complete
+import com.poptato.design_system.DELETE
+import com.poptato.design_system.Gray00
+import com.poptato.design_system.Gray100
 import com.poptato.design_system.Gray90
+import com.poptato.design_system.Gray95
 import com.poptato.design_system.PoptatoTypo
-import com.poptato.domain.model.response.category.CategoryIconItemModel
-import com.poptato.domain.model.response.category.CategoryIconTotalListModel
-import com.poptato.domain.model.response.category.CategoryIconTypeListModel
+import com.poptato.design_system.Primary60
+import com.poptato.design_system.R
+import com.poptato.domain.model.response.category.CategoryItemModel
 
 @Composable
 fun CategoryBottomSheet(
-    categoryIconList: CategoryIconTotalListModel = CategoryIconTotalListModel(),
-    onSelectCategoryIcon: (CategoryIconItemModel) -> Unit = {}
+    categoryId: Long = -1,
+    categoryList: List<CategoryItemModel> = emptyList(),
+    onDismiss: () -> Unit = {},
+    onCategorySelected: (Long?) -> Unit = {}
 ) {
+    var selectedCategory by remember { mutableLongStateOf(categoryId) }
 
-    CategoryBottomSheetContent(
-        categoryIconList = categoryIconList,
-        onSelectCategoryIcon = onSelectCategoryIcon
+    CategoryListBottomSheetContent(
+        categoryList = categoryList,
+        selectedCategory = selectedCategory,
+        onClickCategory = { selectedCategory = it },
+        onClickDeleteBtn = { onCategorySelected(null) },
+        onClickFinishBtn = {
+            if (selectedCategory.toInt() == -1) onCategorySelected(null) else onCategorySelected(selectedCategory)
+        },
+        onDismiss = onDismiss
     )
 }
 
 @Composable
-fun CategoryBottomSheetContent(
-    categoryIconList: CategoryIconTotalListModel = CategoryIconTotalListModel(),
-    onSelectCategoryIcon: (CategoryIconItemModel) -> Unit = {}
+fun CategoryListBottomSheetContent(
+    categoryList: List<CategoryItemModel> = emptyList(),
+    selectedCategory: Long? = null,
+    onClickCategory: (Long) -> Unit = {},
+    onClickDeleteBtn: () -> Unit = {},
+    onClickFinishBtn: () -> Unit = {},
+    onDismiss: () -> Unit = {},
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .height(610.dp)
-            .background(Gray90)
+            .background(Gray95)
     ) {
-        Box(
+        LazyColumn(
             modifier = Modifier
-                .padding(top = 12.dp, bottom = 16.dp)
-                .height(4.dp)
-                .width(64.dp)
-                .clip(RoundedCornerShape(4.dp))
-                .background(Gray80)
-                .align(Alignment.CenterHorizontally)
-        )
+                .fillMaxWidth()
+                .padding(top = 24.dp, bottom = 16.dp)
+                .height(264.dp),
+        ) {
+            itemsIndexed(categoryList, key = { _, item -> item.categoryId }) { index, item ->
+                if (index != 0 && index != 1) {
+                    CategoryBottomSheetItem(
+                        iconImg = item.categoryImgUrl,
+                        categoryName = item.categoryName,
+                        isSelected = item.categoryId == selectedCategory,
+                        onClick = { onClickCategory(item.categoryId) }
+                    )
+                }
+            }
+        }
 
-        CategoryIconListTotal(
-            categoryIconList = categoryIconList,
-            onSelectCategoryIcon = onSelectCategoryIcon
+        CategoryModifyBtnContent(
+            onClickDeleteBtn = onClickDeleteBtn,
+            onClickFinishBtn = onClickFinishBtn,
+            onDismiss = onDismiss
         )
     }
 }
 
 @Composable
-fun CategoryIconListTotal(
-    categoryIconList: CategoryIconTotalListModel = CategoryIconTotalListModel(),
-    onSelectCategoryIcon: (CategoryIconItemModel) -> Unit = {}
+fun CategoryBottomSheetItem(
+    iconImg: String = "",
+    categoryName: String = "",
+    isSelected: Boolean = false,
+    onClick: () -> Unit = {},
 ) {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        items(categoryIconList.icons, key = { it.iconType }) { iconTypes ->
-            CategoryIconListForType(
-                categoryIcons = iconTypes,
-                onSelectCategoryIcon = onSelectCategoryIcon
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-        }
-    }
-}
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-fun CategoryIconListForType(
-    categoryIcons: CategoryIconTypeListModel = CategoryIconTypeListModel(),
-    onSelectCategoryIcon: (CategoryIconItemModel) -> Unit = {}
-) {
-
-    val context = LocalContext.current
-    val imageLoader = ImageLoader.Builder(context)
-        .components {
-            add(SvgDecoder.Factory())
-        }
-        .build()
-    Coil.setImageLoader(imageLoader)
-
-    Column(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
+            .background(if (isSelected) Gray90 else Gray95)
+            .padding(vertical = 12.dp)
             .padding(horizontal = 24.dp)
+            .clickable {
+                onClick()
+            },
     ) {
-        Text(
-            text = categoryIcons.iconType,
-            style = PoptatoTypo.smMedium,
-            color = Gray60
+        AsyncImage(
+            model = iconImg,
+            contentDescription = "category icon",
+            modifier = Modifier
+                .size(24.dp),
+            contentScale = ContentScale.Crop
         )
 
-        FlowRow(
-            maxItemsInEachRow = 7,
+        Text(
+            text = categoryName,
+            style = PoptatoTypo.mdMedium,
+            color = Gray00,
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp),
-            horizontalArrangement = Arrangement.spacedBy(15.dp)
-        ) {
+                .padding(start = 8.dp)
+        )
 
-            categoryIcons.icons.forEach { item ->
-                AsyncImage(
-                    model = item.iconImgUrl,
-                    contentDescription = "icon ${item.iconId}",
-                    modifier = Modifier
-                        .size(32.dp)
-                        .clickable {
-                            onSelectCategoryIcon(item)
-                        },
-                    contentScale = ContentScale.Crop
-                )
-            }
+        Spacer(modifier = Modifier.weight(1f))
+
+        if (isSelected) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_check),
+                contentDescription = "check icon",
+                tint = Color.Unspecified
+            )
         }
+
+    }
+}
+
+@Composable
+fun CategoryModifyBtnContent(
+    onClickDeleteBtn: () -> Unit = {},
+    onClickFinishBtn: () -> Unit = {},
+    onDismiss: () -> Unit = {},
+) {
+    Spacer(modifier = Modifier.height(16.dp))
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(48.dp)
+            .padding(horizontal = 16.dp)
+    ) {
+        CategoryBottomSheetBtn(
+            btnText = DELETE,
+            btnColor = Gray90,
+            textColor = Gray00,
+            textStyle = PoptatoTypo.mdMedium,
+            modifier = Modifier.weight(1f),
+            onClickBtn = {
+                onClickDeleteBtn()
+                onDismiss()
+            }
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        CategoryBottomSheetBtn(
+            btnText = Complete,
+            btnColor = Primary60,
+            textColor = Gray100,
+            textStyle = PoptatoTypo.mdSemiBold,
+            modifier = Modifier.weight(1f),
+            onClickBtn = {
+                onClickFinishBtn()
+                onDismiss()
+            }
+        )
+    }
+
+    Spacer(modifier = Modifier.height(16.dp))
+}
+
+@SuppressLint("ModifierParameter")
+@Composable
+fun CategoryBottomSheetBtn(
+    btnText: String = "",
+    btnColor: Color = Color.Unspecified,
+    textColor: Color = Color.Unspecified,
+    textStyle: TextStyle = PoptatoTypo.lgSemiBold,
+    onClickBtn: () -> Unit = {},
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .height(48.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(btnColor)
+            .clickable { onClickBtn() },
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = btnText,
+            style = textStyle,
+            color = textColor
+        )
     }
 }
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun PreviewCategoryBottomSheet() {
-    CategoryBottomSheetContent()
+fun PreviewCategoryListBottomSheet() {
+    CategoryListBottomSheetContent()
 }
