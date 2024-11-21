@@ -90,9 +90,9 @@ fun MainScreen() {
         skipHalfExpanded = true
     )
     val isShowDialog = remember { mutableStateOf(false) }
-    val showBottomSheet: (TodoItemModel, CategoryItemModel) -> Unit =
-        { item: TodoItemModel, category: CategoryItemModel ->
-            viewModel.onSelectedTodoItem(item, category)
+    val showBottomSheet: (TodoItemModel, List<CategoryItemModel>) -> Unit =
+        { item: TodoItemModel, categoryList: List<CategoryItemModel> ->
+            viewModel.onSelectedTodoItem(item, categoryList)
             scope.launch { sheetState.show() }
         }
     val showCategoryIconBottomSheet: (CategoryIconTotalListModel) -> Unit =
@@ -201,7 +201,7 @@ fun MainScreen() {
                     modifier = Modifier
                         .fillMaxWidth()
                         .then(
-                            if (uiState.bottomSheetType == BottomSheetType.Category) {
+                            if (uiState.bottomSheetType == BottomSheetType.CategoryIcon) {
                                 Modifier.height(610.dp)
                             } else {
                                 Modifier.wrapContentHeight()
@@ -261,7 +261,7 @@ fun MainScreen() {
                             )
                         }
 
-                        BottomSheetType.Category -> {
+                        BottomSheetType.CategoryIcon -> {
                             CategoryIconBottomSheet(
                                 categoryIconList = uiState.categoryIconList,
                                 onSelectCategoryIcon = {

@@ -20,7 +20,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -58,7 +57,8 @@ fun TodoBottomSheet(
     onClickShowDatePicker: () -> Unit = {},
     onClickBtnDelete: (Long) -> Unit = {},
     onClickBtnModify: (Long) -> Unit = {},
-    onClickBtnBookmark: (Long) -> Unit = {}
+    onClickBtnBookmark: (Long) -> Unit = {},
+    onClickCategoryBottomSheet: () -> Unit = {}
 ) {
     var deadline by remember { mutableStateOf(item.deadline) }
     var isBookmark by remember { mutableStateOf(item.isBookmark) }
@@ -77,7 +77,8 @@ fun TodoBottomSheet(
         onClickBtnBookmark = {
             onClickBtnBookmark(it)
             isBookmark = !isBookmark
-        }
+        },
+        onClickCategoryBottomSheet = onClickCategoryBottomSheet
     )
 }
 
@@ -88,7 +89,8 @@ fun TodoBottomSheetContent(
     onClickShowDatePicker: () -> Unit = {},
     onClickBtnDelete: (Long) -> Unit = {},
     onClickBtnModify: (Long) -> Unit = {},
-    onClickBtnBookmark: (Long) -> Unit = {}
+    onClickBtnBookmark: (Long) -> Unit = {},
+    onClickCategoryBottomSheet: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -155,7 +157,10 @@ fun TodoBottomSheetContent(
             resourceId = R.drawable.ic_add_category_icon,
             buttonText = Category,
             textColor = Gray30,
-            category = categoryItem
+            category = categoryItem,
+            modifier = Modifier.clickable { 
+                onClickCategoryBottomSheet()
+            }
         )
     }
 }

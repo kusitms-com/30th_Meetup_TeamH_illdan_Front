@@ -53,11 +53,12 @@ class MainViewModel @Inject constructor() : BaseViewModel<MainPageState>(MainPag
         )
     }
 
-    fun onSelectedTodoItem(item: TodoItemModel, category: CategoryItemModel) {
+    fun onSelectedTodoItem(item: TodoItemModel, category: List<CategoryItemModel>) {
         updateState(
             uiState.value.copy(
                 selectedTodoItem = item,
-                selectedTodoCategoryItem = category
+                categoryList = category,
+                selectedTodoCategoryItem = category.filter { it.categoryId == item.categoryId }[0]
             )
         )
         emitEventFlow(MainEvent.ShowTodoBottomSheet)
@@ -90,7 +91,7 @@ class MainViewModel @Inject constructor() : BaseViewModel<MainPageState>(MainPag
     fun onSelectedCategoryIcon(categoryList: CategoryIconTotalListModel) {
         updateState(
             uiState.value.copy(
-                bottomSheetType = BottomSheetType.Category,
+                bottomSheetType = BottomSheetType.CategoryIcon,
                 categoryIconList = categoryList
             )
         )

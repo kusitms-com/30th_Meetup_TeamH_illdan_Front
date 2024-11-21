@@ -77,7 +77,7 @@ fun NavGraphBuilder.loginNavGraph(
 
 fun NavGraphBuilder.backlogNavGraph(
     navController: NavHostController,
-    showBottomSheet: (TodoItemModel, CategoryItemModel) -> Unit,
+    showBottomSheet: (TodoItemModel, List<CategoryItemModel>) -> Unit,
     updateDeadlineFlow: SharedFlow<String?>,
     deleteTodoFlow: SharedFlow<Long>,
     activateItemFlow: SharedFlow<Long>,

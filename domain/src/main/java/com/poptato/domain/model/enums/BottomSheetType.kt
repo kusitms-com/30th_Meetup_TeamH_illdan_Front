@@ -1,5 +1,5 @@
 package com.poptato.domain.model.enums
 
 enum class BottomSheetType{
-    Main, FullDate, Calendar, SubDate, Category
+    Main, FullDate, Calendar, SubDate, CategoryIcon
 }

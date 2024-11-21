@@ -113,9 +113,11 @@ class BacklogViewModel @Inject constructor(
     private fun onSuccessGetBacklogList(response: BacklogListModel) {
         updateSnapshotList(response.backlogs)
 
+        val backlogs: List<TodoItemModel> = response.backlogs.map { it.apply { categoryId = uiState.value.selectedCategoryId } }
+
         updateState(
             uiState.value.copy(
-                backlogList = response.backlogs,
+                backlogList = backlogs,
                 totalPageCount = response.totalPageCount,
                 totalItemCount = response.totalCount,
                 isFinishedInitialization = true
