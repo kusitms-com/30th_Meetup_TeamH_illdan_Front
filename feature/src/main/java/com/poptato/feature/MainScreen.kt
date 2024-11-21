@@ -63,6 +63,7 @@ import com.poptato.navigation.splashNavGraph
 import com.poptato.navigation.todayNavGraph
 import com.poptato.navigation.yesterdayListNavGraph
 import com.poptato.ui.common.CalendarBottomSheet
+import com.poptato.ui.common.CategoryBottomSheet
 import com.poptato.ui.common.CategoryIconBottomSheet
 import com.poptato.ui.common.CommonSnackBar
 import com.poptato.ui.common.DatePickerBottomSheet
@@ -238,6 +239,9 @@ fun MainScreen() {
                                     scope.launch {
                                         viewModel.updateBookmarkFlow.emit(it)
                                     }
+                                },
+                                onClickCategoryBottomSheet = {
+                                    viewModel.updateBottomSheetType(BottomSheetType.CategoryList)
                                 }
                             )
                         }
@@ -270,6 +274,12 @@ fun MainScreen() {
                                         sheetState.hide()
                                     }
                                 }
+                            )
+                        }
+
+                        BottomSheetType.CategoryList -> {
+                            CategoryBottomSheet(
+                                categoryList = uiState.categoryList
                             )
                         }
                     }
