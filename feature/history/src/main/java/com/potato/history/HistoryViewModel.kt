@@ -35,7 +35,7 @@ class HistoryViewModel @Inject constructor(
             )
 
             viewModelScope.launch {
-                getHistoryListUseCase.invoke(
+                getHistoryListUseCase(
                     request = HistoryListRequestModel(
                         page = uiState.value.currentPage,
                         size = uiState.value.pageSize,
@@ -70,7 +70,7 @@ class HistoryViewModel @Inject constructor(
 
     fun getCalendarList() {
         viewModelScope.launch {
-            getHistoryCalendarListUseCase.invoke(
+            getHistoryCalendarListUseCase(
                 request = HistoryCalendarRequestModel(
                     year = uiState.value.currentMonthStartDate.year.toString(),
                     month = uiState.value.currentMonthStartDate.monthValue
