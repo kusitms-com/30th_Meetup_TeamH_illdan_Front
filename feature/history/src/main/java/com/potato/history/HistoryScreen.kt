@@ -1,7 +1,9 @@
 package com.potato.history
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.LocalOverscrollConfiguration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.FlingBehavior
@@ -49,7 +51,9 @@ import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.R
 import com.poptato.domain.model.response.history.HistoryItemModel
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.overscroll
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -360,6 +364,7 @@ private fun LazyListState.onLoadMoreWhenLastItemVisible(action: () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun InfinityLazyColumn(
     modifier: Modifier = Modifier.padding(start = 24.dp, end = 24.dp),
@@ -373,15 +378,16 @@ fun InfinityLazyColumn(
     content: LazyListScope.() -> Unit,
 ) {
     state.onLoadMoreWhenLastItemVisible(action = loadMore)
-
-    LazyColumn(
-        modifier = modifier,
-        state = state,
-        reverseLayout = reverseLayout,
-        verticalArrangement = verticalArrangement,
-        horizontalAlignment = horizontalAlignment,
-        flingBehavior = flingBehavior,
-        userScrollEnabled = userScrollEnabled,
-        content = content
-    )
+    CompositionLocalProvider(LocalOverscrollConfiguration provides null) {
+        LazyColumn(
+            modifier = modifier,
+            state = state,
+            reverseLayout = reverseLayout,
+            verticalArrangement = verticalArrangement,
+            horizontalAlignment = horizontalAlignment,
+            flingBehavior = flingBehavior,
+            userScrollEnabled = userScrollEnabled,
+            content = content
+        )
+    }
 }
