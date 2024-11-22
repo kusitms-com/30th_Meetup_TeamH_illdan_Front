@@ -171,4 +171,25 @@ object PoptatoTypo {
         fontWeight = FontWeight.Normal,
         lineHeight = 18.sp
     )
+
+    val calSemiBold: TextStyle = TextStyle(
+        fontSize = 10.sp,
+        fontFamily = fontFamily,
+        fontWeight = FontWeight.SemiBold,
+        lineHeight = 15.sp
+    )
+
+    val calMedium: TextStyle = TextStyle(
+        fontSize = 10.sp,
+        fontFamily = fontFamily,
+        fontWeight = FontWeight.Medium,
+        lineHeight = 15.sp
+    )
+
+    val calRegular: TextStyle = TextStyle(
+        fontSize = 10.sp,
+        fontFamily = fontFamily,
+        fontWeight = FontWeight.Normal,
+        lineHeight = 15.sp
+    )
 }

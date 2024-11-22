@@ -6,13 +6,20 @@ import com.poptato.core.util.TimeFormatter
 import com.poptato.core.util.move
 import com.poptato.domain.model.enums.TodoStatus
 import com.poptato.domain.model.request.today.GetTodayListRequestModel
+import com.poptato.domain.model.request.todo.DeadlineContentModel
 import com.poptato.domain.model.request.todo.DragDropRequestModel
+import com.poptato.domain.model.request.todo.ModifyTodoRequestModel
 import com.poptato.domain.model.request.todo.TodoIdModel
+import com.poptato.domain.model.request.todo.UpdateDeadlineRequestModel
 import com.poptato.domain.model.response.today.TodayListModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.domain.usecase.today.GetTodayListUseCase
+import com.poptato.domain.usecase.todo.DeleteTodoUseCase
 import com.poptato.domain.usecase.todo.DragDropUseCase
+import com.poptato.domain.usecase.todo.ModifyTodoUseCase
 import com.poptato.domain.usecase.todo.SwipeTodoUseCase
+import com.poptato.domain.usecase.todo.UpdateBookmarkUseCase
+import com.poptato.domain.usecase.todo.UpdateDeadlineUseCase
 import com.poptato.domain.usecase.todo.UpdateTodoCompletionUseCase
 import com.poptato.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,6 +33,10 @@ class TodayViewModel @Inject constructor(
     private val updateTodoCompletionUseCase: UpdateTodoCompletionUseCase,
     private val swipeTodoUseCase: SwipeTodoUseCase,
     private val dragDropUseCase: DragDropUseCase,
+    private val modifyTodoUseCase: ModifyTodoUseCase,
+    private val updateDeadlineUseCase: UpdateDeadlineUseCase,
+    private val updateBookmarkUseCase: UpdateBookmarkUseCase,
+    private val deleteTodoUseCase: DeleteTodoUseCase
 ) : BaseViewModel<TodayPageState>(TodayPageState()) {
     private var snapshotList: List<TodoItemModel> = emptyList()
 
@@ -146,5 +157,117 @@ class TodayViewModel @Inject constructor(
 
     private fun updateSnapshotList(newList: List<TodoItemModel>) {
         snapshotList = newList
+    }
+
+    fun modifyTodo(item: ModifyTodoRequestModel) {
+        modifyTodoInUI(item = item)
+
+        viewModelScope.launch {
+            modifyTodoUseCase.invoke(
+                request = item
+            ).collect {
+                resultResponse(it, { updateSnapshotList(uiState.value.todayList) }, { onFailedUpdateTodayList() })
+            }
+        }
+    }
+
+    private fun modifyTodoInUI(item: ModifyTodoRequestModel) {
+        val newList = uiState.value.todayList.map {
+            if (it.todoId == item.todoId) {
+                it.copy(content = item.content.content)
+            } else {
+                it
+            }
+        }
+
+        updateList(newList)
+    }
+
+    fun setDeadline(deadline: String?, id: Long) {
+        updateDeadlineInUI(deadline = deadline, id = id)
+
+        viewModelScope.launch {
+            updateDeadlineUseCase.invoke(
+                request = UpdateDeadlineRequestModel(
+                    todoId = uiState.value.selectedItem.todoId,
+                    deadline = DeadlineContentModel(deadline)
+                )
+            ).collect {
+                resultResponse(it, { updateSnapshotList(uiState.value.todayList) }, { onFailedUpdateTodayList() })
+            }
+        }
+    }
+
+    private fun updateDeadlineInUI(deadline: String?, id: Long) {
+        val dDay = TimeFormatter.calculateDDay(deadline)
+        val newList = uiState.value.todayList.map {
+            if (it.todoId == id) {
+                it.copy(deadline = deadline ?: "", dDay = dDay)
+            } else {
+                it
+            }
+        }
+        val updatedItem = uiState.value.selectedItem.copy(deadline = deadline ?: "", dDay = dDay)
+
+        updateState(
+            uiState.value.copy(
+                todayList = newList,
+                selectedItem = updatedItem
+            )
+        )
+    }
+
+    fun deleteBacklog(id: Long) {
+        val newList = uiState.value.todayList.filter { it.todoId != id }
+        updateList(newList)
+
+        viewModelScope.launch {
+            deleteTodoUseCase.invoke(id).collect {
+                resultResponse(
+                    it,
+                    {
+                        updateSnapshotList(uiState.value.todayList)
+                        emitEventFlow(TodayEvent.OnSuccessDeleteTodo)
+                    },
+                    { onFailedUpdateTodayList() }
+                )
+            }
+        }
+    }
+
+    fun updateBookmark(id: Long) {
+        updateBookmarkInUI(id)
+
+        viewModelScope.launch {
+            updateBookmarkUseCase.invoke(id).collect {
+                resultResponse(it, { updateSnapshotList(uiState.value.todayList) }, { onFailedUpdateTodayList() })
+            }
+        }
+    }
+
+    private fun updateBookmarkInUI(id: Long) {
+        val newList = uiState.value.todayList.map {
+            if (it.todoId == id) {
+                it.copy(isBookmark = !it.isBookmark)
+            } else {
+                it
+            }
+        }
+        val updatedItem = uiState.value.selectedItem.copy(isBookmark = !uiState.value.selectedItem.isBookmark)
+
+        updateState(
+            uiState.value.copy(
+                todayList = newList,
+                selectedItem = updatedItem
+            )
+        )
+    }
+
+    fun onSelectedItem(item: TodoItemModel) {
+        updateState(
+            uiState.value.copy(
+                selectedItem = item
+            )
+        )
     }
 }
