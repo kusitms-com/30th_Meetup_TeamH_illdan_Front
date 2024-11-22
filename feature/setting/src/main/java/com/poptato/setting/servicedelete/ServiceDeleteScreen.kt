@@ -192,6 +192,7 @@ fun DeleteReasonsItem(
                 .padding(vertical = 18.dp),
         ) {
             PoptatoCheckBox(
+                checkBoxDrawable = R.drawable.ic_checked_danger,
                 isChecked = isSelected,
                 onCheckedChange = {}
             )

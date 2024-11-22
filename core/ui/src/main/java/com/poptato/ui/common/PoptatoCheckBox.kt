@@ -17,7 +17,8 @@ import com.poptato.design_system.R
 @Composable
 fun PoptatoCheckBox(
     isChecked: Boolean = false,
-    onCheckedChange: (Boolean) -> Unit = {}
+    onCheckedChange: (Boolean) -> Unit = {},
+    checkBoxDrawable: Int? = null
 ) {
     Box(
         modifier = Modifier
@@ -27,7 +28,7 @@ fun PoptatoCheckBox(
         contentAlignment = Alignment.Center
     ) {
         if (isChecked) {
-            Icon(painter = painterResource(id = R.drawable.ic_checked), contentDescription = "", tint = Color.Unspecified)
+            Icon(painter = painterResource(id = checkBoxDrawable ?: R.drawable.ic_checked), contentDescription = "", tint = Color.Unspecified)
         } else {
             Icon(painter = painterResource(id = R.drawable.ic_unchecked), contentDescription = "", tint = Color.Unspecified)
         }

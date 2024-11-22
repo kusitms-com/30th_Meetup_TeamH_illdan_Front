@@ -19,15 +19,20 @@ class ServiceDeleteViewModel @Inject constructor(
 ) {
 
     fun setSelectedReason(reason: UserDeleteType) {
-        val tempList = uiState.value.selectedReasonList + reason
+        val newList: MutableList<UserDeleteType> = mutableListOf()
+        newList.addAll(uiState.value.selectedReasonList)
+
+        if (!uiState.value.selectedReasonList.contains(reason)) {
+            newList.add(reason)
+        } else {
+            newList.remove(reason)
+        }
 
         updateState(
             uiState.value.copy(
-                selectedReasonList = tempList
+                selectedReasonList = newList
             )
         )
-
-        Timber.d("[테스트] -> $tempList")
     }
 
     fun userDelete() {
