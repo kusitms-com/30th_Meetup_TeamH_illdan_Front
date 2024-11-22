@@ -46,6 +46,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import com.poptato.design_system.CategoryAddTitle
 import com.poptato.design_system.CategoryIconDialogTitle
+import com.poptato.design_system.CategoryModifyTitle
 import com.poptato.design_system.CategoryNameDialogTitle
 import com.poptato.design_system.CategoryNameInputTitle
 import com.poptato.design_system.Complete
@@ -57,9 +58,11 @@ import com.poptato.design_system.Gray90
 import com.poptato.design_system.Gray95
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.R
+import com.poptato.domain.model.enums.CategoryScreenType
 import com.poptato.domain.model.enums.DialogType
 import com.poptato.domain.model.response.category.CategoryIconItemModel
 import com.poptato.domain.model.response.category.CategoryIconTotalListModel
+import com.poptato.domain.model.response.category.CategoryScreenContentModel
 import com.poptato.domain.model.response.dialog.DialogContentModel
 import kotlinx.coroutines.flow.SharedFlow
 
@@ -68,7 +71,8 @@ fun CategoryScreen(
     goBackToBacklog: () -> Unit = {},
     showIconBottomSheet: (CategoryIconTotalListModel) -> Unit = {},
     selectedIconInBottomSheet: SharedFlow<CategoryIconItemModel>,
-    showDialog: (DialogContentModel) -> Unit = {}
+    showDialog: (DialogContentModel) -> Unit = {},
+    screenContent: SharedFlow<CategoryScreenContentModel>
 ) {
 
     val viewModel: CategoryViewModel = hiltViewModel()
@@ -83,6 +87,12 @@ fun CategoryScreen(
     LaunchedEffect(selectedIconInBottomSheet) {
         selectedIconInBottomSheet.collect {
             viewModel.getSelectedIcon(it)
+        }
+    }
+
+    LaunchedEffect(screenContent) {
+        screenContent.collect {
+            viewModel.getModifyIconItem(it)
         }
     }
 
@@ -127,7 +137,8 @@ fun CategoryContent(
         CategoryTitle(
             interactionSource = interactionSource,
             onClickBackBtn = onClickBackBtn,
-            onClickFinishBtn = onClickFinishBtn
+            onClickFinishBtn = onClickFinishBtn,
+            screenType = uiState.screenType
         )
 
         CategoryAddContent(
@@ -142,6 +153,7 @@ fun CategoryContent(
 @Composable
 fun CategoryTitle(
     interactionSource: MutableInteractionSource,
+    screenType: CategoryScreenType,
     onClickBackBtn: () -> Unit = {},
     onClickFinishBtn: () -> Unit = {}
 ) {
@@ -168,7 +180,7 @@ fun CategoryTitle(
         )
 
         Text(
-            text = CategoryAddTitle,
+            text = if (screenType == CategoryScreenType.Add) CategoryAddTitle else CategoryModifyTitle,
             style = PoptatoTypo.mdSemiBold,
             color = Gray00,
             modifier = Modifier
@@ -246,7 +258,7 @@ fun CategoryAddContent(
                 .size(40.dp)
                 .align(Alignment.CenterVertically)
         ) {
-            if (uiState.selectedIcon == null) {
+            if (uiState.categoryIconImgUrl.isEmpty()) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_add_category_icon),
                     contentDescription = "add category icon",
@@ -261,7 +273,7 @@ fun CategoryAddContent(
                 )
             } else {
                 Image(
-                    painter = rememberAsyncImagePainter(model = uiState.selectedIcon.iconImgUrl),
+                    painter = rememberAsyncImagePainter(model = uiState.categoryIconImgUrl),
                     contentDescription = "selected icon",
                     modifier = Modifier
                         .fillMaxSize()

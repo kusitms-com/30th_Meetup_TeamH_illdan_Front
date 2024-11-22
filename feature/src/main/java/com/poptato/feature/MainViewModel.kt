@@ -4,6 +4,7 @@ import com.poptato.core.enums.BottomNavType
 import com.poptato.domain.model.enums.BottomSheetType
 import com.poptato.domain.model.response.category.CategoryIconItemModel
 import com.poptato.domain.model.response.category.CategoryIconTotalListModel
+import com.poptato.domain.model.response.category.CategoryScreenContentModel
 import com.poptato.domain.model.response.dialog.DialogContentModel
 import com.poptato.domain.model.response.history.CalendarMonthModel
 import com.poptato.domain.model.response.today.TodoItemModel
@@ -22,6 +23,7 @@ class MainViewModel @Inject constructor() : BaseViewModel<MainPageState>(MainPag
     val animationDuration = 300
     val selectedIconInBottomSheet = MutableSharedFlow<CategoryIconItemModel>()
     val updateMonthFlow = MutableSharedFlow<CalendarMonthModel>()
+    val categoryScreenContent = MutableSharedFlow<CategoryScreenContentModel>(replay = 1)
 
 
     fun setBottomNavType(route: String?) {
