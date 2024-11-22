@@ -2,6 +2,7 @@ package com.poptato.setting.servicedelete
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +15,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
@@ -22,6 +25,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -38,12 +42,18 @@ import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
 import com.poptato.design_system.Gray40
 import com.poptato.design_system.Gray95
+import com.poptato.design_system.MissingFeature
+import com.poptato.design_system.NotUsed
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.R
 import com.poptato.design_system.SecondNoticeContent
 import com.poptato.design_system.SecondNoticeTitle
+import com.poptato.design_system.TooComplex
 import com.poptato.design_system.UserDeleteBtn
+import com.poptato.design_system.UserDeleteContent
 import com.poptato.design_system.UserDeleteTitle
+import com.poptato.domain.model.enums.UserDeleteType
+import com.poptato.ui.common.PoptatoCheckBox
 
 @Composable
 fun ServiceDeleteScreen(
@@ -89,17 +99,28 @@ fun ServiceDeleteContent(
             text = UserDeleteTitle,
             color = Gray00,
             style = PoptatoTypo.xxLSemiBold,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+            textAlign = TextAlign.Start,
+            modifier = Modifier
+                .padding(start = 25.dp)
         )
 
-        Box(
+        Text(
+            text = UserDeleteContent,
+            color = Gray40,
+            style = PoptatoTypo.mdRegular,
             modifier = Modifier
-                .padding(top = 32.dp)
-        ) {
-            DeleteNotice()
+                .padding(top = 8.dp)
+                .padding(horizontal = 25.dp)
+        )
 
-        }
+//        Box(
+//            modifier = Modifier
+//                .padding(top = 24.dp)
+//        ) {
+//            DeleteNotice()
+//
+//        }
+        DeleteReasonsContent()
 
         UserDeleteBtn(
             onClickDeleteBtn = onClickDeleteBtn
@@ -130,57 +151,53 @@ fun CloseBtn(
 }
 
 @Composable
-fun DeleteNotice() {
-    Column {
-        DeleteNoticeItem(noticeTitle = FirstNoticeTitle, noticeContent = FirstNoticeContent)
-        Spacer(modifier = Modifier.height(16.dp))
-        DeleteNoticeItem(noticeTitle = SecondNoticeTitle, noticeContent = SecondNoticeContent)
+fun DeleteReasonsContent() {
+
+    val reasonsList: List<UserDeleteType> = listOf(UserDeleteType.NOT_USED_OFTEN, UserDeleteType.MISSING_FEATURES, UserDeleteType.TOO_COMPLEX)
+    val reasonsContextList = listOf(NotUsed, MissingFeature, TooComplex)
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 17.dp)
+            .padding(top = 24.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        itemsIndexed(reasonsContextList, key = { _, item -> item }) { index, item ->
+            DeleteReasonsItem(
+                reason = item
+            )
+        }
     }
 }
 
 @Composable
-fun DeleteNoticeItem(
-    noticeTitle: String,
-    noticeContent: String
+fun DeleteReasonsItem(
+    reason: String
 ) {
-    Column(
+    Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .padding(start = 17.dp, end = 15.dp)
-            .background(Gray95, shape = RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(8.dp))
+            .background(Gray95),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start
     ) {
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-                .padding(top = 16.dp)
+                .padding(start = 20.dp)
+                .padding(vertical = 18.dp),
         ) {
+            PoptatoCheckBox()
 
-            Icon(
-                painter = painterResource(id = R.drawable.ic_caution),
-                contentDescription = "",
-                tint = Color.Unspecified,
-                modifier = Modifier.size(20.dp))
-
-            Spacer(modifier = Modifier.width(4.dp))
+            Spacer(modifier = Modifier.width(8.dp))
 
             Text(
-                text = noticeTitle,
-                color = Gray00,
-                style = PoptatoTypo.mdSemiBold
+                text = reason,
+                style = PoptatoTypo.smMedium,
+                color = Gray00
             )
         }
-
-        Text(
-            text = noticeContent,
-            color = Gray40,
-            style = PoptatoTypo.smMedium,
-            modifier = Modifier
-                .padding(horizontal = 20.dp)
-                .padding(top = 8.dp, bottom = 16.dp)
-        )
     }
 }
 
@@ -196,7 +213,7 @@ fun UserDeleteBtn(
     ) {
         Box(
             modifier = Modifier
-                .size(600.dp)
+                .size(400.dp)
                 .offset(y = 175.dp)
                 .background(
                     brush = Brush.verticalGradient(
