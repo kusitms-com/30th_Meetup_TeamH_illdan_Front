@@ -82,7 +82,8 @@ fun HistoryScreen(
         onLoadNextPage = { viewModel.getHistoryList() },
         onDateSelected = { selectedDate -> viewModel.updateSelectedDate(selectedDate)},
         onPreviousMonthClick = {viewModel.updateCurrentMonth(MonthNav.PREVIOUS)},
-        onNextMonthClick = {viewModel.updateCurrentMonth(MonthNav.NEXT)}
+        onNextMonthClick = {viewModel.updateCurrentMonth(MonthNav.NEXT)},
+        getImageResourceForDate = { date, hasEvent -> viewModel.getImageResourceForDate(date, hasEvent) }
     )
 }
 
@@ -93,6 +94,7 @@ fun HistoryContent(
     onDateSelected: (String) -> Unit,
     onPreviousMonthClick: () -> Unit,
     onNextMonthClick: () -> Unit,
+    getImageResourceForDate: (LocalDate, Boolean) -> Int
 ) {
     val listState = rememberLazyListState()
 
@@ -108,7 +110,8 @@ fun HistoryContent(
             onDateSelected = onDateSelected,
             eventDates = uiState.eventDates,
             onPreviousMonthClick = onPreviousMonthClick,
-            onNextMonthClick = onNextMonthClick
+            onNextMonthClick = onNextMonthClick,
+            getImageResourceForDate = getImageResourceForDate
         )
 
         Spacer(modifier = Modifier.height(30.dp))
@@ -152,7 +155,8 @@ fun CalendarContent(
     onDateSelected: (String) -> Unit = {},
     eventDates: List<String>,
     onNextMonthClick: () -> Unit,
-    onPreviousMonthClick: () -> Unit
+    onPreviousMonthClick: () -> Unit,
+    getImageResourceForDate: (LocalDate, Boolean) -> Int
 ) {
     val daysInMonth = currentMonthStartDate.lengthOfMonth()
     val firstDayOfWeek = (currentMonthStartDate.withDayOfMonth(1).dayOfWeek.value % 7) // 일요일 = 0
@@ -196,7 +200,8 @@ fun CalendarContent(
                     isSelected = selectedDate == date.toString(),
                     isToday = today == date,
                     hasEvent = eventDates.contains(date.toString()),
-                    onClick = { onDateSelected(date.toString()) }
+                    onClick = { onDateSelected(date.toString()) },
+                    imageResource = getImageResourceForDate(date, eventDates.contains(date.toString()))
                 )
             }
         }
@@ -268,7 +273,7 @@ fun CalendarDayItem(
     isToday: Boolean,
     hasEvent: Boolean,
     onClick: () -> Unit,
-    viewModel: HistoryViewModel = hiltViewModel(),
+    imageResource: Int
 ) {
     Column(
         modifier = Modifier
@@ -282,8 +287,6 @@ fun CalendarDayItem(
                 .size(36.dp),
             contentAlignment = Alignment.Center
         ) {
-            val imageResource = viewModel.getImageResourceForDate(date, hasEvent)
-
             Image(
                 painter = painterResource(id = imageResource),
                 contentDescription = null,

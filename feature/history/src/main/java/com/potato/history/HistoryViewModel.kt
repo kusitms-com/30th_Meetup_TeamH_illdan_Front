@@ -43,19 +43,14 @@ class HistoryViewModel @Inject constructor(
             )
 
             viewModelScope.launch {
-                try {
-                    getHistoryListUseCase.invoke(
-                        request = HistoryListRequestModel(page = uiState.value.currentPage, size = uiState.value.pageSize, date = uiState.value.selectedDate)
-                    ).collect { result ->
-                        resultResponse(result, ::onSuccessGetHistoryList)
-                    }
-                } catch (e: Exception) {
-                    Timber.e("Failed to load next page: $e")
-                    updateState(
-                        uiState.value.copy(
-                            isLoadingMore = false
-                        )
+                getHistoryListUseCase.invoke(
+                    request = HistoryListRequestModel(
+                        page = uiState.value.currentPage,
+                        size = uiState.value.pageSize,
+                        date = uiState.value.selectedDate
                     )
+                ).collect { result ->
+                    resultResponse(result, ::onSuccessGetHistoryList)
                 }
             }
         }
@@ -81,18 +76,15 @@ class HistoryViewModel @Inject constructor(
         }
     }
 
-    fun getCalendarList(){
+    fun getCalendarList() {
         viewModelScope.launch {
-            try {
-                getHistoryCalendarListUseCase.invoke(
-                    request = HistoryCalendarRequestModel(
-                        year = uiState.value.currentMonthStartDate.year.toString(),
-                        month = uiState.value.currentMonthStartDate.monthValue)
-                ).collect { result ->
-                    resultResponse(result, ::onSuccessGetCalendarList)
-                }
-            } catch (e: Exception) {
-                Timber.e("Failed to load history list: $e")
+            getHistoryCalendarListUseCase.invoke(
+                request = HistoryCalendarRequestModel(
+                    year = uiState.value.currentMonthStartDate.year.toString(),
+                    month = uiState.value.currentMonthStartDate.monthValue
+                )
+            ).collect { result ->
+                resultResponse(result, ::onSuccessGetCalendarList)
             }
         }
     }
@@ -114,9 +106,7 @@ class HistoryViewModel @Inject constructor(
             )
         )
 
-        viewModelScope.launch {
-            getHistoryList()
-        }
+        getHistoryList()
     }
 
     fun updateCurrentMonth(dir: MonthNav) {
@@ -131,9 +121,7 @@ class HistoryViewModel @Inject constructor(
             )
         )
 
-        viewModelScope.launch {
-            getCalendarList()
-            getHistoryList()
-        }
+        getCalendarList()
+        getHistoryList()
     }
 }
