@@ -18,6 +18,7 @@ const val Year = "년"
 const val Month = "월"
 const val Day = "일"
 const val BOOKMARK = "중요"
+const val REPEAT = "반복"
 const val TODO = "할 일"
 const val MON = "월"
 const val TUE = "화"
@@ -88,8 +89,8 @@ const val HistoryTitle = "기록"
 const val HistoryListEmpty = "아직 완료한 일이 없어요"
 
 // BottomSheet
-const val REPEAT_TASK_OPTION = "반복 할 일 설정"
-const val DEADLINE_OPTION = "마감기한 설정"
+const val REPEAT_TASK_OPTION = "반복 할 일"
+const val DEADLINE_OPTION = "마감기한"
 const val YEAR_MONTH = "%s년 %s월"
 
 // Error
