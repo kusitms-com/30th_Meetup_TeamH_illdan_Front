@@ -6,6 +6,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -28,6 +29,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,10 +46,18 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -54,6 +66,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.poptato.core.util.TimeFormatter
 import com.poptato.design_system.BtnGetTodoText
+import com.poptato.design_system.COMPLETE_DELETE_TODO
 import com.poptato.design_system.DEADLINE
 import com.poptato.design_system.DEADLINE_DDAY
 import com.poptato.design_system.ERROR_GENERIC_MESSAGE
@@ -69,23 +82,65 @@ import com.poptato.design_system.Primary60
 import com.poptato.design_system.R
 import com.poptato.design_system.TodayTopBarSub
 import com.poptato.domain.model.enums.TodoStatus
+import com.poptato.domain.model.request.todo.ModifyTodoRequestModel
+import com.poptato.domain.model.request.todo.TodoContentModel
+import com.poptato.domain.model.response.category.CategoryItemModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.ui.common.BookmarkItem
 import com.poptato.ui.common.PoptatoCheckBox
 import com.poptato.ui.common.TopBar
+import com.poptato.ui.util.LoadingManager
 import com.poptato.ui.util.rememberDragDropListState
 import com.poptato.ui.util.toPx
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
 @Composable
 fun TodayScreen(
     goToBacklog: () -> Unit = {},
-    showSnackBar: (String) -> Unit
+    showSnackBar: (String) -> Unit,
+    showBottomSheet: (TodoItemModel, List<CategoryItemModel>) -> Unit = { _, _ -> },
+    updateDeadlineFlow: SharedFlow<String?>,
+    deleteTodoFlow: SharedFlow<Long>,
+    activateItemFlow: SharedFlow<Long>,
+    updateBookmarkFlow: SharedFlow<Long>,
+    updateCategoryFlow: SharedFlow<Long?>,
 ) {
     val viewModel: TodayViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val date = TimeFormatter.getTodayMonthDay()
+    var activeItemId by remember { mutableStateOf<Long?>(null) }
+
+    LaunchedEffect(activateItemFlow) {
+        activateItemFlow.collect { id ->
+            activeItemId = id
+        }
+    }
+
+    LaunchedEffect(deleteTodoFlow) {
+        deleteTodoFlow.collect {
+            viewModel.deleteBacklog(it)
+        }
+    }
+
+    LaunchedEffect(updateDeadlineFlow) {
+        updateDeadlineFlow.collect {
+            viewModel.setDeadline(it, uiState.selectedItem.todoId)
+        }
+    }
+
+    LaunchedEffect(updateBookmarkFlow) {
+        updateBookmarkFlow.collect {
+            viewModel.updateBookmark(it)
+        }
+    }
+
+    LaunchedEffect(updateCategoryFlow) {
+        updateCategoryFlow.collect {
+            viewModel.updateCategory(uiState.selectedItem.todoId, it)
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collect { event ->
@@ -93,7 +148,16 @@ fun TodayScreen(
                 is TodayEvent.OnFailedUpdateTodayList -> {
                     showSnackBar(ERROR_GENERIC_MESSAGE)
                 }
+                is TodayEvent.OnSuccessDeleteTodo -> {
+                    showSnackBar(COMPLETE_DELETE_TODO)
+                }
             }
+        }
+    }
+
+    LaunchedEffect(uiState.isFinishedInitialization) {
+        if (uiState.isFinishedInitialization) {
+            LoadingManager.endLoading()
         }
     }
 
@@ -107,8 +171,27 @@ fun TodayScreen(
             onClickBtnGetTodo = { goToBacklog() },
             onItemSwiped = { itemToRemove -> viewModel.swipeTodayItem(itemToRemove) },
             onMove = { from, to -> viewModel.moveItem(from, to) },
-            onDragEnd = { viewModel.onDragEnd() }
+            onDragEnd = { viewModel.onDragEnd() },
+            showBottomSheet = {
+                viewModel.getSelectedItemDetailContent(it) { callback ->
+                    showBottomSheet(callback, uiState.categoryList)
+                }
+            },
+            activeItemId = activeItemId,
+            onClearActiveItem = { activeItemId = null },
+            onTodoItemModified = { id: Long, content: String ->
+                viewModel.modifyTodo(
+                    item = ModifyTodoRequestModel(
+                        todoId = id,
+                        content = TodoContentModel(
+                            content = content
+                        )
+                    )
+                )
+            },
         )
+    } else {
+        LoadingManager.startLoading()
     }
 }
 
@@ -120,7 +203,11 @@ fun TodayContent(
     onClickBtnGetTodo: () -> Unit = {},
     onItemSwiped: (TodoItemModel) -> Unit = {},
     onMove: (fromIndex: Int, toIndex: Int) -> Unit = { _, _ -> },
-    onDragEnd: () -> Unit
+    onDragEnd: () -> Unit,
+    showBottomSheet: (TodoItemModel) -> Unit = {},
+    activeItemId: Long?,
+    onClearActiveItem: () -> Unit = {},
+    onTodoItemModified: (Long, String) -> Unit = {_,_ ->},
 ) {
     Column(
         modifier = Modifier
@@ -152,7 +239,11 @@ fun TodayContent(
                 onCheckedChange = onCheckedChange,
                 onItemSwiped = onItemSwiped,
                 onMove = onMove,
-                onDragEnd = onDragEnd
+                onDragEnd = onDragEnd,
+                showBottomSheet = showBottomSheet,
+                activeItemId = activeItemId,
+                onClearActiveItem = onClearActiveItem,
+                onTodoItemModified = onTodoItemModified,
             )
         }
     }
@@ -165,7 +256,11 @@ fun TodayTodoList(
     onCheckedChange: (TodoStatus, Long) -> Unit = { _, _ -> },
     onItemSwiped: (TodoItemModel) -> Unit = {},
     onMove: (fromIndex: Int, toIndex: Int) -> Unit = { _, _ -> },
-    onDragEnd: () -> Unit
+    onDragEnd: () -> Unit,
+    showBottomSheet: (TodoItemModel) -> Unit = {},
+    activeItemId: Long?,
+    onClearActiveItem: () -> Unit = {},
+    onTodoItemModified: (Long, String) -> Unit = {_,_ ->}
 ) {
     var draggedItem by remember { mutableStateOf<TodoItemModel?>(null) }
     var isDragging by remember { mutableStateOf(false) }
@@ -220,6 +315,7 @@ fun TodayTodoList(
         itemsIndexed(items = list, key = { index, item -> item.todoId }) { index, item ->
             var offsetX by remember { mutableFloatStateOf(0f) }
             val isDragged = index == dragDropState.currentIndexOfDraggedItem
+            val isActive = activeItemId == item.todoId
 
             TodayTodoItem(
                 item = item,
@@ -268,8 +364,11 @@ fun TodayTodoList(
                             Color.Transparent
                         ),
                         RoundedCornerShape(8.dp)
-                    )
-
+                    ),
+                showBottomSheet = showBottomSheet,
+                isActive = isActive,
+                onClearActiveItem = onClearActiveItem,
+                onTodoItemModified = onTodoItemModified
             )
             Spacer(modifier = Modifier.height(12.dp))
         }
@@ -284,7 +383,21 @@ fun TodayTodoItem(
     item: TodoItemModel = TodoItemModel(),
     onCheckedChange: (TodoStatus, Long) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier,
+    showBottomSheet: (TodoItemModel) -> Unit = {},
+    isActive: Boolean,
+    onClearActiveItem: () -> Unit = {},
+    onTodoItemModified: (Long, String) -> Unit = {_,_ ->}
 ) {
+    val focusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
+    var textFieldValue by remember {
+        mutableStateOf(
+            TextFieldValue(
+                text = item.content,
+                selection = TextRange(item.content.length)
+            )
+        )
+    }
     var showAnimation by remember { mutableStateOf(false) }
     val transition = updateTransition(targetState = showAnimation, label = "")
 
@@ -317,22 +430,22 @@ fun TodayTodoItem(
         if (isAnimating) -50f else 0f
     }
 
-    Box(
+    Row(
         modifier = modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(Gray95)
             .offset { IntOffset(0, yOffset.toInt()) }
             .graphicsLayer(
                 scaleX = scale,
                 scaleY = scale,
                 shadowElevation = elevation.toPx()
-            )
+            ),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(8.dp))
-                .background(Gray95)
+                .weight(1f)
         ) {
-
             Row(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
@@ -369,14 +482,57 @@ fun TodayTodoItem(
 
                 Spacer(modifier = Modifier.width(12.dp))
 
-                Text(
-                    text = item.content,
-                    color = Gray00,
-                    style = PoptatoTypo.mdRegular,
-                    modifier = Modifier.weight(1f)
-                )
+                if (isActive) {
+                    LaunchedEffect(Unit) {
+                        focusRequester.requestFocus()
+                    }
+
+                    BasicTextField(
+                        value = textFieldValue,
+                        onValueChange = { newTextFieldValue ->
+                            textFieldValue = newTextFieldValue
+                        },
+                        textStyle = PoptatoTypo.mdRegular.copy(color = Gray00),
+                        modifier = Modifier
+                            .focusRequester(focusRequester)
+                            .onFocusChanged { focusState ->
+                                if (focusState.isFocused) {
+                                    textFieldValue = textFieldValue.copy(
+                                        selection = TextRange(textFieldValue.text.length)
+                                    )
+                                }
+                            },
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            imeAction = ImeAction.Done
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                keyboardController?.hide()
+                                onClearActiveItem()
+                                if (item.content != textFieldValue.text) onTodoItemModified(item.todoId, textFieldValue.text)
+                            }
+                        ),
+                        cursorBrush = SolidColor(Gray00)
+                    )
+                } else {
+                    Text(
+                        text = item.content,
+                        color = Gray00,
+                        style = PoptatoTypo.mdRegular,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
             }
         }
+
+        Icon(
+            painter = painterResource(id = R.drawable.ic_three_dot),
+            contentDescription = null,
+            tint = Color.Unspecified,
+            modifier = Modifier.clickable { showBottomSheet(item) }
+        )
+
+        Spacer(modifier = Modifier.width(16.dp))
     }
 }
 

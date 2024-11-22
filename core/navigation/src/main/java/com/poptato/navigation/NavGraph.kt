@@ -224,13 +224,25 @@ fun NavGraphBuilder.myPageNavGraph(
 
 fun NavGraphBuilder.todayNavGraph(
     navController: NavHostController,
-    showSnackBar: (String) -> Unit
+    showSnackBar: (String) -> Unit,
+    showBottomSheet: (TodoItemModel, List<CategoryItemModel>) -> Unit,
+    deleteTodoFlow: SharedFlow<Long>,
+    updateDeadlineFlow: SharedFlow<String?>,
+    activateItemFlow: SharedFlow<Long>,
+    updateBookmarkFlow: SharedFlow<Long>,
+    updateCategoryFlow: SharedFlow<Long?>,
 ) {
     navigation(startDestination = NavRoutes.TodayScreen.route, route = NavRoutes.TodayGraph.route) {
         composable(NavRoutes.TodayScreen.route) {
             TodayScreen(
                 goToBacklog = { navController.navigate(NavRoutes.BacklogScreen.route) },
-                showSnackBar = showSnackBar
+                showSnackBar = showSnackBar,
+                showBottomSheet = showBottomSheet,
+                updateDeadlineFlow = updateDeadlineFlow,
+                updateBookmarkFlow = updateBookmarkFlow,
+                activateItemFlow = activateItemFlow,
+                deleteTodoFlow = deleteTodoFlow,
+                updateCategoryFlow = updateCategoryFlow
             )
         }
     }
