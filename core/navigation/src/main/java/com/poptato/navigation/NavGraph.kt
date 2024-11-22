@@ -5,12 +5,17 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.poptato.backlog.BacklogScreen
+import com.poptato.category.CategoryScreen
+import com.poptato.domain.model.enums.DialogType
+import com.poptato.domain.model.response.category.CategoryIconItemModel
+import com.poptato.domain.model.response.category.CategoryIconTotalListModel
+import com.poptato.domain.model.response.dialog.DialogContentModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.login.KaKaoLoginScreen
 import com.poptato.mypage.MyPageScreen
-import com.poptato.mypage.viewer.NoticeViewerScreen
-import com.poptato.mypage.viewer.FAQViewerScreen
 import com.poptato.mypage.policy.PolicyViewerScreen
+import com.poptato.mypage.viewer.FAQViewerScreen
+import com.poptato.mypage.viewer.NoticeViewerScreen
 import com.poptato.setting.servicedelete.ServiceDeleteScreen
 import com.poptato.setting.userdata.UserDataScreen
 import com.poptato.splash.SplashScreen
@@ -85,12 +90,34 @@ fun NavGraphBuilder.backlogNavGraph(
         composable(NavRoutes.BacklogScreen.route) {
             BacklogScreen(
                 goToYesterdayList = { navController.navigate(NavRoutes.YesterdayListScreen.route) },
+                goToCategorySelect = { navController.navigate(NavRoutes.CategoryScreen.route) },
                 showBottomSheet = showBottomSheet,
                 updateDeadlineFlow = updateDeadlineFlow,
                 deleteTodoFlow = deleteTodoFlow,
                 activateItemFlow = activateItemFlow,
                 updateBookmarkFlow = updateBookmarkFlow,
                 showSnackBar = showSnackBar
+            )
+        }
+    }
+}
+
+fun NavGraphBuilder.categoryNavGraph(
+    navController: NavHostController,
+    showCategoryIconBottomSheet: (CategoryIconTotalListModel) -> Unit,
+    selectedIconInBottomSheet: SharedFlow<CategoryIconItemModel>,
+    showDialog: (DialogContentModel) -> Unit
+) {
+    navigation(
+        startDestination = NavRoutes.CategoryScreen.route,
+        route = NavRoutes.CategoryGraph.route
+    ) {
+        composable(NavRoutes.CategoryScreen.route) {
+            CategoryScreen(
+                goBackToBacklog = { navController.popBackStack() },
+                showIconBottomSheet = showCategoryIconBottomSheet,
+                selectedIconInBottomSheet = selectedIconInBottomSheet,
+                showDialog = showDialog
             )
         }
     }
@@ -120,10 +147,12 @@ fun NavGraphBuilder.yesterdayListNavGraph(navController: NavHostController) {
     }
 }
 
-fun NavGraphBuilder.myPageNavGraph(navController: NavHostController) {
+fun NavGraphBuilder.myPageNavGraph(
+    navController: NavHostController,
+    showDialog: (DialogContentModel) -> Unit) {
     navigation(
         startDestination = NavRoutes.MyPageScreen.route,
-        route = NavRoutes.MyPageGraph.route
+        route = NavRoutes.MyPageGraph.route,
     ) {
         composable(NavRoutes.MyPageScreen.route) {
             MyPageScreen(
@@ -136,25 +165,31 @@ fun NavGraphBuilder.myPageNavGraph(navController: NavHostController) {
 
         composable(NavRoutes.NoticeViewScreen.route) {
             NoticeViewerScreen(
-                goBackToMyPage = { navController.navigate(NavRoutes.MyPageScreen.route) {
-                    popUpTo(NavRoutes.MyPageScreen.route) { inclusive = true }
-                } }
+                goBackToMyPage = {
+                    navController.navigate(NavRoutes.MyPageScreen.route) {
+                        popUpTo(NavRoutes.MyPageScreen.route) { inclusive = true }
+                    }
+                }
             )
         }
 
         composable(NavRoutes.FAQViewScreen.route) {
             FAQViewerScreen(
-                goBackToMyPage = { navController.navigate(NavRoutes.MyPageScreen.route) {
-                    popUpTo(NavRoutes.MyPageScreen.route) { inclusive = true }
-                } }
+                goBackToMyPage = {
+                    navController.navigate(NavRoutes.MyPageScreen.route) {
+                        popUpTo(NavRoutes.MyPageScreen.route) { inclusive = true }
+                    }
+                }
             )
         }
 
         composable(NavRoutes.PolicyViewScreen.route) {
             PolicyViewerScreen(
-                goBackToMyPage = { navController.navigate(NavRoutes.MyPageScreen.route) {
-                    popUpTo(NavRoutes.MyPageScreen.route) { inclusive = true }
-                } }
+                goBackToMyPage = {
+                    navController.navigate(NavRoutes.MyPageScreen.route) {
+                        popUpTo(NavRoutes.MyPageScreen.route) { inclusive = true }
+                    }
+                }
             )
         }
 
@@ -170,6 +205,7 @@ fun NavGraphBuilder.myPageNavGraph(navController: NavHostController) {
                 goBackToMyPage = { navController.popBackStack() },
                 goBackToLogIn = { navController.navigate(NavRoutes.KaKaoLoginScreen.route) },
                 goToServiceDelete = { navController.navigate(NavRoutes.ServiceDeleteScreen.route) },
+                showDialog = showDialog
             )
         }
     }

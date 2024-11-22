@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -101,6 +102,7 @@ import timber.log.Timber
 @Composable
 fun BacklogScreen(
     goToYesterdayList: () -> Unit = {},
+    goToCategorySelect: () -> Unit = {},
     showBottomSheet: (TodoItemModel) -> Unit = {},
     updateDeadlineFlow: SharedFlow<String?>,
     deleteTodoFlow: SharedFlow<Long>,
@@ -163,7 +165,8 @@ fun BacklogScreen(
             onValueChange = { newValue -> viewModel.onValueChange(newValue) },
             createBacklog = { newItem -> viewModel.createBacklog(newItem) },
             onItemSwiped = { itemToRemove -> viewModel.swipeBacklogItem(itemToRemove) },
-            onClickYesterdayList = { goToYesterdayList() },      // TODO 테스트용: "어제 리스트 체크하기" 스낵바 생성 후 변경 예정
+            onClickYesterdayList = { goToYesterdayList() },
+            onClickCategoryAdd = { goToCategorySelect() },
             onClickBtnTodoSettings = {
                 showBottomSheet(uiState.backlogList[it])
                 viewModel.onSelectedItem(uiState.backlogList[it])
@@ -196,6 +199,7 @@ fun BacklogContent(
     onValueChange: (String) -> Unit = {},
     createBacklog: (String) -> Unit = {},
     onClickYesterdayList: () -> Unit = {},
+    onClickCategoryAdd:() -> Unit = {},
     onItemSwiped: (TodoItemModel) -> Unit = {},
     onClickBtnTodoSettings: (Int) -> Unit = {},
     interactionSource: MutableInteractionSource,
@@ -211,6 +215,10 @@ fun BacklogContent(
             .fillMaxSize()
             .background(Gray100)
     ) {
+        BacklogCategoryList(
+            onClickCategoryAdd = onClickCategoryAdd
+        )
+
         TopBar(
             titleText = com.poptato.design_system.TODO,
             subText = uiState.backlogList.size.toString(),
@@ -272,6 +280,28 @@ fun BacklogContent(
                     interactionSource = interactionSource
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun BacklogCategoryList(
+    onClickCategoryAdd:() -> Unit = {},
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+    ) {
+        Row {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_add_circle),
+                contentDescription = "add backlog category",
+                tint = Color.Unspecified,
+                modifier = Modifier
+                    .padding(vertical = 12.dp, horizontal = 6.dp)
+                    .clickable { onClickCategoryAdd() }
+            )
         }
     }
 }

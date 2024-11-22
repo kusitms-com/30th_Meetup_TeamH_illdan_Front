@@ -5,9 +5,7 @@ import android.app.Activity
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -15,8 +13,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -25,24 +21,20 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.Snackbar
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -51,30 +43,33 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.poptato.core.enums.BottomNavType
-import com.poptato.design_system.BgSnackBar
 import com.poptato.design_system.FINISH_APP_GUIDE
-import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
-import com.poptato.design_system.PoptatoTypo
 import com.poptato.domain.model.enums.BottomSheetType
+import com.poptato.domain.model.enums.DialogType
+import com.poptato.domain.model.response.category.CategoryIconTotalListModel
+import com.poptato.domain.model.response.dialog.DialogContentModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.feature.component.BottomNavBar
 import com.poptato.navigation.NavRoutes
+import com.poptato.navigation.backlogNavGraph
+import com.poptato.navigation.categoryNavGraph
 import com.poptato.navigation.historyNavGraph
 import com.poptato.navigation.loginNavGraph
 import com.poptato.navigation.myPageNavGraph
-import com.poptato.navigation.backlogNavGraph
 import com.poptato.navigation.splashNavGraph
 import com.poptato.navigation.todayNavGraph
 import com.poptato.navigation.yesterdayListNavGraph
 import com.poptato.ui.common.CalendarBottomSheet
+import com.poptato.ui.common.CategoryBottomSheet
 import com.poptato.ui.common.CommonSnackBar
 import com.poptato.ui.common.DatePickerBottomSheet
+import com.poptato.ui.common.OneBtnTypeDialog
 import com.poptato.ui.common.TodoBottomSheet
+import com.poptato.ui.common.TwoBtnTypeDialog
 import com.poptato.ui.util.CommonEventManager
 import com.poptato.ui.util.DismissKeyboardOnClick
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
@@ -92,8 +87,13 @@ fun MainScreen() {
         initialValue = ModalBottomSheetValue.Hidden,
         skipHalfExpanded = true
     )
+    val isShowDialog = remember { mutableStateOf(false) }
     val showBottomSheet: (TodoItemModel) -> Unit = { item: TodoItemModel ->
         viewModel.onSelectedTodoItem(item)
+        scope.launch { sheetState.show() }
+    }
+    val showCategoryIconBottomSheet: (CategoryIconTotalListModel) -> Unit = { categoryList: CategoryIconTotalListModel ->
+        viewModel.onSelectedCategoryIcon(categoryList)
         scope.launch { sheetState.show() }
     }
     val backPressHandler: () -> Unit = {
@@ -112,6 +112,10 @@ fun MainScreen() {
     }
     val showSnackBar: (String) -> Unit = { message ->
         scope.launch { snackBarHost.showSnackbar(message = message) }
+    }
+    val showDialog: (DialogContentModel) -> Unit = {
+        viewModel.onSetDialogContent(it)
+        isShowDialog.value = true
     }
 
     if (uiState.bottomNavType != BottomNavType.DEFAULT) {
@@ -151,6 +155,23 @@ fun MainScreen() {
     }
 
     DismissKeyboardOnClick {
+        if (isShowDialog.value) {
+            when (uiState.dialogContent.dialogType) {
+                DialogType.OneBtn -> {
+                    OneBtnTypeDialog(
+                        onDismiss = { isShowDialog.value = false },
+                        dialogContent = uiState.dialogContent
+                    )
+                }
+                DialogType.TwoBtn -> {
+                    TwoBtnTypeDialog(
+                        onDismiss = { isShowDialog.value = false },
+                        dialogContent = uiState.dialogContent
+                    )
+                }
+            }
+        }
+
         ModalBottomSheetLayout(
             sheetState = sheetState,
             sheetContent = {
@@ -161,6 +182,13 @@ fun MainScreen() {
                     },
                     modifier = Modifier
                         .fillMaxWidth()
+                        .then(
+                            if (uiState.bottomSheetType == BottomSheetType.Category) {
+                                Modifier.height(610.dp)
+                            } else {
+                                Modifier.wrapContentHeight()
+                            }
+                        )
                         .background(Gray100)
                         .navigationBarsPadding(),
                     label = ""
@@ -205,6 +233,17 @@ fun MainScreen() {
                             DatePickerBottomSheet(
                                 onDismissRequest = { viewModel.updateBottomSheetType(BottomSheetType.Calendar) },
                                 bottomSheetType = BottomSheetType.SubDate
+                            )
+                        }
+                        BottomSheetType.Category -> {
+                            CategoryBottomSheet(
+                                categoryIconList = uiState.categoryIconList,
+                                onSelectCategoryIcon = {
+                                    scope.launch {
+                                        viewModel.selectedIconInBottomSheet.emit(it)
+                                        sheetState.hide()
+                                    }
+                                }
                             )
                         }
                     }
@@ -260,7 +299,7 @@ fun MainScreen() {
                         )
                     }
                 },
-                snackbarHost = { CommonSnackBar(hostState = snackBarHost) }
+                snackbarHost = { CommonSnackBar(hostState = snackBarHost) },
             ) { innerPadding ->
                 Box(
                     modifier = Modifier
@@ -306,7 +345,9 @@ fun MainScreen() {
                         splashNavGraph(navController = navController)
                         loginNavGraph(navController = navController, showSnackBar = showSnackBar)
                         yesterdayListNavGraph(navController = navController)
-                        myPageNavGraph(navController = navController)
+                        myPageNavGraph(
+                            navController = navController,
+                            showDialog = showDialog)
                         backlogNavGraph(
                             navController = navController,
                             showBottomSheet = showBottomSheet,
@@ -324,6 +365,12 @@ fun MainScreen() {
                             updateBookmarkFlow = viewModel.updateBookmarkFlow,
                             deleteTodoFlow = viewModel.deleteTodoFlow,
                             activateItemFlow = viewModel.activateItemFlow
+                        )
+                        categoryNavGraph(
+                            navController = navController,
+                            showCategoryIconBottomSheet = showCategoryIconBottomSheet,
+                            selectedIconInBottomSheet = viewModel.selectedIconInBottomSheet,
+                            showDialog = showDialog
                         )
                         historyNavGraph(navController = navController)
                     }
