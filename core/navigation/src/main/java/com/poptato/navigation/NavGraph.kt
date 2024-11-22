@@ -229,7 +229,8 @@ fun NavGraphBuilder.todayNavGraph(
     deleteTodoFlow: SharedFlow<Long>,
     updateDeadlineFlow: SharedFlow<String?>,
     activateItemFlow: SharedFlow<Long>,
-    updateBookmarkFlow: SharedFlow<Long>
+    updateBookmarkFlow: SharedFlow<Long>,
+    updateCategoryFlow: SharedFlow<Long?>,
 ) {
     navigation(startDestination = NavRoutes.TodayScreen.route, route = NavRoutes.TodayGraph.route) {
         composable(NavRoutes.TodayScreen.route) {
@@ -240,7 +241,8 @@ fun NavGraphBuilder.todayNavGraph(
                 updateDeadlineFlow = updateDeadlineFlow,
                 updateBookmarkFlow = updateBookmarkFlow,
                 activateItemFlow = activateItemFlow,
-                deleteTodoFlow = deleteTodoFlow
+                deleteTodoFlow = deleteTodoFlow,
+                updateCategoryFlow = updateCategoryFlow
             )
         }
     }

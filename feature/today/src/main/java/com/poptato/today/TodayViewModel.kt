@@ -10,8 +10,10 @@ import com.poptato.domain.model.request.today.GetTodayListRequestModel
 import com.poptato.domain.model.request.todo.DeadlineContentModel
 import com.poptato.domain.model.request.todo.DragDropRequestModel
 import com.poptato.domain.model.request.todo.ModifyTodoRequestModel
+import com.poptato.domain.model.request.todo.TodoCategoryIdModel
 import com.poptato.domain.model.request.todo.TodoIdModel
 import com.poptato.domain.model.request.todo.UpdateDeadlineRequestModel
+import com.poptato.domain.model.request.todo.UpdateTodoCategoryModel
 import com.poptato.domain.model.response.category.CategoryListModel
 import com.poptato.domain.model.response.today.TodayListModel
 import com.poptato.domain.model.response.today.TodoItemModel
@@ -23,6 +25,7 @@ import com.poptato.domain.usecase.todo.ModifyTodoUseCase
 import com.poptato.domain.usecase.todo.SwipeTodoUseCase
 import com.poptato.domain.usecase.todo.UpdateBookmarkUseCase
 import com.poptato.domain.usecase.todo.UpdateDeadlineUseCase
+import com.poptato.domain.usecase.todo.UpdateTodoCategoryUseCase
 import com.poptato.domain.usecase.todo.UpdateTodoCompletionUseCase
 import com.poptato.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,7 +43,8 @@ class TodayViewModel @Inject constructor(
     private val modifyTodoUseCase: ModifyTodoUseCase,
     private val updateDeadlineUseCase: UpdateDeadlineUseCase,
     private val updateBookmarkUseCase: UpdateBookmarkUseCase,
-    private val deleteTodoUseCase: DeleteTodoUseCase
+    private val deleteTodoUseCase: DeleteTodoUseCase,
+    private val updateTodoCategoryUseCase: UpdateTodoCategoryUseCase
 ) : BaseViewModel<TodayPageState>(TodayPageState()) {
     private var snapshotList: List<TodoItemModel> = emptyList()
 
@@ -292,5 +296,20 @@ class TodayViewModel @Inject constructor(
                 selectedItem = item
             )
         )
+    }
+
+    fun updateCategory(todoId: Long, categoryId: Long?) {
+        viewModelScope.launch {
+            updateTodoCategoryUseCase(request = UpdateTodoCategoryModel(
+                todoId = todoId,
+                todoCategoryModel = TodoCategoryIdModel(categoryId)
+            )
+            ).collect {
+                resultResponse(it, {
+                }, { error ->
+                    Timber.d("[카테고리] 수정 서버통신 실패 -> $error")
+                })
+            }
+        }
     }
 }

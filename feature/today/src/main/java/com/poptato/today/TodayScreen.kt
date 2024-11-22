@@ -104,7 +104,8 @@ fun TodayScreen(
     updateDeadlineFlow: SharedFlow<String?>,
     deleteTodoFlow: SharedFlow<Long>,
     activateItemFlow: SharedFlow<Long>,
-    updateBookmarkFlow: SharedFlow<Long>
+    updateBookmarkFlow: SharedFlow<Long>,
+    updateCategoryFlow: SharedFlow<Long?>,
 ) {
     val viewModel: TodayViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -132,6 +133,12 @@ fun TodayScreen(
     LaunchedEffect(updateBookmarkFlow) {
         updateBookmarkFlow.collect {
             viewModel.updateBookmark(it)
+        }
+    }
+
+    LaunchedEffect(updateCategoryFlow) {
+        updateCategoryFlow.collect {
+            viewModel.updateCategory(uiState.selectedItem.todoId, it)
         }
     }
 

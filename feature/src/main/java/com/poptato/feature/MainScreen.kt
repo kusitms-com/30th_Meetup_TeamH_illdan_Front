@@ -412,7 +412,8 @@ fun MainScreen() {
                             updateDeadlineFlow = viewModel.updateDeadlineFlow,
                             updateBookmarkFlow = viewModel.updateBookmarkFlow,
                             deleteTodoFlow = viewModel.deleteTodoFlow,
-                            activateItemFlow = viewModel.activateItemFlow
+                            activateItemFlow = viewModel.activateItemFlow,
+                            updateCategoryFlow = viewModel.updateCategoryFlow,
                         )
                         categoryNavGraph(
                             navController = navController,
