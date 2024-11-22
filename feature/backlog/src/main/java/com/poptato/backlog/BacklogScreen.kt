@@ -291,29 +291,33 @@ fun BacklogContent(
                 isCategorySettingBtnSelected = { onDropdownExpandedChange(true) }
             )
 
-            DropdownMenu(
-                shape = RoundedCornerShape(12.dp),
-                containerColor = Gray95,
-                expanded = isDropDownMenuExpanded,
-                onDismissRequest = { onDropdownExpandedChange(false) },
-                offset = DpOffset(x = (-31).dp, y = 0.dp)
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(end = 31.dp, top = 42.dp)
             ) {
-                CategoryDropDownItem(
-                    itemIcon = R.drawable.ic_pen,
-                    itemText = modify,
-                    textColor = Gray30,
-                    onClickItemDropdownItem = onClickCategoryModifyDropdown
-                )
+                DropdownMenu(
+                    shape = RoundedCornerShape(12.dp),
+                    containerColor = Gray95,
+                    expanded = isDropDownMenuExpanded,
+                    onDismissRequest = { onDropdownExpandedChange(false) }
+                ) {
+                    CategoryDropDownItem(
+                        itemIcon = R.drawable.ic_pen,
+                        itemText = modify,
+                        textColor = Gray30,
+                        onClickItemDropdownItem = onClickCategoryModifyDropdown
+                    )
 
-                Divider(color = Gray90)
+                    Divider(color = Gray90)
 
-                CategoryDropDownItem(
-                    itemIcon = R.drawable.ic_trash,
-                    itemText = DELETE_ACTION,
-                    textColor = Danger50,
-                    onClickItemDropdownItem = onClickCategoryDeleteDropdown
-                )
-
+                    CategoryDropDownItem(
+                        itemIcon = R.drawable.ic_trash,
+                        itemText = DELETE_ACTION,
+                        textColor = Danger50,
+                        onClickItemDropdownItem = onClickCategoryDeleteDropdown
+                    )
+                }
             }
         }
 
