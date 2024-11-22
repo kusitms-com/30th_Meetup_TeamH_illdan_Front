@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.poptato.design_system.BgProgressBar
 import com.poptato.design_system.Gray100
 import com.poptato.design_system.Gray80
 import com.poptato.design_system.Primary60
@@ -44,7 +45,7 @@ class MainActivity : ComponentActivity() {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(Gray80.copy(alpha = 0.7f))
+//                            .background(BgProgressBar.copy(alpha = 0.5f))
                     ) {
                         CircularProgressIndicator(
                             modifier = Modifier.align(Alignment.Center),

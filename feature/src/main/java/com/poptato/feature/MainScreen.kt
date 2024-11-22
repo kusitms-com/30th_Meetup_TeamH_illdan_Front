@@ -357,13 +357,21 @@ fun MainScreen() {
                             updateBookmarkFlow = viewModel.updateBookmarkFlow,
                             showSnackBar = showSnackBar
                         )
+                        todayNavGraph(
+                            navController = navController,
+                            showSnackBar = showSnackBar,
+                            showBottomSheet = showBottomSheet,
+                            updateDeadlineFlow = viewModel.updateDeadlineFlow,
+                            updateBookmarkFlow = viewModel.updateBookmarkFlow,
+                            deleteTodoFlow = viewModel.deleteTodoFlow,
+                            activateItemFlow = viewModel.activateItemFlow
+                        )
                         categoryNavGraph(
                             navController = navController,
                             showCategoryIconBottomSheet = showCategoryIconBottomSheet,
                             selectedIconInBottomSheet = viewModel.selectedIconInBottomSheet,
                             showDialog = showDialog
                         )
-                        todayNavGraph(navController = navController, showSnackBar = showSnackBar)
                         historyNavGraph(navController = navController)
                     }
                 }
