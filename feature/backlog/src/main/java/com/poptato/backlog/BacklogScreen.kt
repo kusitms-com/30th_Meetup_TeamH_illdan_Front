@@ -115,6 +115,7 @@ import com.poptato.domain.model.response.dialog.DialogContentModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.ui.common.BookmarkItem
 import com.poptato.ui.common.TopBar
+import com.poptato.ui.util.LoadingManager
 import com.poptato.ui.util.rememberDragDropListState
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
@@ -180,6 +181,12 @@ fun BacklogScreen(
     LaunchedEffect(updateCategoryFlow) {
         updateCategoryFlow.collect {
             viewModel.updateCategory(uiState.selectedItem.todoId, it)
+        }
+    }
+
+    LaunchedEffect(uiState.isFinishedInitialization) {
+        if (uiState.isFinishedInitialization) {
+            LoadingManager.endLoading()
         }
     }
 
@@ -250,6 +257,8 @@ fun BacklogScreen(
             isDropDownMenuExpanded = isDropDownMenuExpanded,
             onDropdownExpandedChange = { isDropDownMenuExpanded = it }
         )
+    } else {
+        LoadingManager.startLoading()
     }
 }
 
@@ -298,29 +307,33 @@ fun BacklogContent(
                 isCategorySettingBtnSelected = { onDropdownExpandedChange(true) }
             )
 
-            DropdownMenu(
-                shape = RoundedCornerShape(12.dp),
-                containerColor = Gray95,
-                expanded = isDropDownMenuExpanded,
-                onDismissRequest = { onDropdownExpandedChange(false) },
-                offset = DpOffset(x = (-31).dp, y = 0.dp)
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(end = 31.dp, top = 42.dp)
             ) {
-                CategoryDropDownItem(
-                    itemIcon = R.drawable.ic_pen,
-                    itemText = modify,
-                    textColor = Gray30,
-                    onClickItemDropdownItem = onClickCategoryModifyDropdown
-                )
+                DropdownMenu(
+                    shape = RoundedCornerShape(12.dp),
+                    containerColor = Gray95,
+                    expanded = isDropDownMenuExpanded,
+                    onDismissRequest = { onDropdownExpandedChange(false) }
+                ) {
+                    CategoryDropDownItem(
+                        itemIcon = R.drawable.ic_pen,
+                        itemText = modify,
+                        textColor = Gray30,
+                        onClickItemDropdownItem = onClickCategoryModifyDropdown
+                    )
 
-                Divider(color = Gray90)
+                    Divider(color = Gray90)
 
-                CategoryDropDownItem(
-                    itemIcon = R.drawable.ic_trash,
-                    itemText = DELETE_ACTION,
-                    textColor = Danger50,
-                    onClickItemDropdownItem = onClickCategoryDeleteDropdown
-                )
-
+                    CategoryDropDownItem(
+                        itemIcon = R.drawable.ic_trash,
+                        itemText = DELETE_ACTION,
+                        textColor = Danger50,
+                        onClickItemDropdownItem = onClickCategoryDeleteDropdown
+                    )
+                }
             }
         }
 
