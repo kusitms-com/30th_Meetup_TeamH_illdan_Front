@@ -1,7 +1,6 @@
 package com.poptato.today
 
 import com.poptato.domain.model.response.category.CategoryItemModel
-import com.poptato.domain.model.response.today.TodayListModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.ui.base.PageState
 

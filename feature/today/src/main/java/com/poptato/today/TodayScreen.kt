@@ -173,8 +173,9 @@ fun TodayScreen(
             onMove = { from, to -> viewModel.moveItem(from, to) },
             onDragEnd = { viewModel.onDragEnd() },
             showBottomSheet = {
-                showBottomSheet(it, uiState.categoryList)
-                viewModel.onSelectedItem(it)
+                viewModel.getSelectedItemDetailContent(it) { callback ->
+                    showBottomSheet(callback, uiState.categoryList)
+                }
             },
             activeItemId = activeItemId,
             onClearActiveItem = { activeItemId = null },
