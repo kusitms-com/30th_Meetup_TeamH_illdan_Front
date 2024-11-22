@@ -103,7 +103,8 @@ fun TodayScreen(
     updateDeadlineFlow: SharedFlow<String?>,
     deleteTodoFlow: SharedFlow<Long>,
     activateItemFlow: SharedFlow<Long>,
-    updateBookmarkFlow: SharedFlow<Long>
+    updateBookmarkFlow: SharedFlow<Long>,
+    updateTodoRepeatFlow: SharedFlow<Long>
 ) {
     val viewModel: TodayViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()

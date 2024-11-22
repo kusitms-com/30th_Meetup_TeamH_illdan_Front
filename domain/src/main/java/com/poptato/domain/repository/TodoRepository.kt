@@ -14,4 +14,5 @@ interface TodoRepository {
     suspend fun updateBookmark(todoId: Long): Flow<Result<Unit>>
     suspend fun swipeTodo(request: TodoIdModel): Flow<Result<Unit>>
     suspend fun updateTodoCompletion(todoId: Long): Flow<Result<Unit>>
+    suspend fun updateTodoRepeat(todoId: Long): Flow<Result<Unit>>
 }

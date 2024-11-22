@@ -15,6 +15,7 @@ object BacklogListResponseMapper: Mapper<BacklogListResponse, BacklogListModel> 
                         todoId = item.todoId,
                         content = item.content,
                         isBookmark = item.isBookmark,
+                        isRepeat = item.isRepeat,
                         deadline = item.deadline ?: "",
                         dDay = item.dDay
                     )

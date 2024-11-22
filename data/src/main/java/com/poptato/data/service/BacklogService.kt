@@ -20,6 +20,7 @@ interface BacklogService {
 
     @GET(Endpoints.Backlog.BACKLOGS)
     suspend fun getBacklogList(
+        @Query("category") categoryId: Long,
         @Query("page") page: Int,
         @Query("size") size: Int
     ): Response<ApiResponse<BacklogListResponse>>

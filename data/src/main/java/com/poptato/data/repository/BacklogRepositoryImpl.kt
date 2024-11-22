@@ -19,7 +19,7 @@ class BacklogRepositoryImpl @Inject constructor(
         return apiLaunch(apiCall = { backlogService.createBacklog(request) }, TodoIdResponseMapper )
     }
 
-    override suspend fun getBacklogList(page: Int, size: Int): Flow<Result<BacklogListModel>> {
-        return apiLaunch(apiCall = { backlogService.getBacklogList(page, size) }, BacklogListResponseMapper)
+    override suspend fun getBacklogList(categoryId: Long, page: Int, size: Int): Flow<Result<BacklogListModel>> {
+        return apiLaunch(apiCall = { backlogService.getBacklogList(categoryId, page, size) }, BacklogListResponseMapper)
     }
 }

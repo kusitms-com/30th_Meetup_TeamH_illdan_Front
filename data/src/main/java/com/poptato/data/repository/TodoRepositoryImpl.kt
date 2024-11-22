@@ -41,4 +41,8 @@ class TodoRepositoryImpl @Inject constructor(
     override suspend fun updateTodoCompletion(todoId: Long): Flow<Result<Unit>> {
         return apiLaunch(apiCall = { todoService.updateTodoCompletion(todoId) }, UnitResponseMapper)
     }
+
+    override suspend fun updateTodoRepeat(todoId: Long): Flow<Result<Unit>> {
+        return apiLaunch(apiCall = { todoService.updateTodoRepeat(todoId) }, UnitResponseMapper)
+    }
 }

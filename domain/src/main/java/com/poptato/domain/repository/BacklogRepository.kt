@@ -7,5 +7,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface BacklogRepository {
     suspend fun createBacklog(request: CreateBacklogRequestModel): Flow<Result<TodoIdModel>>
-    suspend fun getBacklogList(page: Int, size: Int): Flow<Result<BacklogListModel>>
+    suspend fun getBacklogList(categoryId: Long, page: Int, size: Int): Flow<Result<BacklogListModel>>
 }
