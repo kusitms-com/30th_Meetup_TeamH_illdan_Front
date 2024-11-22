@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -23,15 +24,23 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -39,7 +48,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -53,6 +61,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -62,24 +71,31 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.poptato.core.util.move
+import coil.compose.rememberAsyncImagePainter
 import com.poptato.design_system.BACKLOG_YESTERDAY_TASK_GUIDE
 import com.poptato.design_system.BacklogHint
 import com.poptato.design_system.COMPLETE_DELETE_TODO
 import com.poptato.design_system.CONFIRM_ACTION
+import com.poptato.design_system.Cancel
+import com.poptato.design_system.CategoryDeleteDropDownContent
+import com.poptato.design_system.CategoryDeleteDropDownTitle
 import com.poptato.design_system.DEADLINE
 import com.poptato.design_system.DEADLINE_DDAY
 import com.poptato.design_system.DEADLINE_PASSED
+import com.poptato.design_system.DELETE
+import com.poptato.design_system.DELETE_ACTION
+import com.poptato.design_system.Danger50
 import com.poptato.design_system.ERROR_GENERIC_MESSAGE
 import com.poptato.design_system.EmptyBacklogTitle
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
+import com.poptato.design_system.Gray30
 import com.poptato.design_system.Gray70
 import com.poptato.design_system.Gray80
 import com.poptato.design_system.Gray90
@@ -87,8 +103,14 @@ import com.poptato.design_system.Gray95
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.Primary60
 import com.poptato.design_system.R
+import com.poptato.design_system.modify
+import com.poptato.domain.model.enums.CategoryScreenType
+import com.poptato.domain.model.enums.DialogType
 import com.poptato.domain.model.request.todo.ModifyTodoRequestModel
 import com.poptato.domain.model.request.todo.TodoContentModel
+import com.poptato.domain.model.response.category.CategoryItemModel
+import com.poptato.domain.model.response.category.CategoryScreenContentModel
+import com.poptato.domain.model.response.dialog.DialogContentModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.ui.common.BookmarkItem
 import com.poptato.ui.common.RepeatItem
@@ -98,26 +120,25 @@ import com.poptato.ui.util.LoadingManager
 import com.poptato.ui.util.rememberDragDropListState
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
-import my.nanihadesuka.compose.LazyColumnScrollbar
-import my.nanihadesuka.compose.ScrollbarSettings
-import timber.log.Timber
 
 @Composable
 fun BacklogScreen(
     goToYesterdayList: () -> Unit = {},
-    goToCategorySelect: () -> Unit = {},
+    goToCategorySelect: (CategoryScreenContentModel) -> Unit = {},
     showBottomSheet: (TodoItemModel) -> Unit = {},
     updateDeadlineFlow: SharedFlow<String?>,
     deleteTodoFlow: SharedFlow<Long>,
     activateItemFlow: SharedFlow<Long>,
     updateBookmarkFlow: SharedFlow<Long>,
     updateTodoRepeatFlow: SharedFlow<Long>,
-    showSnackBar: (String) -> Unit
+    showSnackBar: (String) -> Unit,
+    showDialog: (DialogContentModel) -> Unit = {}
 ) {
     val viewModel: BacklogViewModel = hiltViewModel()
     val interactionSource = remember { MutableInteractionSource() }
     val uiState: BacklogPageState by viewModel.uiState.collectAsStateWithLifecycle()
     var activeItemId by remember { mutableStateOf<Long?>(null) }
+    var isDropDownMenuExpanded by remember { mutableStateOf(false) }
 
     LaunchedEffect(activateItemFlow) {
         activateItemFlow.collect { id ->
@@ -137,6 +158,7 @@ fun BacklogScreen(
                 is BacklogEvent.OnFailedUpdateBacklogList -> {
                     showSnackBar(ERROR_GENERIC_MESSAGE)
                 }
+
                 is BacklogEvent.OnSuccessDeleteBacklog -> {
                     showSnackBar(COMPLETE_DELETE_TODO)
                 }
@@ -175,7 +197,35 @@ fun BacklogScreen(
             createBacklog = { newItem -> viewModel.createBacklog(newItem) },
             onItemSwiped = { itemToRemove -> viewModel.swipeBacklogItem(itemToRemove) },
             onClickYesterdayList = { goToYesterdayList() },
-            onClickCategoryAdd = { goToCategorySelect() },
+            onSelectCategory = { categoryId, index ->
+                viewModel.getBacklogListInCategory(categoryId, index)
+            },
+            onClickCategoryAdd = { goToCategorySelect(
+                CategoryScreenContentModel(
+                    CategoryScreenType.Add
+                )
+            ) },
+            onClickCategoryDeleteDropdown = {
+                showDialog(
+                    DialogContentModel(
+                        dialogType = DialogType.TwoBtn,
+                        titleText = CategoryDeleteDropDownTitle,
+                        dialogContentText = CategoryDeleteDropDownContent,
+                        positiveBtnText = DELETE,
+                        cancelBtnText = Cancel,
+                        positiveBtnAction = {}
+                    )
+                )
+            },
+            onClickCategoryModifyDropdown = {
+                isDropDownMenuExpanded = false
+                goToCategorySelect(
+                    CategoryScreenContentModel(
+                        CategoryScreenType.Modify,
+                        uiState.categoryList[uiState.selectedCategoryIndex]
+                    )
+                )
+            },
             onClickBtnTodoSettings = {
                 showBottomSheet(uiState.backlogList[it])
                 viewModel.onSelectedItem(uiState.backlogList[it])
@@ -195,7 +245,9 @@ fun BacklogScreen(
             },
             resetNewItemFlag = { viewModel.updateNewItemFlag(false) },
             onDragEnd = { viewModel.onDragEnd() },
-            onMove = { from, to -> viewModel.onMove(from, to) }
+            onMove = { from, to -> viewModel.onMove(from, to) },
+            isDropDownMenuExpanded = isDropDownMenuExpanded,
+            onDropdownExpandedChange = { isDropDownMenuExpanded = it }
         )
     } else {
         LoadingManager.startLoading()
@@ -208,16 +260,21 @@ fun BacklogContent(
     onValueChange: (String) -> Unit = {},
     createBacklog: (String) -> Unit = {},
     onClickYesterdayList: () -> Unit = {},
-    onClickCategoryAdd:() -> Unit = {},
+    onSelectCategory: (Long, Int) -> Unit = { _, _ -> },
+    onClickCategoryAdd: () -> Unit = {},
+    onClickCategoryDeleteDropdown: () -> Unit = {},
+    onClickCategoryModifyDropdown: () -> Unit = {},
     onItemSwiped: (TodoItemModel) -> Unit = {},
     onClickBtnTodoSettings: (Int) -> Unit = {},
     interactionSource: MutableInteractionSource,
     activeItemId: Long?,
     onClearActiveItem: () -> Unit = {},
-    onTodoItemModified: (Long, String) -> Unit = {_,_ ->},
+    onTodoItemModified: (Long, String) -> Unit = { _, _ -> },
     resetNewItemFlag: () -> Unit = {},
-    onDragEnd: (List<TodoItemModel>) -> Unit = {  },
-    onMove: (Int, Int) -> Unit
+    onDragEnd: (List<TodoItemModel>) -> Unit = { },
+    onMove: (Int, Int) -> Unit,
+    isDropDownMenuExpanded: Boolean = false,
+    onDropdownExpandedChange: (Boolean) -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -225,15 +282,52 @@ fun BacklogContent(
             .background(Gray100)
     ) {
         BacklogCategoryList(
-            onClickCategoryAdd = onClickCategoryAdd
+            onClickCategoryAdd = onClickCategoryAdd,
+            categoryList = uiState.categoryList,
+            interactionSource = interactionSource,
+            onSelectCategory = onSelectCategory,
+            selectedCategoryId = uiState.selectedCategoryId
         )
 
-        TopBar(
-            titleText = com.poptato.design_system.TODO,
-            subText = uiState.backlogList.size.toString(),
-            subTextStyle = PoptatoTypo.xLSemiBold,
-            subTextColor = Primary60
-        )
+        Box {
+            TopBar(
+                titleText = com.poptato.design_system.TODO,
+                subText = uiState.backlogList.size.toString(),
+                subTextStyle = PoptatoTypo.xLSemiBold,
+                subTextColor = Primary60,
+                isCategorySettingBtn = (uiState.selectedCategoryId.toInt() != 0 && uiState.selectedCategoryId.toInt() != 1),    // TODO 서버통신 후 selectedCategoryIndex로 변경
+                isCategorySettingBtnSelected = { onDropdownExpandedChange(true) }
+            )
+
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(end = 31.dp, top = 42.dp)
+            ) {
+                DropdownMenu(
+                    shape = RoundedCornerShape(12.dp),
+                    containerColor = Gray95,
+                    expanded = isDropDownMenuExpanded,
+                    onDismissRequest = { onDropdownExpandedChange(false) }
+                ) {
+                    CategoryDropDownItem(
+                        itemIcon = R.drawable.ic_pen,
+                        itemText = modify,
+                        textColor = Gray30,
+                        onClickItemDropdownItem = onClickCategoryModifyDropdown
+                    )
+
+                    Divider(color = Gray90)
+
+                    CategoryDropDownItem(
+                        itemIcon = R.drawable.ic_trash,
+                        itemText = DELETE_ACTION,
+                        textColor = Danger50,
+                        onClickItemDropdownItem = onClickCategoryDeleteDropdown
+                    )
+                }
+            }
+        }
 
         Box(
             modifier = Modifier.fillMaxSize()
@@ -294,24 +388,126 @@ fun BacklogContent(
 }
 
 @Composable
-fun BacklogCategoryList(
-    onClickCategoryAdd:() -> Unit = {},
+fun CategoryDropDownItem(
+    itemIcon: Int,
+    itemText: String,
+    textColor: Color,
+    onClickItemDropdownItem: () -> Unit = {}
 ) {
-    Box(
+    DropdownMenuItem(
+        contentPadding = PaddingValues(0.dp),
+        leadingIcon = {
+            Icon(
+                painter = painterResource(id = itemIcon),
+                contentDescription = "category icon",
+                tint = Color.Unspecified,
+                modifier = Modifier
+                    .padding(start = 12.dp)
+                    .size(16.dp)
+            )
+        },
+        text = {
+            Text(
+                text = itemText,
+                color = textColor,
+                style = PoptatoTypo.smMedium,
+                modifier = Modifier
+            )
+        },
+        onClick = { onClickItemDropdownItem() }
+    )
+}
+
+@Composable
+fun BacklogCategoryList(
+    interactionSource: MutableInteractionSource,
+    categoryList: List<CategoryItemModel> = emptyList(),
+    onClickCategoryAdd: () -> Unit = {},
+    onSelectCategory: (Long, Int) -> Unit = { _, _ -> },
+    selectedCategoryId: Long = 0
+) {
+
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
+            .padding(top = 16.dp)
     ) {
-        Row {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_add_circle),
-                contentDescription = "add backlog category",
-                tint = Color.Unspecified,
-                modifier = Modifier
-                    .padding(vertical = 12.dp, horizontal = 6.dp)
-                    .clickable { onClickCategoryAdd() }
-            )
+
+        LazyRow(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            item {
+                // TODO 카테고리 리스트 서버통신 완료 후 LazyRow 아이템으로 플로우 변경 및 삭제
+                CategoryListIcon(
+                    paddingStart = 16,
+                    imgResource = painterResource(id = R.drawable.ic_category_all),
+                    isSelected = selectedCategoryId.toInt() == 0,
+                    onClickCategory = { onSelectCategory(0, -1) }
+                )
+
+                CategoryListIcon(
+                    paddingStart = 12,
+                    imgResource = painterResource(id = R.drawable.ic_category_star),
+                    isSelected = selectedCategoryId.toInt() == 1,
+                    onClickCategory = { onSelectCategory(1, -1) }
+                )
+            }
+
+            itemsIndexed(categoryList, key = { _, item -> item.categoryId }) { index, item ->
+                CategoryListIcon(
+                    imgResource = rememberAsyncImagePainter(model = item.categoryImgUrl),
+                    isSelected = selectedCategoryId == item.categoryId,
+                    onClickCategory = { onSelectCategory(item.categoryId, index) }
+                )
+            }
+
+            item {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_add_category),
+                    contentDescription = "add backlog category",
+                    tint = Color.Unspecified,
+                    modifier = Modifier
+                        .padding(end = 12.dp)
+                        .size(40.dp)
+                        .clickable(
+                            indication = null,
+                            interactionSource = interactionSource,
+                            onClick = { onClickCategoryAdd() }
+                        )
+                )
+            }
         }
+
+    }
+}
+
+@Composable
+fun CategoryListIcon(
+    paddingStart: Int = 0,
+    paddingHorizontal: Int = 0,
+    imgResource: Painter,
+    isSelected: Boolean,
+    onClickCategory: () -> Unit = {}
+) {
+    Box(
+        modifier = Modifier
+            .padding(start = paddingStart.dp)
+            .padding(horizontal = paddingHorizontal.dp)
+            .size(40.dp)
+            .border(width = 1.dp, color = if (isSelected) Gray00 else Gray95, shape = CircleShape)
+            .clickable { onClickCategory() }
+    ) {
+        Icon(
+            painter = imgResource,
+            contentDescription = "category icon",
+            tint = Color.Unspecified,
+            modifier = Modifier
+                .align(Alignment.Center)
+                .size(24.dp)
+        )
     }
 }
 
@@ -323,7 +519,7 @@ fun BacklogTaskList(
     onClickBtnTodoSettings: (Int) -> Unit = {},
     activeItemId: Long?,
     onClearActiveItem: () -> Unit = {},
-    onTodoItemModified: (Long, String) -> Unit = {_,_ ->},
+    onTodoItemModified: (Long, String) -> Unit = { _, _ -> },
     isNewItemCreated: Boolean = false,
     resetNewItemFlag: () -> Unit = {},
     onDragEnd: (List<TodoItemModel>) -> Unit = { },
@@ -459,7 +655,7 @@ fun BacklogItem(
     modifier: Modifier = Modifier,
     onClickBtnTodoSettings: (Int) -> Unit = {},
     onClearActiveItem: () -> Unit = {},
-    onTodoItemModified: (Long, String) -> Unit = {_,_ ->}
+    onTodoItemModified: (Long, String) -> Unit = { _, _ -> }
 ) {
     Row(
         modifier = modifier
@@ -516,7 +712,9 @@ fun BacklogItem(
                 }
             }
 
-            if (!item.isBookmark && item.dDay == null) Spacer(modifier = Modifier.height(16.dp)) else Spacer(modifier = Modifier.height(8.dp))
+            if (!item.isBookmark && item.dDay == null) Spacer(modifier = Modifier.height(16.dp)) else Spacer(
+                modifier = Modifier.height(8.dp)
+            )
 
             if (isActive) {
 
@@ -546,7 +744,10 @@ fun BacklogItem(
                         onDone = {
                             keyboardController?.hide()
                             onClearActiveItem()
-                            if (item.content != textFieldValue.text) onTodoItemModified(item.todoId, textFieldValue.text)
+                            if (item.content != textFieldValue.text) onTodoItemModified(
+                                item.todoId,
+                                textFieldValue.text
+                            )
                         }
                     ),
                     cursorBrush = SolidColor(Gray00)

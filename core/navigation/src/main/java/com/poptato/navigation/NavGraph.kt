@@ -6,9 +6,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.poptato.backlog.BacklogScreen
 import com.poptato.category.CategoryScreen
-import com.poptato.domain.model.enums.DialogType
 import com.poptato.domain.model.response.category.CategoryIconItemModel
 import com.poptato.domain.model.response.category.CategoryIconTotalListModel
+import com.poptato.domain.model.response.category.CategoryScreenContentModel
 import com.poptato.domain.model.response.dialog.DialogContentModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.login.KaKaoLoginScreen
@@ -81,8 +81,10 @@ fun NavGraphBuilder.backlogNavGraph(
     deleteTodoFlow: SharedFlow<Long>,
     activateItemFlow: SharedFlow<Long>,
     updateBookmarkFlow: SharedFlow<Long>,
+    showSnackBar: (String) -> Unit,
+    showDialog: (DialogContentModel) -> Unit,
+    categoryScreenContent: (CategoryScreenContentModel) -> Unit,
     updateTodoRepeatFlow: SharedFlow<Long>,
-    showSnackBar: (String) -> Unit
 ) {
     navigation(
         startDestination = NavRoutes.BacklogScreen.route,
@@ -91,14 +93,17 @@ fun NavGraphBuilder.backlogNavGraph(
         composable(NavRoutes.BacklogScreen.route) {
             BacklogScreen(
                 goToYesterdayList = { navController.navigate(NavRoutes.YesterdayListScreen.route) },
-                goToCategorySelect = { navController.navigate(NavRoutes.CategoryScreen.route) },
+                goToCategorySelect = {
+                    categoryScreenContent(it)
+                    navController.navigate(NavRoutes.CategoryScreen.route) },
                 showBottomSheet = showBottomSheet,
                 updateDeadlineFlow = updateDeadlineFlow,
                 deleteTodoFlow = deleteTodoFlow,
                 activateItemFlow = activateItemFlow,
                 updateBookmarkFlow = updateBookmarkFlow,
                 updateTodoRepeatFlow = updateTodoRepeatFlow,
-                showSnackBar = showSnackBar
+                showSnackBar = showSnackBar,
+                showDialog = showDialog
             )
         }
     }
@@ -108,7 +113,8 @@ fun NavGraphBuilder.categoryNavGraph(
     navController: NavHostController,
     showCategoryIconBottomSheet: (CategoryIconTotalListModel) -> Unit,
     selectedIconInBottomSheet: SharedFlow<CategoryIconItemModel>,
-    showDialog: (DialogContentModel) -> Unit
+    showDialog: (DialogContentModel) -> Unit,
+    categoryScreenFromBacklog: SharedFlow<CategoryScreenContentModel>
 ) {
     navigation(
         startDestination = NavRoutes.CategoryScreen.route,
@@ -119,7 +125,8 @@ fun NavGraphBuilder.categoryNavGraph(
                 goBackToBacklog = { navController.popBackStack() },
                 showIconBottomSheet = showCategoryIconBottomSheet,
                 selectedIconInBottomSheet = selectedIconInBottomSheet,
-                showDialog = showDialog
+                showDialog = showDialog,
+                screenContent = categoryScreenFromBacklog
             )
         }
     }

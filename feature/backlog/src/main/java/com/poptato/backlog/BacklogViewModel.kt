@@ -13,6 +13,8 @@ import com.poptato.domain.model.request.todo.DragDropRequestModel
 import com.poptato.domain.model.request.todo.ModifyTodoRequestModel
 import com.poptato.domain.model.request.todo.UpdateDeadlineRequestModel
 import com.poptato.domain.model.response.backlog.BacklogListModel
+import com.poptato.domain.model.response.category.CategoryIconItemModel
+import com.poptato.domain.model.response.category.CategoryItemModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.domain.model.response.yesterday.YesterdayListModel
 import com.poptato.domain.usecase.backlog.CreateBacklogUseCase
@@ -51,9 +53,38 @@ class BacklogViewModel @Inject constructor(
     private var snapshotList: List<TodoItemModel> = emptyList()
     private var tempTodoId: Long? = null
 
+    private val _categoryList: List<CategoryItemModel> = listOf(
+        CategoryItemModel(11, "전체", "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
+        CategoryItemModel(12, "중요", "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
+        CategoryItemModel(13, "이름1", "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
+        CategoryItemModel(14, "이름2", "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
+        CategoryItemModel(15, "이름3", "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
+    )
+
     init {
+        getCategoryList()
         getYesterdayList(0, 1)
         getBacklogList(0, 100)
+    }
+
+    private fun getCategoryList() {
+        // TODO 카테고리 리스트 서버통신 연결
+        updateState(
+            uiState.value.copy(
+                categoryList = _categoryList
+            )
+        )
+    }
+
+    fun getBacklogListInCategory(categoryId: Long, categoryIndex: Int) {
+        // TODO 선택한 카테고리에 대한 백로그 리스트 가져오는 것으로 수정
+        updateState(
+            uiState.value.copy(
+                selectedCategoryId = categoryId,
+                selectedCategoryIndex = categoryIndex
+            )
+        )
+        Timber.d("[카테고리] 선택 -> $categoryId")
     }
 
     private fun getBacklogList(page: Int, size: Int) {
