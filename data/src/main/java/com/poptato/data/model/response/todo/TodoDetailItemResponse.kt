@@ -10,7 +10,7 @@ data class TodoDetailItemResponse (
     @SerializedName("content")
     val content: String = "",
     @SerializedName("deadline")
-    val deadline: String = "",
+    val deadline: String? = "",
     @SerializedName("categoryName")
     val categoryName: String? = null,
     @SerializedName("emojiImageUrl")
