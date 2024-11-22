@@ -81,6 +81,7 @@ fun NavGraphBuilder.backlogNavGraph(
     deleteTodoFlow: SharedFlow<Long>,
     activateItemFlow: SharedFlow<Long>,
     updateBookmarkFlow: SharedFlow<Long>,
+    updateTodoRepeatFlow: SharedFlow<Long>,
     showSnackBar: (String) -> Unit
 ) {
     navigation(
@@ -96,6 +97,7 @@ fun NavGraphBuilder.backlogNavGraph(
                 deleteTodoFlow = deleteTodoFlow,
                 activateItemFlow = activateItemFlow,
                 updateBookmarkFlow = updateBookmarkFlow,
+                updateTodoRepeatFlow = updateTodoRepeatFlow,
                 showSnackBar = showSnackBar
             )
         }
@@ -218,7 +220,8 @@ fun NavGraphBuilder.todayNavGraph(
     deleteTodoFlow: SharedFlow<Long>,
     updateDeadlineFlow: SharedFlow<String?>,
     activateItemFlow: SharedFlow<Long>,
-    updateBookmarkFlow: SharedFlow<Long>
+    updateBookmarkFlow: SharedFlow<Long>,
+    updateTodoRepeatFlow: SharedFlow<Long>
 ) {
     navigation(startDestination = NavRoutes.TodayScreen.route, route = NavRoutes.TodayGraph.route) {
         composable(NavRoutes.TodayScreen.route) {
@@ -229,7 +232,8 @@ fun NavGraphBuilder.todayNavGraph(
                 updateDeadlineFlow = updateDeadlineFlow,
                 updateBookmarkFlow = updateBookmarkFlow,
                 activateItemFlow = activateItemFlow,
-                deleteTodoFlow = deleteTodoFlow
+                deleteTodoFlow = deleteTodoFlow,
+                updateTodoRepeatFlow = updateTodoRepeatFlow
             )
         }
     }

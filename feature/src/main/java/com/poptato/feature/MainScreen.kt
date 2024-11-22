@@ -215,6 +215,10 @@ fun MainScreen() {
                                     scope.launch {
                                         viewModel.updateBookmarkFlow.emit(it)
                                     }
+                                },
+                                onClickBtnRepeat = {
+                                    viewModel.onUpdatedTodoRepeat(!uiState.selectedTodoItem.isRepeat)
+                                    scope.launch { viewModel.updateTodoRepeatFlow.emit(it) }
                                 }
                             )
                         }
@@ -355,6 +359,7 @@ fun MainScreen() {
                             deleteTodoFlow = viewModel.deleteTodoFlow,
                             activateItemFlow = viewModel.activateItemFlow,
                             updateBookmarkFlow = viewModel.updateBookmarkFlow,
+                            updateTodoRepeatFlow = viewModel.updateTodoRepeatFlow,
                             showSnackBar = showSnackBar
                         )
                         todayNavGraph(
@@ -364,7 +369,8 @@ fun MainScreen() {
                             updateDeadlineFlow = viewModel.updateDeadlineFlow,
                             updateBookmarkFlow = viewModel.updateBookmarkFlow,
                             deleteTodoFlow = viewModel.deleteTodoFlow,
-                            activateItemFlow = viewModel.activateItemFlow
+                            activateItemFlow = viewModel.activateItemFlow,
+                            updateTodoRepeatFlow = viewModel.updateTodoRepeatFlow
                         )
                         categoryNavGraph(
                             navController = navController,

@@ -34,6 +34,7 @@ import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.R
 import com.poptato.design_system.REPEAT_TASK_OPTION
 import com.poptato.design_system.DELETE_ACTION
+import com.poptato.design_system.Gray95
 import com.poptato.design_system.modify
 import com.poptato.domain.model.response.today.TodoItemModel
 
@@ -43,7 +44,8 @@ fun TodoBottomSheet(
     onClickShowDatePicker: () -> Unit = {},
     onClickBtnDelete: (Long) -> Unit = {},
     onClickBtnModify: (Long) -> Unit = {},
-    onClickBtnBookmark: (Long) -> Unit = {}
+    onClickBtnBookmark: (Long) -> Unit = {},
+    onClickBtnRepeat: (Long) -> Unit = {}
 ) {
     var deadline by remember { mutableStateOf(item.deadline) }
     var isBookmark by remember { mutableStateOf(item.isBookmark) }
@@ -61,7 +63,8 @@ fun TodoBottomSheet(
         onClickBtnBookmark = {
             onClickBtnBookmark(it)
             isBookmark = !isBookmark
-        }
+        },
+        onClickBtnRepeat = onClickBtnRepeat
     )
 }
 
@@ -71,18 +74,19 @@ fun TodoBottomSheetContent(
     onClickShowDatePicker: () -> Unit = {},
     onClickBtnDelete: (Long) -> Unit = {},
     onClickBtnModify: (Long) -> Unit = {},
-    onClickBtnBookmark: (Long) -> Unit = {}
+    onClickBtnBookmark: (Long) -> Unit = {},
+    onClickBtnRepeat: (Long) -> Unit = {}
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .height(324.dp)
-            .background(Gray100)
+            .background(Gray95)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Gray100)
+                .background(Gray95)
                 .padding(top = 24.dp)
                 .padding(horizontal = 24.dp)
         ) {
@@ -121,7 +125,20 @@ fun TodoBottomSheetContent(
         BottomSheetBtn(resourceId = R.drawable.ic_pen, buttonText = modify, textColor = Gray30, modifier = Modifier.clickable {
             onClickBtnModify(item.todoId)
         })
-        BottomSheetBtn(resourceId = R.drawable.ic_refresh, buttonText = REPEAT_TASK_OPTION, textColor = Gray30)
+        BottomSheetBtn(resourceId = R.drawable.ic_trash, buttonText = DELETE_ACTION, textColor = Danger50, modifier = Modifier.clickable {
+            onClickBtnDelete(item.todoId)
+        })
+        BottomSheetBtn(
+            resourceId = R.drawable.ic_refresh,
+            buttonText = REPEAT_TASK_OPTION,
+            textColor = Gray30,
+            modifier = Modifier.clickable {
+                onClickBtnRepeat(item.todoId)
+            },
+            isRepeatBtn = true,
+            isRepeat = item.isRepeat,
+            onClickBtnRepeat = { onClickBtnRepeat(item.todoId) }
+        )
         BottomSheetBtn(
             resourceId = R.drawable.ic_calendar,
             buttonText = DEADLINE_OPTION,
@@ -131,9 +148,6 @@ fun TodoBottomSheetContent(
             },
             deadline = item.deadline
         )
-        BottomSheetBtn(resourceId = R.drawable.ic_trash, buttonText = DELETE_ACTION, textColor = Danger50, modifier = Modifier.clickable {
-            onClickBtnDelete(item.todoId)
-        })
     }
 }
 
@@ -145,8 +159,13 @@ fun BottomSheetBtn(
     buttonText: String,
     textColor: Color,
     deadline: String = "",
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isRepeatBtn: Boolean = false,
+    isRepeat: Boolean = false,
+    onClickBtnRepeat: () -> Unit = {}
 ) {
+    var isChecked by remember { mutableStateOf(isRepeat) }
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -154,9 +173,16 @@ fun BottomSheetBtn(
     ) {
         Icon(painter = painterResource(id = resourceId), contentDescription = null, tint = resourceColor)
         Spacer(modifier = Modifier.width(8.dp))
-        Text(text = buttonText, style = PoptatoTypo.mdMedium, color = textColor)
+        Text(text = buttonText, style = PoptatoTypo.mdRegular, color = textColor)
         Spacer(modifier = Modifier.weight(1f))
         if (deadline.isNotEmpty()) Text(text = deadline, style = PoptatoTypo.mdMedium, color = Gray00)
+        if (isRepeatBtn) PoptatoSwitchButton(
+            check = isChecked,
+            onClick = {
+                isChecked = !isChecked
+                onClickBtnRepeat()
+            }
+        )
     }
 }
 

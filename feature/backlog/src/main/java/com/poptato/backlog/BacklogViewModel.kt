@@ -24,6 +24,7 @@ import com.poptato.domain.usecase.todo.ModifyTodoUseCase
 import com.poptato.domain.usecase.todo.SwipeTodoUseCase
 import com.poptato.domain.usecase.todo.UpdateBookmarkUseCase
 import com.poptato.domain.usecase.todo.UpdateDeadlineUseCase
+import com.poptato.domain.usecase.todo.UpdateTodoRepeatUseCase
 import com.poptato.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -42,7 +43,8 @@ class BacklogViewModel @Inject constructor(
     private val dragDropUseCase: DragDropUseCase,
     private val updateDeadlineUseCase: UpdateDeadlineUseCase,
     private val updateBookmarkUseCase: UpdateBookmarkUseCase,
-    private val swipeTodoUseCase: SwipeTodoUseCase
+    private val swipeTodoUseCase: SwipeTodoUseCase,
+    private val updateTodoRepeatUseCase: UpdateTodoRepeatUseCase
 ) : BaseViewModel<BacklogPageState>(
     BacklogPageState()
 ) {
@@ -56,7 +58,7 @@ class BacklogViewModel @Inject constructor(
 
     private fun getBacklogList(page: Int, size: Int) {
         viewModelScope.launch {
-            getBacklogListUseCase.invoke(request = GetBacklogListRequestModel(page = page, size = size)).collect {
+            getBacklogListUseCase.invoke(request = GetBacklogListRequestModel(categoryId = -1, page = page, size = size)).collect {
                 resultResponse(it, ::onSuccessGetBacklogList)
             }
         }
@@ -108,7 +110,7 @@ class BacklogViewModel @Inject constructor(
         addTemporaryBacklog(content)
 
         viewModelScope.launch(Dispatchers.IO) {
-            createBacklogUseCase.invoke(request = CreateBacklogRequestModel(content)).collect {
+            createBacklogUseCase.invoke(request = CreateBacklogRequestModel(categoryId = -1, content = content)).collect {
                 resultResponse(it, ::onSuccessCreateBacklog, { onFailedUpdateBacklogList() })
             }
         }
@@ -293,6 +295,34 @@ class BacklogViewModel @Inject constructor(
             }
         }
         val updatedItem = uiState.value.selectedItem.copy(isBookmark = !uiState.value.selectedItem.isBookmark)
+
+        updateState(
+            uiState.value.copy(
+                backlogList = newList,
+                selectedItem = updatedItem
+            )
+        )
+    }
+
+    fun updateTodoRepeat(id: Long) {
+        updateTodoRepeatInUI(id)
+
+        viewModelScope.launch {
+            updateTodoRepeatUseCase(id).collect {
+                resultResponse(it, { updateSnapshotList(uiState.value.backlogList) }, { onFailedUpdateBacklogList() })
+            }
+        }
+    }
+
+    private fun updateTodoRepeatInUI(id: Long) {
+        val newList = uiState.value.backlogList.map {
+            if (it.todoId == id) {
+                it.copy(isRepeat = !it.isRepeat)
+            } else {
+                it
+            }
+        }
+        val updatedItem = uiState.value.selectedItem.copy(isRepeat = !uiState.value.selectedItem.isRepeat)
 
         updateState(
             uiState.value.copy(

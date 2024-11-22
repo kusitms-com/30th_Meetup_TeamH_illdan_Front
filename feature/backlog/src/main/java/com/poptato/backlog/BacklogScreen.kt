@@ -82,6 +82,7 @@ import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
 import com.poptato.design_system.Gray70
 import com.poptato.design_system.Gray80
+import com.poptato.design_system.Gray90
 import com.poptato.design_system.Gray95
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.Primary60
@@ -90,6 +91,7 @@ import com.poptato.domain.model.request.todo.ModifyTodoRequestModel
 import com.poptato.domain.model.request.todo.TodoContentModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.ui.common.BookmarkItem
+import com.poptato.ui.common.RepeatItem
 import com.poptato.ui.common.TopBar
 import com.poptato.ui.util.LoadingManager
 import com.poptato.ui.util.rememberDragDropListState
@@ -108,10 +110,10 @@ fun BacklogScreen(
     deleteTodoFlow: SharedFlow<Long>,
     activateItemFlow: SharedFlow<Long>,
     updateBookmarkFlow: SharedFlow<Long>,
+    updateTodoRepeatFlow: SharedFlow<Long>,
     showSnackBar: (String) -> Unit
 ) {
     val viewModel: BacklogViewModel = hiltViewModel()
-    val context = LocalContext.current
     val interactionSource = remember { MutableInteractionSource() }
     val uiState: BacklogPageState by viewModel.uiState.collectAsStateWithLifecycle()
     var activeItemId by remember { mutableStateOf<Long?>(null) }
@@ -150,6 +152,12 @@ fun BacklogScreen(
     LaunchedEffect(updateBookmarkFlow) {
         updateBookmarkFlow.collect {
             viewModel.updateBookmark(it)
+        }
+    }
+
+    LaunchedEffect(updateTodoRepeatFlow) {
+        updateTodoRepeatFlow.collect {
+            viewModel.updateTodoRepeat(it)
         }
     }
 
@@ -486,11 +494,25 @@ fun BacklogItem(
                     BookmarkItem()
                     Spacer(modifier = Modifier.width(6.dp))
                 }
-                if (item.dDay != null) Text(
-                    text = formatDeadline(item.dDay),
-                    style = PoptatoTypo.xsSemiBold,
-                    color = Gray70
-                )
+                if (item.isRepeat) {
+                    RepeatItem()
+                    Spacer(modifier = Modifier.width(6.dp))
+                }
+                if (item.dDay != null) {
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(color = Gray90, shape = RoundedCornerShape(4.dp))
+                            .padding(horizontal = 4.dp, vertical = 2.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = formatDeadline(item.dDay),
+                            style = PoptatoTypo.xsSemiBold,
+                            color = Gray70
+                        )
+                    }
+                }
             }
 
             if (!item.isBookmark && item.dDay == null) Spacer(modifier = Modifier.height(16.dp)) else Spacer(modifier = Modifier.height(8.dp))
