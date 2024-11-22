@@ -1,7 +1,6 @@
 package com.poptato.setting.servicedelete
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,11 +23,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,15 +48,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.poptato.design_system.CategoryNameInputTitle
 import com.poptato.design_system.Danger50
 import com.poptato.design_system.DeleteReasonInputHint
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
 import com.poptato.design_system.Gray40
 import com.poptato.design_system.Gray60
-import com.poptato.design_system.Gray70
-import com.poptato.design_system.Gray90
 import com.poptato.design_system.Gray95
 import com.poptato.design_system.MissingFeature
 import com.poptato.design_system.NotUsed
@@ -78,6 +74,11 @@ fun ServiceDeleteScreen(
 
     val viewModel: ServiceDeleteViewModel = hiltViewModel()
     val uiState: ServiceDeletePageState by viewModel.uiState.collectAsStateWithLifecycle()
+    val isDeleteValid by remember {
+        derivedStateOf {
+            uiState.selectedReasonList.isNotEmpty() || uiState.deleteInputReason.isNotEmpty()
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collect { event ->
@@ -95,7 +96,8 @@ fun ServiceDeleteScreen(
         isSelectedReasonsList = uiState.selectedReasonList,
         onSelectedReason = { viewModel.setSelectedReason(it) },
         deleteInputReason = uiState.deleteInputReason,
-        onValueChange = { newValue -> viewModel.onValueChange(newValue) }
+        onValueChange = { newValue -> viewModel.onValueChange(newValue) },
+        isDeleteBtnValid = isDeleteValid
     )
 }
 
@@ -106,7 +108,8 @@ fun ServiceDeleteContent(
     onSelectedReason: (UserDeleteType) -> Unit = {},
     isSelectedReasonsList: List<UserDeleteType> = emptyList(),
     deleteInputReason: String = "",
-    onValueChange: (String) -> Unit = {}
+    onValueChange: (String) -> Unit = {},
+    isDeleteBtnValid: Boolean = false,
 ) {
     Column(
         modifier = Modifier
@@ -144,7 +147,8 @@ fun ServiceDeleteContent(
         )
 
         UserDeleteBtn(
-            onClickDeleteBtn = onClickDeleteBtn
+            onClickDeleteBtn = onClickDeleteBtn,
+            isDeleteBtnValid = isDeleteBtnValid
         )
     }
 }
@@ -229,7 +233,7 @@ fun DeleteReasonsItem(
             PoptatoCheckBox(
                 checkBoxDrawable = R.drawable.ic_checked_danger,
                 isChecked = isSelected,
-                onCheckedChange = {}
+                onCheckedChange = { onClick() }
             )
 
             Spacer(modifier = Modifier.width(8.dp))
@@ -310,6 +314,7 @@ fun DeleteReasonTextField(
 
 @Composable
 fun UserDeleteBtn(
+    isDeleteBtnValid: Boolean = false,
     onClickDeleteBtn: () -> Unit = {}
 ) {
 
@@ -341,8 +346,16 @@ fun UserDeleteBtn(
                 .wrapContentHeight()
                 .padding(horizontal = 16.dp)
                 .padding(bottom = 8.dp)
-                .background(Danger50, shape = RoundedCornerShape(12.dp))
-                .clickable { onClickDeleteBtn() }
+                .background(
+                    if (isDeleteBtnValid) Danger50 else Gray95,  // TODO 디자인 수정
+                    shape = RoundedCornerShape(12.dp)
+                )
+                .clickable(
+                    enabled = isDeleteBtnValid,
+                    onClick = {
+                        onClickDeleteBtn()
+                    }
+                )
         ) {
             Text(
                 text = UserDeleteBtn,
