@@ -1,6 +1,7 @@
 package com.poptato.data.repository
 
 import com.poptato.data.base.BaseRepository
+import com.poptato.data.mapper.TodoDetailResponseMapper
 import com.poptato.data.mapper.UnitResponseMapper
 import com.poptato.data.service.TodoService
 import com.poptato.domain.model.request.todo.DragDropRequestModel
@@ -8,6 +9,7 @@ import com.poptato.domain.model.request.todo.ModifyTodoRequestModel
 import com.poptato.domain.model.request.todo.TodoIdModel
 import com.poptato.domain.model.request.todo.UpdateDeadlineRequestModel
 import com.poptato.domain.model.request.todo.UpdateTodoCategoryModel
+import com.poptato.domain.model.response.todo.TodoDetailItemModel
 import com.poptato.domain.repository.TodoRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -60,5 +62,11 @@ class TodoRepositoryImpl @Inject constructor(
                 request = request.todoCategoryModel
             )
         }, UnitResponseMapper)
+    }
+
+    override suspend fun getTodoDetail(todoId: Long): Flow<Result<TodoDetailItemModel>> {
+        return apiLaunch(apiCall = {
+            todoService.getTodoDetail(todoId = todoId)
+        }, TodoDetailResponseMapper)
     }
 }

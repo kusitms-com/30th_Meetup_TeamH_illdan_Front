@@ -2,15 +2,16 @@ package com.poptato.data.service
 
 import com.poptato.data.base.ApiResponse
 import com.poptato.data.base.Endpoints
-import com.poptato.domain.model.request.todo.TodoIdModel
+import com.poptato.data.model.response.todo.TodoDetailItemResponse
 import com.poptato.domain.model.request.todo.DeadlineContentModel
 import com.poptato.domain.model.request.todo.DragDropRequestModel
 import com.poptato.domain.model.request.todo.TodoCategoryIdModel
-import com.poptato.domain.model.request.todo.UpdateTodoCategoryModel
 import com.poptato.domain.model.request.todo.TodoContentModel
+import com.poptato.domain.model.request.todo.TodoIdModel
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
+import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.Path
 
@@ -57,4 +58,9 @@ interface TodoService {
         @Path("todoId") todoId: Long,
         @Body request: TodoCategoryIdModel
     ): Response<ApiResponse<Unit>>
+
+    @GET(Endpoints.Todo.DELETE)
+    suspend fun getTodoDetail(
+        @Path("todoId") todoId: Long
+    ): Response<ApiResponse<TodoDetailItemResponse>>
 }
