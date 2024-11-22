@@ -1,26 +1,17 @@
 package com.potato.history
 
 import androidx.lifecycle.viewModelScope
-import com.poptato.domain.model.request.backlog.GetBacklogListRequestModel
 import com.poptato.domain.model.request.history.HistoryCalendarRequestModel
 import com.poptato.domain.model.request.history.HistoryListRequestModel
-import com.poptato.domain.model.response.backlog.BacklogListModel
 import com.poptato.domain.model.response.history.HistoryCalendarListModel
-import com.poptato.domain.model.response.history.HistoryItemModel
 import com.poptato.domain.model.response.history.HistoryListModel
-import com.poptato.domain.usecase.backlog.GetBacklogListUseCase
 import com.poptato.domain.usecase.history.GetHistoryCalendarListUseCase
 import com.poptato.domain.usecase.history.GetHistoryListUseCase
-import com.poptato.history.R
 import com.poptato.ui.base.BaseViewModel
-import com.potato.history.model.HistoryGroupedItem
-import com.potato.history.model.MonthNav
+import com.poptato.domain.model.enums.MonthNav
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import timber.log.Timber
-import java.util.Collections.copy
 import javax.inject.Inject
 
 @HiltViewModel

@@ -24,7 +24,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListScope
@@ -40,7 +39,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
 import com.poptato.design_system.Gray70
@@ -51,11 +49,9 @@ import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.R
 import com.poptato.domain.model.response.history.HistoryItemModel
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.overscroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.text.style.TextAlign
@@ -69,8 +65,7 @@ import com.poptato.design_system.SUN
 import com.poptato.design_system.THU
 import com.poptato.design_system.TUE
 import com.poptato.design_system.WED
-import com.potato.history.model.HistoryGroupedItem
-import com.potato.history.model.MonthNav
+import com.poptato.domain.model.enums.MonthNav
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 

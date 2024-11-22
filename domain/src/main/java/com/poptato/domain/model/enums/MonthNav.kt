@@ -1,4 +1,4 @@
-package com.potato.history.model
+package com.poptato.domain.model.enums
 
 enum class MonthNav {
     PREVIOUS,
