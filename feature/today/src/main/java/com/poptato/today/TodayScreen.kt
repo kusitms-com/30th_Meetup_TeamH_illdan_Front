@@ -84,6 +84,7 @@ import com.poptato.design_system.TodayTopBarSub
 import com.poptato.domain.model.enums.TodoStatus
 import com.poptato.domain.model.request.todo.ModifyTodoRequestModel
 import com.poptato.domain.model.request.todo.TodoContentModel
+import com.poptato.domain.model.response.category.CategoryItemModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.ui.common.BookmarkItem
 import com.poptato.ui.common.PoptatoCheckBox
@@ -99,7 +100,7 @@ import kotlinx.coroutines.launch
 fun TodayScreen(
     goToBacklog: () -> Unit = {},
     showSnackBar: (String) -> Unit,
-    showBottomSheet: (TodoItemModel) -> Unit = {},
+    showBottomSheet: (TodoItemModel, List<CategoryItemModel>) -> Unit = { _, _ -> },
     updateDeadlineFlow: SharedFlow<String?>,
     deleteTodoFlow: SharedFlow<Long>,
     activateItemFlow: SharedFlow<Long>,
@@ -165,7 +166,7 @@ fun TodayScreen(
             onMove = { from, to -> viewModel.moveItem(from, to) },
             onDragEnd = { viewModel.onDragEnd() },
             showBottomSheet = {
-                showBottomSheet(it)
+                showBottomSheet(it, uiState.categoryList)
                 viewModel.onSelectedItem(it)
             },
             activeItemId = activeItemId,

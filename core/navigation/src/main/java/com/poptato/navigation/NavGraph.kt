@@ -225,7 +225,7 @@ fun NavGraphBuilder.myPageNavGraph(
 fun NavGraphBuilder.todayNavGraph(
     navController: NavHostController,
     showSnackBar: (String) -> Unit,
-    showBottomSheet: (TodoItemModel) -> Unit,
+    showBottomSheet: (TodoItemModel, List<CategoryItemModel>) -> Unit,
     deleteTodoFlow: SharedFlow<Long>,
     updateDeadlineFlow: SharedFlow<String?>,
     activateItemFlow: SharedFlow<Long>,

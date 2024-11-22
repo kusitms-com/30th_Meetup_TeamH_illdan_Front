@@ -5,14 +5,17 @@ import com.poptato.core.enums.TodoType
 import com.poptato.core.util.TimeFormatter
 import com.poptato.core.util.move
 import com.poptato.domain.model.enums.TodoStatus
+import com.poptato.domain.model.request.category.GetCategoryListRequestModel
 import com.poptato.domain.model.request.today.GetTodayListRequestModel
 import com.poptato.domain.model.request.todo.DeadlineContentModel
 import com.poptato.domain.model.request.todo.DragDropRequestModel
 import com.poptato.domain.model.request.todo.ModifyTodoRequestModel
 import com.poptato.domain.model.request.todo.TodoIdModel
 import com.poptato.domain.model.request.todo.UpdateDeadlineRequestModel
+import com.poptato.domain.model.response.category.CategoryListModel
 import com.poptato.domain.model.response.today.TodayListModel
 import com.poptato.domain.model.response.today.TodoItemModel
+import com.poptato.domain.usecase.category.GetCategoryListUseCase
 import com.poptato.domain.usecase.today.GetTodayListUseCase
 import com.poptato.domain.usecase.todo.DeleteTodoUseCase
 import com.poptato.domain.usecase.todo.DragDropUseCase
@@ -29,6 +32,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TodayViewModel @Inject constructor(
+    private val getCategoryListUseCase: GetCategoryListUseCase,
     private val getTodayListUseCase: GetTodayListUseCase,
     private val updateTodoCompletionUseCase: UpdateTodoCompletionUseCase,
     private val swipeTodoUseCase: SwipeTodoUseCase,
@@ -42,6 +46,25 @@ class TodayViewModel @Inject constructor(
 
     init {
         getTodayList(0, 50)
+        getCategoryList()
+    }
+
+    private fun getCategoryList() {
+        viewModelScope.launch {
+            getCategoryListUseCase(request = GetCategoryListRequestModel(0, 8)).collect {
+                resultResponse(it, { data ->
+                    onSuccessGetCategoryList(data)
+                })
+            }
+        }
+    }
+
+    private fun onSuccessGetCategoryList(response: CategoryListModel) {
+        updateState(
+            uiState.value.copy(
+                categoryList = response.categoryList
+            )
+        )
     }
 
     fun onCheckedTodo(status: TodoStatus, id: Long) {
