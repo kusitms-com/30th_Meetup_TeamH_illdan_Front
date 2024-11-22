@@ -364,6 +364,15 @@ fun MainScreen() {
                             showDialog = showDialog,
                             categoryScreenContent = categoryScreenContent
                         )
+                        todayNavGraph(
+                            navController = navController,
+                            showSnackBar = showSnackBar,
+                            showBottomSheet = showBottomSheet,
+                            updateDeadlineFlow = viewModel.updateDeadlineFlow,
+                            updateBookmarkFlow = viewModel.updateBookmarkFlow,
+                            deleteTodoFlow = viewModel.deleteTodoFlow,
+                            activateItemFlow = viewModel.activateItemFlow
+                        )
                         categoryNavGraph(
                             navController = navController,
                             showCategoryIconBottomSheet = showCategoryIconBottomSheet,
@@ -371,7 +380,6 @@ fun MainScreen() {
                             showDialog = showDialog,
                             categoryScreenFromBacklog = viewModel.categoryScreenContent
                         )
-                        todayNavGraph(navController = navController, showSnackBar = showSnackBar)
                         historyNavGraph(navController = navController)
                     }
                 }

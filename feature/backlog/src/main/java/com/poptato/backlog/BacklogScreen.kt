@@ -114,6 +114,7 @@ import com.poptato.domain.model.response.dialog.DialogContentModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.ui.common.BookmarkItem
 import com.poptato.ui.common.TopBar
+import com.poptato.ui.util.LoadingManager
 import com.poptato.ui.util.rememberDragDropListState
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
@@ -172,6 +173,12 @@ fun BacklogScreen(
     LaunchedEffect(updateBookmarkFlow) {
         updateBookmarkFlow.collect {
             viewModel.updateBookmark(it)
+        }
+    }
+
+    LaunchedEffect(uiState.isFinishedInitialization) {
+        if (uiState.isFinishedInitialization) {
+            LoadingManager.endLoading()
         }
     }
 
@@ -234,6 +241,8 @@ fun BacklogScreen(
             isDropDownMenuExpanded = isDropDownMenuExpanded,
             onDropdownExpandedChange = { isDropDownMenuExpanded = it }
         )
+    } else {
+        LoadingManager.startLoading()
     }
 }
 

@@ -55,3 +55,4 @@ val Bookmark = Color(0xFF294746)
 
 // Background
 val BgSnackBar = Color(0xFF121214)
+val BgProgressBar = Color(0xFF000000)
