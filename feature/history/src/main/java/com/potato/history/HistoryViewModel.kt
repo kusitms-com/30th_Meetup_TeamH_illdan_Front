@@ -9,6 +9,7 @@ import com.poptato.domain.usecase.history.GetHistoryCalendarListUseCase
 import com.poptato.domain.usecase.history.GetHistoryListUseCase
 import com.poptato.ui.base.BaseViewModel
 import com.poptato.domain.model.enums.MonthNav
+import com.poptato.domain.model.response.history.CalendarMonthModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -100,19 +101,32 @@ class HistoryViewModel @Inject constructor(
         getHistoryList()
     }
 
-    fun updateCurrentMonth(dir: MonthNav) {
+    fun updateCurrentMonth(updateMonthStartDate: LocalDate) {
+        updateState(
+            uiState.value.copy(
+                currentMonthStartDate = updateMonthStartDate
+            )
+        )
+    }
+
+    fun onClickCalNav(dir: MonthNav){
         val updatedMonthStartDate = when (dir) {
             MonthNav.PREVIOUS -> uiState.value.currentMonthStartDate.minusMonths(1).withDayOfMonth(1)
             MonthNav.NEXT -> uiState.value.currentMonthStartDate.plusMonths(1).withDayOfMonth(1)
         }
-
-        updateState(
-            uiState.value.copy(
-                currentMonthStartDate = updatedMonthStartDate
-            )
-        )
-
+        updateCurrentMonth(updatedMonthStartDate)
         getCalendarList()
         getHistoryList()
+    }
+
+    fun setCalendarMonthModel(onUpdated: (CalendarMonthModel) -> Unit){
+        val currentMonthStartDate = uiState.value.currentMonthStartDate
+        val calendarMonth = CalendarMonthModel(currentMonthStartDate.year, currentMonthStartDate.monthValue)
+        updateState(
+            uiState.value.copy(
+                calendarMonth = calendarMonth
+            )
+        )
+        onUpdated(calendarMonth)
     }
 }

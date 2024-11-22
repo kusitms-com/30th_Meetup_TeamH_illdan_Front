@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -66,23 +67,39 @@ import com.poptato.design_system.THU
 import com.poptato.design_system.TUE
 import com.poptato.design_system.WED
 import com.poptato.domain.model.enums.MonthNav
+import com.poptato.domain.model.response.history.CalendarMonthModel
+import kotlinx.coroutines.flow.SharedFlow
+import timber.log.Timber
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @Composable
 fun HistoryScreen(
-
+    showBottomSheet: (CalendarMonthModel) -> Unit,
+    updateMonthFlow: SharedFlow<CalendarMonthModel>
 ) {
     val viewModel: HistoryViewModel = hiltViewModel()
     val uiState: HistoryPageState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(updateMonthFlow) {
+        updateMonthFlow.collect { selectedMonth ->
+            viewModel.updateCurrentMonth(LocalDate.of(selectedMonth.year, selectedMonth.month, 1))
+            viewModel.getCalendarList()
+        }
+    }
 
     HistoryContent(
         uiState = uiState,
         onLoadNextPage = { viewModel.getHistoryList() },
         onDateSelected = { selectedDate -> viewModel.updateSelectedDate(selectedDate)},
-        onPreviousMonthClick = {viewModel.updateCurrentMonth(MonthNav.PREVIOUS)},
-        onNextMonthClick = {viewModel.updateCurrentMonth(MonthNav.NEXT)},
-        getImageResourceForDate = { date, hasEvent -> viewModel.getImageResourceForDate(date, hasEvent) }
+        onPreviousMonthClick = {viewModel.onClickCalNav(MonthNav.PREVIOUS)},
+        onNextMonthClick = {viewModel.onClickCalNav(MonthNav.NEXT)},
+        getImageResourceForDate = { date, hasEvent -> viewModel.getImageResourceForDate(date, hasEvent) },
+        onClickCalendarHeader = {
+            viewModel.setCalendarMonthModel { updatedCalendarMonth ->
+                showBottomSheet(updatedCalendarMonth)
+            }
+        }
     )
 }
 
@@ -93,7 +110,8 @@ fun HistoryContent(
     onDateSelected: (String) -> Unit,
     onPreviousMonthClick: () -> Unit,
     onNextMonthClick: () -> Unit,
-    getImageResourceForDate: (LocalDate, Boolean) -> Int
+    getImageResourceForDate: (LocalDate, Boolean) -> Int,
+    onClickCalendarHeader: () -> Unit
 ) {
     val listState = rememberLazyListState()
 
@@ -110,7 +128,8 @@ fun HistoryContent(
             eventDates = uiState.eventDates,
             onPreviousMonthClick = onPreviousMonthClick,
             onNextMonthClick = onNextMonthClick,
-            getImageResourceForDate = getImageResourceForDate
+            getImageResourceForDate = getImageResourceForDate,
+            onClickCalendarHeader = onClickCalendarHeader
         )
 
         Spacer(modifier = Modifier.height(30.dp))
@@ -155,7 +174,8 @@ fun CalendarContent(
     eventDates: List<String>,
     onNextMonthClick: () -> Unit,
     onPreviousMonthClick: () -> Unit,
-    getImageResourceForDate: (LocalDate, Boolean) -> Int
+    getImageResourceForDate: (LocalDate, Boolean) -> Int,
+    onClickCalendarHeader: () -> Unit,
 ) {
     val daysInMonth = currentMonthStartDate.lengthOfMonth()
     val firstDayOfWeek = (currentMonthStartDate.withDayOfMonth(1).dayOfWeek.value % 7) // 일요일 = 0
@@ -172,7 +192,8 @@ fun CalendarContent(
         CalendarHeader(
             currentMonth = currentMonthStartDate,
             onPreviousMonthClick = { onPreviousMonthClick() },
-            onNextMonthClick = { onNextMonthClick() }
+            onNextMonthClick = { onNextMonthClick() },
+            onHeaderClick = { onClickCalendarHeader() }
         )
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -211,7 +232,8 @@ fun CalendarContent(
 fun CalendarHeader(
     currentMonth: LocalDate,
     onPreviousMonthClick: () -> Unit,
-    onNextMonthClick: () -> Unit
+    onNextMonthClick: () -> Unit,
+    onHeaderClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -227,11 +249,27 @@ fun CalendarHeader(
                 tint = Gray40
             )
         }
-        Text(
-            text = currentMonth.format(DateTimeFormatter.ofPattern("yyyy년 M월")),
-            style = PoptatoTypo.mdMedium,
-            color = Gray00
-        )
+        Row(
+            modifier = Modifier
+                .clickable { onHeaderClick() }
+                .padding(horizontal = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = currentMonth.format(DateTimeFormatter.ofPattern("yyyy년 M월")),
+                style = PoptatoTypo.mdMedium,
+                color = Gray00,
+            )
+            Spacer(modifier = Modifier.width(7.dp))
+            Icon(
+                painter = painterResource(id = R.drawable.ic_triangle_down),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(16.dp),
+                tint = Gray40
+            )
+        }
         IconButton(onClick = onNextMonthClick, modifier = Modifier.size(20.dp), enabled = currentMonth < LocalDate.now().withDayOfMonth(1)) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_arrow_right_20),
