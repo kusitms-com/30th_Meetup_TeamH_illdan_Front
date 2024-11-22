@@ -18,6 +18,7 @@ import com.poptato.domain.model.request.todo.UpdateTodoCategoryModel
 import com.poptato.domain.model.response.backlog.BacklogListModel
 import com.poptato.domain.model.response.category.CategoryListModel
 import com.poptato.domain.model.response.today.TodoItemModel
+import com.poptato.domain.model.response.todo.TodoDetailItemModel
 import com.poptato.domain.model.response.yesterday.YesterdayListModel
 import com.poptato.domain.usecase.backlog.CreateBacklogUseCase
 import com.poptato.domain.usecase.backlog.GetBacklogListUseCase
@@ -25,6 +26,7 @@ import com.poptato.domain.usecase.category.DeleteCategoryUseCase
 import com.poptato.domain.usecase.category.GetCategoryListUseCase
 import com.poptato.domain.usecase.todo.DeleteTodoUseCase
 import com.poptato.domain.usecase.todo.DragDropUseCase
+import com.poptato.domain.usecase.todo.GetTodoDetailUseCase
 import com.poptato.domain.usecase.todo.ModifyTodoUseCase
 import com.poptato.domain.usecase.todo.SwipeTodoUseCase
 import com.poptato.domain.usecase.todo.UpdateBookmarkUseCase
@@ -52,7 +54,8 @@ class BacklogViewModel @Inject constructor(
     private val updateDeadlineUseCase: UpdateDeadlineUseCase,
     private val updateBookmarkUseCase: UpdateBookmarkUseCase,
     private val swipeTodoUseCase: SwipeTodoUseCase,
-    private val updateTodoCategoryUseCase: UpdateTodoCategoryUseCase
+    private val updateTodoCategoryUseCase: UpdateTodoCategoryUseCase,
+    private val getTodoDetailUseCase: GetTodoDetailUseCase
 ) : BaseViewModel<BacklogPageState>(
     BacklogPageState()
 ) {
@@ -290,12 +293,30 @@ class BacklogViewModel @Inject constructor(
         )
     }
 
-    fun onSelectedItem(item: TodoItemModel) {
+    fun getSelectedItemDetailContent(item: TodoItemModel, callback: (TodoItemModel) -> Unit) {
+        viewModelScope.launch {
+            getTodoDetailUseCase(item.todoId).collect {
+                resultResponse(it, { data ->
+                    callback(setSelectedItemCategory(item, data))
+                }, { error ->
+                    Timber.d("[todo] 할 일 상세조회 실패 -> $error")
+                })
+            }
+        }
+    }
+
+    private fun setSelectedItemCategory(item: TodoItemModel, response: TodoDetailItemModel): TodoItemModel {
+        val categoryId: Long =
+            uiState.value.categoryList.firstOrNull { it.categoryName == response.categoryName && it.categoryImgUrl == response.emojiImageUrl }?.categoryId ?: -1
+        val todoItem: TodoItemModel = item.copy(categoryId = categoryId)
+
         updateState(
             uiState.value.copy(
-                selectedItem = item
+                selectedItem = todoItem,
             )
         )
+
+        return todoItem
     }
 
     fun deleteBacklog(id: Long) {

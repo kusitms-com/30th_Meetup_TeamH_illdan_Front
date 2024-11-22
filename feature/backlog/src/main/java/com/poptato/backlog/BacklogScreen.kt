@@ -232,11 +232,9 @@ fun BacklogScreen(
                 )
             },
             onClickBtnTodoSettings = {
-                showBottomSheet(
-                    uiState.backlogList[it],
-                    uiState.categoryList
-                )
-                viewModel.onSelectedItem(uiState.backlogList[it])
+                viewModel.getSelectedItemDetailContent(uiState.backlogList[it]) { callback ->
+                    showBottomSheet(callback, uiState.categoryList)
+                }
             },
             interactionSource = interactionSource,
             activeItemId = activeItemId,
