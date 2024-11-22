@@ -85,7 +85,7 @@ const val BtnGetTodoText = "할 일 가져오기"
 
 //history
 const val HistoryTitle = "기록"
-const val HistoryListEmpty = "아직 완료한 일이 없어요"
+const val HistoryListEmpty = "완료한 일이 없어요"
 
 // BottomSheet
 const val REPEAT_TASK_OPTION = "반복 할 일 설정"
