@@ -49,14 +49,16 @@ fun TodoBottomSheet(
 ) {
     var deadline by remember { mutableStateOf(item.deadline) }
     var isBookmark by remember { mutableStateOf(item.isBookmark) }
+    var isRepeat by remember { mutableStateOf(item.isRepeat) }
 
     LaunchedEffect(item) {
         deadline = item.deadline
         isBookmark = item.isBookmark
+        isRepeat = item.isRepeat
     }
 
     TodoBottomSheetContent(
-        item = item.copy(deadline = deadline, isBookmark = isBookmark),
+        item = item.copy(deadline = deadline, isBookmark = isBookmark, isRepeat = isRepeat),
         onClickShowDatePicker = onClickShowDatePicker,
         onClickBtnDelete = onClickBtnDelete,
         onClickBtnModify = onClickBtnModify,
@@ -164,7 +166,6 @@ fun BottomSheetBtn(
     isRepeat: Boolean = false,
     onClickBtnRepeat: () -> Unit = {}
 ) {
-    var isChecked by remember { mutableStateOf(isRepeat) }
 
     Row(
         modifier = modifier
@@ -177,9 +178,8 @@ fun BottomSheetBtn(
         Spacer(modifier = Modifier.weight(1f))
         if (deadline.isNotEmpty()) Text(text = deadline, style = PoptatoTypo.mdMedium, color = Gray00)
         if (isRepeatBtn) PoptatoSwitchButton(
-            check = isChecked,
+            check = isRepeat,
             onClick = {
-                isChecked = !isChecked
                 onClickBtnRepeat()
             }
         )

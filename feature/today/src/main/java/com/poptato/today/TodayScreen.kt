@@ -75,6 +75,7 @@ import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
 import com.poptato.design_system.Gray40
 import com.poptato.design_system.Gray70
+import com.poptato.design_system.Gray90
 import com.poptato.design_system.Gray95
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.Primary100
@@ -87,7 +88,9 @@ import com.poptato.domain.model.request.todo.TodoContentModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.ui.common.BookmarkItem
 import com.poptato.ui.common.PoptatoCheckBox
+import com.poptato.ui.common.RepeatItem
 import com.poptato.ui.common.TopBar
+import com.poptato.ui.common.formatDeadline
 import com.poptato.ui.util.LoadingManager
 import com.poptato.ui.util.rememberDragDropListState
 import com.poptato.ui.util.toPx
@@ -132,6 +135,12 @@ fun TodayScreen(
     LaunchedEffect(updateBookmarkFlow) {
         updateBookmarkFlow.collect {
             viewModel.updateBookmark(it)
+        }
+    }
+
+    LaunchedEffect(updateTodoRepeatFlow) {
+        updateTodoRepeatFlow.collect {
+            viewModel.updateTodoRepeat(it)
         }
     }
 
@@ -448,11 +457,25 @@ fun TodayTodoItem(
                     BookmarkItem()
                     Spacer(modifier = Modifier.width(6.dp))
                 }
-                if (item.dDay != null) Text(
-                    text = if(item.dDay != 0) String.format(DEADLINE, item.dDay) else DEADLINE_DDAY,
-                    style = PoptatoTypo.xsSemiBold,
-                    color = Gray70
-                )
+                if (item.isRepeat) {
+                    RepeatItem()
+                    Spacer(modifier = Modifier.width(6.dp))
+                }
+                if (item.dDay != null) {
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(color = Gray90, shape = RoundedCornerShape(4.dp))
+                            .padding(horizontal = 4.dp, vertical = 2.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = formatDeadline(item.dDay),
+                            style = PoptatoTypo.xsSemiBold,
+                            color = Gray70
+                        )
+                    }
+                }
             }
 
             Row(

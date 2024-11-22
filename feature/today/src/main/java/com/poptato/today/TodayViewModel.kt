@@ -21,6 +21,7 @@ import com.poptato.domain.usecase.todo.SwipeTodoUseCase
 import com.poptato.domain.usecase.todo.UpdateBookmarkUseCase
 import com.poptato.domain.usecase.todo.UpdateDeadlineUseCase
 import com.poptato.domain.usecase.todo.UpdateTodoCompletionUseCase
+import com.poptato.domain.usecase.todo.UpdateTodoRepeatUseCase
 import com.poptato.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -36,7 +37,8 @@ class TodayViewModel @Inject constructor(
     private val modifyTodoUseCase: ModifyTodoUseCase,
     private val updateDeadlineUseCase: UpdateDeadlineUseCase,
     private val updateBookmarkUseCase: UpdateBookmarkUseCase,
-    private val deleteTodoUseCase: DeleteTodoUseCase
+    private val deleteTodoUseCase: DeleteTodoUseCase,
+    private val updateTodoRepeatUseCase: UpdateTodoRepeatUseCase
 ) : BaseViewModel<TodayPageState>(TodayPageState()) {
     private var snapshotList: List<TodoItemModel> = emptyList()
 
@@ -254,6 +256,34 @@ class TodayViewModel @Inject constructor(
             }
         }
         val updatedItem = uiState.value.selectedItem.copy(isBookmark = !uiState.value.selectedItem.isBookmark)
+
+        updateState(
+            uiState.value.copy(
+                todayList = newList,
+                selectedItem = updatedItem
+            )
+        )
+    }
+
+    fun updateTodoRepeat(id: Long) {
+        updateTodoRepeatInUI(id)
+
+        viewModelScope.launch {
+            updateTodoRepeatUseCase(id).collect {
+                resultResponse(it, { updateSnapshotList(uiState.value.todayList) }, { onFailedUpdateTodayList() })
+            }
+        }
+    }
+
+    private fun updateTodoRepeatInUI(id: Long) {
+        val newList = uiState.value.todayList.map {
+            if (it.todoId == id) {
+                it.copy(isRepeat = !it.isRepeat)
+            } else {
+                it
+            }
+        }
+        val updatedItem = uiState.value.selectedItem.copy(isRepeat = !uiState.value.selectedItem.isRepeat)
 
         updateState(
             uiState.value.copy(

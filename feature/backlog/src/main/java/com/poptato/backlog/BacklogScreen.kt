@@ -93,6 +93,7 @@ import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.ui.common.BookmarkItem
 import com.poptato.ui.common.RepeatItem
 import com.poptato.ui.common.TopBar
+import com.poptato.ui.common.formatDeadline
 import com.poptato.ui.util.LoadingManager
 import com.poptato.ui.util.rememberDragDropListState
 import kotlinx.coroutines.flow.SharedFlow
@@ -728,11 +729,3 @@ fun BacklogGuideItem(
     }
 }
 
-fun formatDeadline(dDay: Int?): String {
-    return when {
-        dDay == null -> ""
-        dDay > 0 -> String.format(DEADLINE, dDay)
-        dDay < 0 -> String.format(DEADLINE_PASSED, -dDay)
-        else -> DEADLINE_DDAY
-    }
-}
