@@ -1,6 +1,7 @@
 package com.poptato.setting.servicedelete
 
 import androidx.lifecycle.viewModelScope
+import com.poptato.domain.model.enums.UserDeleteType
 import com.poptato.domain.usecase.auth.ClearTokenUseCase
 import com.poptato.domain.usecase.mypage.UserDeleteUseCase
 import com.poptato.ui.base.BaseViewModel
@@ -16,6 +17,18 @@ class ServiceDeleteViewModel @Inject constructor(
 ) : BaseViewModel<ServiceDeletePageState>(
     ServiceDeletePageState()
 ) {
+
+    fun setSelectedReason(reason: UserDeleteType) {
+        val tempList = uiState.value.selectedReasonList + reason
+
+        updateState(
+            uiState.value.copy(
+                selectedReasonList = tempList
+            )
+        )
+
+        Timber.d("[테스트] -> $tempList")
+    }
 
     fun userDelete() {
         viewModelScope.launch {

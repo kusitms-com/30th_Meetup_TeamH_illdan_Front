@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -36,8 +35,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.poptato.design_system.Danger50
-import com.poptato.design_system.FirstNoticeContent
-import com.poptato.design_system.FirstNoticeTitle
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
 import com.poptato.design_system.Gray40
@@ -46,8 +43,6 @@ import com.poptato.design_system.MissingFeature
 import com.poptato.design_system.NotUsed
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.R
-import com.poptato.design_system.SecondNoticeContent
-import com.poptato.design_system.SecondNoticeTitle
 import com.poptato.design_system.TooComplex
 import com.poptato.design_system.UserDeleteBtn
 import com.poptato.design_system.UserDeleteContent
@@ -76,14 +71,18 @@ fun ServiceDeleteScreen(
 
     ServiceDeleteContent(
         onClickCloseBtn = { goBackToSetting() },
-        onClickDeleteBtn = { viewModel.userDelete() }
+        onClickDeleteBtn = { viewModel.userDelete() },
+        isSelectedReasonsList = uiState.selectedReasonList,
+        onSelectedReason = { viewModel.setSelectedReason(it) }
     )
 }
 
 @Composable
 fun ServiceDeleteContent(
     onClickCloseBtn: () -> Unit = {},
-    onClickDeleteBtn: () -> Unit = {}
+    onClickDeleteBtn: () -> Unit = {},
+    onSelectedReason: (UserDeleteType) -> Unit = {},
+    isSelectedReasonsList: List<UserDeleteType> = emptyList()
 ) {
     Column(
         modifier = Modifier
@@ -113,14 +112,10 @@ fun ServiceDeleteContent(
                 .padding(horizontal = 25.dp)
         )
 
-//        Box(
-//            modifier = Modifier
-//                .padding(top = 24.dp)
-//        ) {
-//            DeleteNotice()
-//
-//        }
-        DeleteReasonsContent()
+        DeleteReasonsContent(
+            isSelectedReasonsList = isSelectedReasonsList,
+            onSelectedReason = onSelectedReason
+        )
 
         UserDeleteBtn(
             onClickDeleteBtn = onClickDeleteBtn
@@ -151,10 +146,13 @@ fun CloseBtn(
 }
 
 @Composable
-fun DeleteReasonsContent() {
+fun DeleteReasonsContent(
+    onSelectedReason: (UserDeleteType) -> Unit = {},
+    isSelectedReasonsList: List<UserDeleteType> = emptyList()
+) {
 
     val reasonsList: List<UserDeleteType> = listOf(UserDeleteType.NOT_USED_OFTEN, UserDeleteType.MISSING_FEATURES, UserDeleteType.TOO_COMPLEX)
-    val reasonsContextList = listOf(NotUsed, MissingFeature, TooComplex)
+    val reasonsContextList: List<String> = listOf(NotUsed, MissingFeature, TooComplex)
 
     LazyColumn(
         modifier = Modifier
@@ -163,9 +161,11 @@ fun DeleteReasonsContent() {
             .padding(top = 24.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        itemsIndexed(reasonsContextList, key = { _, item -> item }) { index, item ->
+        itemsIndexed(reasonsList, key = { _, item -> item }) { index, item ->
             DeleteReasonsItem(
-                reason = item
+                reason = reasonsContextList[index],
+                isSelected = isSelectedReasonsList.contains(item),
+                onClick = { onSelectedReason(item) }
             )
         }
     }
@@ -173,12 +173,15 @@ fun DeleteReasonsContent() {
 
 @Composable
 fun DeleteReasonsItem(
-    reason: String
+    reason: String,
+    isSelected: Boolean = false,
+    onClick: () -> Unit = {}
 ) {
     Row(
         modifier = Modifier
             .clip(RoundedCornerShape(8.dp))
-            .background(Gray95),
+            .background(Gray95)
+            .clickable { onClick() },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start
     ) {
@@ -188,7 +191,10 @@ fun DeleteReasonsItem(
                 .padding(start = 20.dp)
                 .padding(vertical = 18.dp),
         ) {
-            PoptatoCheckBox()
+            PoptatoCheckBox(
+                isChecked = isSelected,
+                onCheckedChange = {}
+            )
 
             Spacer(modifier = Modifier.width(8.dp))
 
