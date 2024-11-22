@@ -1,14 +1,18 @@
 package com.poptato.setting.servicedelete
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -17,27 +21,43 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.poptato.design_system.CategoryNameInputTitle
 import com.poptato.design_system.Danger50
+import com.poptato.design_system.DeleteReasonInputHint
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
 import com.poptato.design_system.Gray40
+import com.poptato.design_system.Gray60
+import com.poptato.design_system.Gray70
+import com.poptato.design_system.Gray90
 import com.poptato.design_system.Gray95
 import com.poptato.design_system.MissingFeature
 import com.poptato.design_system.NotUsed
@@ -73,7 +93,9 @@ fun ServiceDeleteScreen(
         onClickCloseBtn = { goBackToSetting() },
         onClickDeleteBtn = { viewModel.userDelete() },
         isSelectedReasonsList = uiState.selectedReasonList,
-        onSelectedReason = { viewModel.setSelectedReason(it) }
+        onSelectedReason = { viewModel.setSelectedReason(it) },
+        deleteInputReason = uiState.deleteInputReason,
+        onValueChange = { newValue -> viewModel.onValueChange(newValue) }
     )
 }
 
@@ -82,7 +104,9 @@ fun ServiceDeleteContent(
     onClickCloseBtn: () -> Unit = {},
     onClickDeleteBtn: () -> Unit = {},
     onSelectedReason: (UserDeleteType) -> Unit = {},
-    isSelectedReasonsList: List<UserDeleteType> = emptyList()
+    isSelectedReasonsList: List<UserDeleteType> = emptyList(),
+    deleteInputReason: String = "",
+    onValueChange: (String) -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -114,7 +138,9 @@ fun ServiceDeleteContent(
 
         DeleteReasonsContent(
             isSelectedReasonsList = isSelectedReasonsList,
-            onSelectedReason = onSelectedReason
+            onSelectedReason = onSelectedReason,
+            deleteInputReason = deleteInputReason,
+            onValueChange = onValueChange
         )
 
         UserDeleteBtn(
@@ -148,7 +174,9 @@ fun CloseBtn(
 @Composable
 fun DeleteReasonsContent(
     onSelectedReason: (UserDeleteType) -> Unit = {},
-    isSelectedReasonsList: List<UserDeleteType> = emptyList()
+    isSelectedReasonsList: List<UserDeleteType> = emptyList(),
+    deleteInputReason: String = "",
+    onValueChange: (String) -> Unit = {}
 ) {
 
     val reasonsList: List<UserDeleteType> = listOf(UserDeleteType.NOT_USED_OFTEN, UserDeleteType.MISSING_FEATURES, UserDeleteType.TOO_COMPLEX)
@@ -166,6 +194,13 @@ fun DeleteReasonsContent(
                 reason = reasonsContextList[index],
                 isSelected = isSelectedReasonsList.contains(item),
                 onClick = { onSelectedReason(item) }
+            )
+        }
+
+        item {
+            DeleteReasonTextField(
+                textInput = deleteInputReason,
+                onValueChange = onValueChange
             )
         }
     }
@@ -205,6 +240,71 @@ fun DeleteReasonsItem(
                 color = Gray00
             )
         }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun DeleteReasonTextField(
+    textInput: String = "",
+    onValueChange: (String) -> Unit = {}
+) {
+    var isFocused by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
+
+    val imeVisible = WindowInsets.isImeVisible
+
+    LaunchedEffect(imeVisible) {
+        if (!imeVisible) {
+            focusManager.clearFocus()
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .background(Gray95)
+    ) {
+        BasicTextField(
+            value = textInput,
+            onValueChange = { input ->
+                onValueChange(input)
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 20.dp)
+                .padding(vertical = 16.dp)
+                .onFocusChanged { focusState ->
+                    isFocused = focusState.isFocused
+                },
+            textStyle = PoptatoTypo.smMedium.copy(color = Gray00),
+            cursorBrush = SolidColor(Gray00),
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    focusManager.clearFocus()
+                }
+            ),
+            decorationBox = { innerTextField ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    if (textInput.isEmpty() && !isFocused) {
+                        Text(
+                            text = DeleteReasonInputHint,
+                            style = PoptatoTypo.smMedium,
+                            color = Gray60
+                        )
+                    }
+                    innerTextField()
+                }
+            }
+        )
     }
 }
 

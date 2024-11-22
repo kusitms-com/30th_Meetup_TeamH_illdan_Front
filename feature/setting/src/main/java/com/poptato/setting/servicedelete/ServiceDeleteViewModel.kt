@@ -35,6 +35,14 @@ class ServiceDeleteViewModel @Inject constructor(
         )
     }
 
+    fun onValueChange(newValue: String) {
+        updateState(
+            uiState.value.copy(
+                deleteInputReason = newValue
+            )
+        )
+    }
+
     fun userDelete() {
         viewModelScope.launch {
             userDeleteUseCase(request = Unit).collect {
