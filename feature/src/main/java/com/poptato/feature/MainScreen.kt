@@ -48,6 +48,7 @@ import com.poptato.design_system.Gray100
 import com.poptato.domain.model.enums.BottomSheetType
 import com.poptato.domain.model.enums.DialogType
 import com.poptato.domain.model.response.category.CategoryIconTotalListModel
+import com.poptato.domain.model.response.category.CategoryScreenContentModel
 import com.poptato.domain.model.response.dialog.DialogContentModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.feature.component.BottomNavBar
@@ -116,6 +117,10 @@ fun MainScreen() {
     val showDialog: (DialogContentModel) -> Unit = {
         viewModel.onSetDialogContent(it)
         isShowDialog.value = true
+    }
+    val categoryScreenContent: (CategoryScreenContentModel) -> Unit = {
+        scope.launch { viewModel.categoryScreenContent.emit(it)
+        }
     }
 
     if (uiState.bottomNavType != BottomNavType.DEFAULT) {
@@ -355,7 +360,9 @@ fun MainScreen() {
                             deleteTodoFlow = viewModel.deleteTodoFlow,
                             activateItemFlow = viewModel.activateItemFlow,
                             updateBookmarkFlow = viewModel.updateBookmarkFlow,
-                            showSnackBar = showSnackBar
+                            showSnackBar = showSnackBar,
+                            showDialog = showDialog,
+                            categoryScreenContent = categoryScreenContent
                         )
                         todayNavGraph(
                             navController = navController,
@@ -370,7 +377,8 @@ fun MainScreen() {
                             navController = navController,
                             showCategoryIconBottomSheet = showCategoryIconBottomSheet,
                             selectedIconInBottomSheet = viewModel.selectedIconInBottomSheet,
-                            showDialog = showDialog
+                            showDialog = showDialog,
+                            categoryScreenFromBacklog = viewModel.categoryScreenContent
                         )
                         historyNavGraph(navController = navController)
                     }

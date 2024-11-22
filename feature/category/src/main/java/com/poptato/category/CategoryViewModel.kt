@@ -3,6 +3,7 @@ package com.poptato.category
 import com.poptato.domain.model.response.category.CategoryIconItemModel
 import com.poptato.domain.model.response.category.CategoryIconTotalListModel
 import com.poptato.domain.model.response.category.CategoryIconTypeListModel
+import com.poptato.domain.model.response.category.CategoryScreenContentModel
 import com.poptato.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import timber.log.Timber
@@ -63,7 +64,18 @@ class CategoryViewModel @Inject constructor(
     fun getSelectedIcon(icon: CategoryIconItemModel) {
         updateState(
             uiState.value.copy(
-                selectedIcon = icon
+                selectedIcon = icon,
+                categoryIconImgUrl = icon.iconImgUrl
+            )
+        )
+    }
+
+    fun getModifyIconItem(item: CategoryScreenContentModel) {
+        updateState(
+            uiState.value.copy(
+                screenType = item.screenType,
+                categoryName = item.categoryItem.categoryName,
+                categoryIconImgUrl = item.categoryItem.categoryImgUrl
             )
         )
     }
