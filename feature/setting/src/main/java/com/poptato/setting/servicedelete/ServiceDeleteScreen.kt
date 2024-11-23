@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.isImeVisible
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -36,9 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -48,7 +45,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.poptato.design_system.Cancel
 import com.poptato.design_system.Danger50
+import com.poptato.design_system.DeleteDialogContent
+import com.poptato.design_system.DeleteDialogTitle
 import com.poptato.design_system.DeleteReasonInputHint
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
@@ -64,13 +64,16 @@ import com.poptato.design_system.TooComplex
 import com.poptato.design_system.UserDeleteBtn
 import com.poptato.design_system.UserDeleteContent
 import com.poptato.design_system.UserDeleteTitle
+import com.poptato.domain.model.enums.DialogType
 import com.poptato.domain.model.enums.UserDeleteType
+import com.poptato.domain.model.response.dialog.DialogContentModel
 import com.poptato.ui.common.PoptatoCheckBox
 
 @Composable
 fun ServiceDeleteScreen(
     goBackToSetting: () -> Unit = {},
-    goBackToLogIn: () -> Unit = {}
+    goBackToLogIn: () -> Unit = {},
+    showDialog: (DialogContentModel) -> Unit = {},
 ) {
 
     val viewModel: ServiceDeleteViewModel = hiltViewModel()
@@ -93,7 +96,20 @@ fun ServiceDeleteScreen(
 
     ServiceDeleteContent(
         onClickCloseBtn = { goBackToSetting() },
-        onClickDeleteBtn = { viewModel.userDelete() },
+        onClickDeleteBtn = {
+            showDialog(
+                DialogContentModel(
+                    dialogType = DialogType.TwoBtn,
+                    titleText = DeleteDialogTitle,
+                    dialogContentText = DeleteDialogContent,
+                    positiveBtnText = UserDeleteBtn,
+                    cancelBtnText = Cancel,
+                    positiveBtnAction = {
+                        viewModel.userDelete()
+                    }
+                )
+            )
+        },
         isSelectedReasonsList = uiState.selectedReasonList,
         onSelectedReason = { viewModel.setSelectedReason(it) },
         deleteInputReason = uiState.deleteInputReason,
