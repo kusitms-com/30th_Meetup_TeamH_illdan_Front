@@ -37,6 +37,7 @@ class KaKaoLoginViewModel @Inject constructor(
                 resultResponse(it, {})
             }
         }
-        emitEventFlow(KaKaoLoginEvent.OnSuccessLogin)
+        if (model.isNewUser) emitEventFlow(KaKaoLoginEvent.NewUserLogin)
+        else emitEventFlow(KaKaoLoginEvent.OnSuccessLogin)
     }
 }

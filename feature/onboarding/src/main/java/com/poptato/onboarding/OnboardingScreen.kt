@@ -1,6 +1,7 @@
 package com.poptato.onboarding
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -45,21 +46,25 @@ import com.poptato.design_system.START
 import kotlinx.coroutines.delay
 
 @Composable
-fun OnboardingScreen() {
+fun OnboardingScreen(
+    goToBacklog: () -> Unit
+) {
     val viewModel: OnboardingViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val pagerState = rememberPagerState(pageCount = { uiState.onboardingList.size })
 
     OnboardingContent(
         onboardingList = uiState.onboardingList,
-        pagerState = pagerState
+        pagerState = pagerState,
+        goToBacklog = goToBacklog
     )
 }
 
 @Composable
 fun OnboardingContent(
     onboardingList: List<OnboardingModel> = emptyList(),
-    pagerState: PagerState
+    pagerState: PagerState,
+    goToBacklog: () -> Unit
 ) {
     val currentPage = pagerState.currentPage
     val composition by rememberLottieComposition(onboardingList[pagerState.currentPage].resource)
@@ -131,7 +136,8 @@ fun OnboardingContent(
                         } else {
                             Gray95
                         }
-                    ),
+                    )
+                    .clickable { goToBacklog() },
                 contentAlignment = Alignment.Center
             ) {
                 Text(

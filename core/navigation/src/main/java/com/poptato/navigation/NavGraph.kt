@@ -83,7 +83,7 @@ fun NavGraphBuilder.loginNavGraph(
         }
 
         composable(NavRoutes.OnboardingScreen.route) {
-            OnboardingScreen()
+            OnboardingScreen(goToBacklog = { navController.navigate(NavRoutes.BacklogGraph.route) })
         }
     }
 }

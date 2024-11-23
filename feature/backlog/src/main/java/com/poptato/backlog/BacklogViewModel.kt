@@ -93,6 +93,8 @@ class BacklogViewModel @Inject constructor(
             deleteCategoryUseCase(request = uiState.value.selectedCategoryId).collect {
                 resultResponse(it, {
                     getCategoryList()
+                    updateState(uiState.value.copy(selectedCategoryId = -1, selectedCategoryIndex = 0))
+                    getBacklogList(-1, 0, 100)
                 }, { error ->
                     Timber.d("[카테고리] 삭제 서버통신 실패 -> $error")
                 })

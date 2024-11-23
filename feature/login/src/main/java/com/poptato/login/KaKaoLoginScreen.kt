@@ -39,7 +39,8 @@ import timber.log.Timber
 @Composable
 fun KaKaoLoginScreen(
     goToBacklog: () -> Unit = {},
-    showSnackBar: (String) -> Unit
+    showSnackBar: (String) -> Unit,
+    goToOnboarding: () -> Unit = {}
 ) {
     val viewModel: KaKaoLoginViewModel = hiltViewModel()
     val context = LocalContext.current
@@ -50,6 +51,9 @@ fun KaKaoLoginScreen(
                 is KaKaoLoginEvent.OnSuccessLogin -> {
                     goToBacklog()
                     showSnackBar(SUCCESS_LOGIN)
+                }
+                is KaKaoLoginEvent.NewUserLogin -> {
+                    goToOnboarding()
                 }
             }
         }
