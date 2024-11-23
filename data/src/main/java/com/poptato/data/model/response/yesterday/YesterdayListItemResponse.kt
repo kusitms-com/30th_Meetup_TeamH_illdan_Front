@@ -9,8 +9,8 @@ data class YesterdayListItemResponse (
     val content: String = "",
     @SerializedName("dday")
     val dday: Int,
-    @SerializedName("bookmark")
+    @SerializedName("isBookmark")
     val bookmark: Boolean,
-    @SerializedName("repeat")
+    @SerializedName("isRepeat")
     val repeat: Boolean
 )

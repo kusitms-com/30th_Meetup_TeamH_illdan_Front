@@ -116,10 +116,33 @@ fun YesterdayContent(
                     .fillMaxWidth()
                     .padding(top = 8.dp)
             ) {
-                YesterdayTodoList(
-                    list = uiState.yesterdayList,
-                    onCheckedChange = onCheckedChange
+                Text(
+                    text = YesterdayListTitle,
+                    style = PoptatoTypo.xxLSemiBold,
+                    color = Gray00,
+                    modifier = Modifier
+                        .padding(start = 16.dp)
                 )
+
+                Image(
+                    painter = painterResource(id = R.drawable.ic_yesterday_bg),
+                    contentDescription = "",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(118.dp),
+                    contentScale = ContentScale.Crop
+                )
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 70.dp)
+                ) {
+                    YesterdayTodoList(
+                        list = uiState.yesterdayList,
+                        onCheckedChange = onCheckedChange
+                    )
+                }
             }
 
             AllCheckBtn(
