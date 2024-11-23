@@ -5,6 +5,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
@@ -54,7 +56,11 @@ fun AllCheckContent() {
             contentScale = ContentScale.Crop
         )
 
-        Box {
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .offset(y = (-490).dp)
+        ) {
 
             Image(
                 painter = painterResource(id = R.drawable.ic_star4),
@@ -66,13 +72,16 @@ fun AllCheckContent() {
 
             Row(
                 verticalAlignment = Alignment.Top,
-                modifier = Modifier.wrapContentSize().align(Alignment.Center)
+                modifier = Modifier
+                    .wrapContentSize()
+                    .align(Alignment.Center)
             ) {
 
                 Image(
                     painter = painterResource(id = R.drawable.ic_star2),
                     contentDescription = "ic_star2",
-                    modifier = Modifier.offset(y = (-8).dp)
+                    modifier = Modifier
+                        .offset(y = (-8).dp)
                         .size(24.dp))
 
                 Text(
@@ -90,6 +99,16 @@ fun AllCheckContent() {
                         .size(32.dp))
             }
         }
+
+        Image(
+            painter = painterResource(id = R.drawable.ic_all_check_bg_bottom),
+            contentDescription = "",
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(420.dp)
+                .align(Alignment.BottomCenter),
+            contentScale = ContentScale.Crop
+        )
 
     }
 }

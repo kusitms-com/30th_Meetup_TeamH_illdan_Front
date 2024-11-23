@@ -50,7 +50,7 @@ const val CategoryDeleteDropDownTitle  = "카테고리를 삭제하시겠어요?
 const val CategoryDeleteDropDownContent = "카테고리에 저장된 할 일도 함께 삭제돼요"
 
 // YesterdayList
-const val YesterdayListTitle = "어제 한 일을 모두 체크하세요!"
+const val YesterdayListTitle = "어제 한 일을\n모두 체크하세요!"
 const val YesterdayAllCheckBtn = "완료"
 const val YesterdayAllCheckContent = "좋아요! 오늘 하루도\n힘차게 시작해볼까요?"
 

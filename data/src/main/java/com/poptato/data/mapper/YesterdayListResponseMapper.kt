@@ -14,7 +14,10 @@ object YesterdayListResponseMapper : Mapper<YesterdayListResponse, YesterdayList
                 yesterdays = data.yesterdays.map { listItem ->
                     YesterdayItemModel(
                         todoId = listItem.todoId,
-                        content = listItem.content
+                        content = listItem.content,
+                        bookmark = listItem.bookmark,
+                        dday = listItem.dday,
+                        repeat = listItem.repeat
                     )
                 }
             )
