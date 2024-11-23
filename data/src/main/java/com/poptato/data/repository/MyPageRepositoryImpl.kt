@@ -5,6 +5,7 @@ import com.poptato.data.mapper.PolicyResponseMapper
 import com.poptato.data.mapper.UnitResponseMapper
 import com.poptato.data.mapper.UserDataResponseMapper
 import com.poptato.data.service.MyPageService
+import com.poptato.domain.model.request.auth.UserDeleteRequestModel
 import com.poptato.domain.model.response.mypage.PolicyModel
 import com.poptato.domain.model.response.mypage.UserDataModel
 import com.poptato.domain.repository.MyPageRepository
@@ -15,8 +16,8 @@ class MyPageRepositoryImpl @Inject constructor(
     private val myPageService: MyPageService
 ) : MyPageRepository, BaseRepository() {
 
-    override suspend fun userDelete(): Flow<Result<Unit>> {
-        return apiLaunch(apiCall = { myPageService.userDelete() }, UnitResponseMapper)
+    override suspend fun userDelete(request: UserDeleteRequestModel): Flow<Result<Unit>> {
+        return apiLaunch(apiCall = { myPageService.userDelete(request) }, UnitResponseMapper)
     }
 
     override suspend fun getUserData(): Flow<Result<UserDataModel>> {

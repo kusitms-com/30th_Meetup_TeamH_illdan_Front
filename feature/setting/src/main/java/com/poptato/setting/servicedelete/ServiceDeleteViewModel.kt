@@ -2,6 +2,7 @@ package com.poptato.setting.servicedelete
 
 import androidx.lifecycle.viewModelScope
 import com.poptato.domain.model.enums.UserDeleteType
+import com.poptato.domain.model.request.auth.UserDeleteRequestModel
 import com.poptato.domain.usecase.auth.ClearTokenUseCase
 import com.poptato.domain.usecase.mypage.UserDeleteUseCase
 import com.poptato.ui.base.BaseViewModel
@@ -45,7 +46,7 @@ class ServiceDeleteViewModel @Inject constructor(
 
     fun userDelete() {
         viewModelScope.launch {
-            userDeleteUseCase(request = Unit).collect {
+            userDeleteUseCase(request = UserDeleteRequestModel(reasons = uiState.value.selectedReasonList, userInputReason = uiState.value.deleteInputReason)).collect {
                 resultResponse(it, {
                     clearTokenUseCase
                     emitEventFlow(ServiceDeleteEvent.GoBackToLogIn)

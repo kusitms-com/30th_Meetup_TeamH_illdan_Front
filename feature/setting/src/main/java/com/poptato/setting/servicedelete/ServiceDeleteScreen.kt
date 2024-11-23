@@ -54,6 +54,7 @@ import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
 import com.poptato.design_system.Gray40
 import com.poptato.design_system.Gray60
+import com.poptato.design_system.Gray80
 import com.poptato.design_system.Gray95
 import com.poptato.design_system.MissingFeature
 import com.poptato.design_system.NotUsed
@@ -347,7 +348,7 @@ fun UserDeleteBtn(
                 .padding(horizontal = 16.dp)
                 .padding(bottom = 8.dp)
                 .background(
-                    if (isDeleteBtnValid) Danger50 else Gray95,  // TODO 디자인 수정
+                    if (isDeleteBtnValid) Danger50 else Gray95,
                     shape = RoundedCornerShape(12.dp)
                 )
                 .clickable(
@@ -359,8 +360,8 @@ fun UserDeleteBtn(
         ) {
             Text(
                 text = UserDeleteBtn,
-                style = PoptatoTypo.lgSemiBold,
-                color = Gray100,
+                style = PoptatoTypo.mdSemiBold,
+                color = if (isDeleteBtnValid) Gray100 else Gray80,
                 modifier = Modifier
                     .padding(vertical = 15.dp)
                     .align(Alignment.Center)
