@@ -324,22 +324,6 @@ fun UserDeleteBtn(
             .fillMaxSize(),
         contentAlignment = Alignment.BottomCenter
     ) {
-        Box(
-            modifier = Modifier
-                .size(400.dp)
-                .offset(y = 175.dp)
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Danger50.copy(alpha = 0.05f),
-                            Color.Transparent
-                        ),
-                        startY = 400f,
-                        endY = 200f
-                    ),
-                    shape = RectangleShape
-                )
-        )
 
         Box(
             modifier = Modifier
