@@ -18,6 +18,7 @@ import com.poptato.mypage.MyPageScreen
 import com.poptato.mypage.policy.PolicyViewerScreen
 import com.poptato.mypage.viewer.FAQViewerScreen
 import com.poptato.mypage.viewer.NoticeViewerScreen
+import com.poptato.setting.servicedelete.finish.ServiceDeleteFinishScreen
 import com.poptato.setting.servicedelete.ServiceDeleteScreen
 import com.poptato.setting.userdata.UserDataScreen
 import com.poptato.splash.SplashScreen
@@ -161,7 +162,10 @@ fun NavGraphBuilder.yesterdayListNavGraph(navController: NavHostController) {
 
 fun NavGraphBuilder.myPageNavGraph(
     navController: NavHostController,
-    showDialog: (DialogContentModel) -> Unit) {
+    showDialog: (DialogContentModel) -> Unit,
+    deleteUserName: (String) -> Unit,
+    deleteUserNameFromUserData: SharedFlow<String>
+    ) {
     navigation(
         startDestination = NavRoutes.MyPageScreen.route,
         route = NavRoutes.MyPageGraph.route,
@@ -209,7 +213,9 @@ fun NavGraphBuilder.myPageNavGraph(
             ServiceDeleteScreen(
                 goBackToSetting = { navController.popBackStack() },
                 goBackToLogIn = { navController.navigate(NavRoutes.KaKaoLoginScreen.route) },
-                showDialog = showDialog
+                showDialog = showDialog,
+                deleteUserName = deleteUserNameFromUserData,
+                showDeleteFinishScreen = { navController.navigate(NavRoutes.ServiceDeleteFinishScreen.route) }
             )
         }
 
@@ -217,8 +223,17 @@ fun NavGraphBuilder.myPageNavGraph(
             UserDataScreen(
                 goBackToMyPage = { navController.popBackStack() },
                 goBackToLogIn = { navController.navigate(NavRoutes.KaKaoLoginScreen.route) },
-                goToServiceDelete = { navController.navigate(NavRoutes.ServiceDeleteScreen.route) },
+                goToServiceDelete = {
+                    deleteUserName(it)
+                    navController.navigate(NavRoutes.ServiceDeleteScreen.route)
+                                    },
                 showDialog = showDialog
+            )
+        }
+
+        composable(NavRoutes.ServiceDeleteFinishScreen.route) {
+            ServiceDeleteFinishScreen(
+                deleteUserName = deleteUserNameFromUserData
             )
         }
     }
