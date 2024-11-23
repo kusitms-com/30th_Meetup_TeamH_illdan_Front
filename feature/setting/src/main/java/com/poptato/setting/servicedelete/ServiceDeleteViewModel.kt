@@ -57,7 +57,6 @@ class ServiceDeleteViewModel @Inject constructor(
             userDeleteUseCase(request = UserDeleteRequestModel(reasons = uiState.value.selectedReasonList, userInputReason = uiState.value.deleteInputReason)).collect {
                 resultResponse(it, {
                     clearTokenUseCase
-                    emitEventFlow(ServiceDeleteEvent.GoBackToLogIn)
                 }, { error ->
                     Timber.d("[마이페이지] 회원탈퇴 서버통신 실패 -> ${error.message}")
                 })

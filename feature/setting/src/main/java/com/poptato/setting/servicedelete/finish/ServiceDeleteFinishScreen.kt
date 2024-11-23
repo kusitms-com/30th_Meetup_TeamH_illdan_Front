@@ -27,11 +27,13 @@ import com.poptato.design_system.Gray100
 import com.poptato.design_system.Gray30
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.R
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharedFlow
 
 @Composable
 fun ServiceDeleteFinishScreen(
-    deleteUserName: SharedFlow<String>
+    deleteUserName: SharedFlow<String>,
+    goBackToLogIn: () -> Unit = {},
 ) {
     val viewModel: ServiceDeleteFinishViewModel = hiltViewModel()
     val uiState: ServiceDeleteFinishPageState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -40,6 +42,11 @@ fun ServiceDeleteFinishScreen(
         deleteUserName.collect {
             viewModel.getDeleteUserName(it)
         }
+    }
+
+    LaunchedEffect(Unit) {
+        delay(2000L)
+        goBackToLogIn()
     }
 
     ServiceDeleteFinishContent(

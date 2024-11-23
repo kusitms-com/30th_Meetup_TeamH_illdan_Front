@@ -75,7 +75,6 @@ import timber.log.Timber
 fun ServiceDeleteScreen(
     deleteUserName: SharedFlow<String>,
     goBackToSetting: () -> Unit = {},
-    goBackToLogIn: () -> Unit = {},
     showDialog: (DialogContentModel) -> Unit = {},
     showDeleteFinishScreen: (String) -> Unit = {}
 ) {
@@ -94,16 +93,6 @@ fun ServiceDeleteScreen(
         }
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.eventFlow.collect { event ->
-            when (event) {
-                is ServiceDeleteEvent.GoBackToLogIn -> {
-                    goBackToLogIn()
-                }
-            }
-        }
-    }
-
     ServiceDeleteContent(
         onClickCloseBtn = { goBackToSetting() },
         onClickDeleteBtn = {
@@ -115,8 +104,8 @@ fun ServiceDeleteScreen(
                     positiveBtnText = UserDeleteBtn,
                     cancelBtnText = Cancel,
                     positiveBtnAction = {
+                        viewModel.userDelete()
                         showDeleteFinishScreen(uiState.userName)
-//                        viewModel.userDelete()
                     }
                 )
             )
