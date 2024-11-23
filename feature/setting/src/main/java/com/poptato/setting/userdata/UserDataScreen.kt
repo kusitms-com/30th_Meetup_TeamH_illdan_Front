@@ -52,7 +52,7 @@ import com.poptato.domain.model.response.dialog.DialogContentModel
 fun UserDataScreen(
     goBackToMyPage: () -> Unit = {},
     goBackToLogIn: () -> Unit = {},
-    goToServiceDelete: () -> Unit = {},
+    goToServiceDelete: (String) -> Unit = {},
     showDialog: (DialogContentModel) -> Unit = {}
 ) {
 
@@ -84,7 +84,7 @@ fun UserDataScreen(
                 )
             )
         },
-        onClickServiceDeleteBtn = { goToServiceDelete() },
+        onClickServiceDeleteBtn = { goToServiceDelete(uiState.userDataModel.name) },
         interactionSource = interactionSource
     )
 }

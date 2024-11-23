@@ -68,12 +68,16 @@ import com.poptato.domain.model.enums.DialogType
 import com.poptato.domain.model.enums.UserDeleteType
 import com.poptato.domain.model.response.dialog.DialogContentModel
 import com.poptato.ui.common.PoptatoCheckBox
+import kotlinx.coroutines.flow.SharedFlow
+import timber.log.Timber
 
 @Composable
 fun ServiceDeleteScreen(
+    deleteUserName: SharedFlow<String>,
     goBackToSetting: () -> Unit = {},
     goBackToLogIn: () -> Unit = {},
     showDialog: (DialogContentModel) -> Unit = {},
+    showDeleteFinishScreen: (String) -> Unit = {}
 ) {
 
     val viewModel: ServiceDeleteViewModel = hiltViewModel()
@@ -81,6 +85,12 @@ fun ServiceDeleteScreen(
     val isDeleteValid by remember {
         derivedStateOf {
             uiState.selectedReasonList.isNotEmpty() || uiState.deleteInputReason.isNotEmpty()
+        }
+    }
+
+    LaunchedEffect(deleteUserName) {
+        deleteUserName.collect {
+            viewModel.getDeleteUserName(it)
         }
     }
 
@@ -105,7 +115,8 @@ fun ServiceDeleteScreen(
                     positiveBtnText = UserDeleteBtn,
                     cancelBtnText = Cancel,
                     positiveBtnAction = {
-                        viewModel.userDelete()
+                        showDeleteFinishScreen(uiState.userName)
+//                        viewModel.userDelete()
                     }
                 )
             )

@@ -19,6 +19,14 @@ class ServiceDeleteViewModel @Inject constructor(
     ServiceDeletePageState()
 ) {
 
+    fun getDeleteUserName(name: String) {
+        updateState(
+            uiState.value.copy(
+                userName = name
+            )
+        )
+    }
+
     fun setSelectedReason(reason: UserDeleteType) {
         val newList: MutableList<UserDeleteType> = mutableListOf()
         newList.addAll(uiState.value.selectedReasonList)
