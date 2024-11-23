@@ -79,6 +79,7 @@ import coil.Coil
 import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.decode.SvgDecoder
+import com.poptato.design_system.ALL
 import com.poptato.design_system.BACKLOG_YESTERDAY_TASK_GUIDE
 import com.poptato.design_system.BacklogHint
 import com.poptato.design_system.COMPLETE_DELETE_TODO
@@ -97,6 +98,7 @@ import com.poptato.design_system.EmptyBacklogTitle
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
 import com.poptato.design_system.Gray30
+import com.poptato.design_system.Gray60
 import com.poptato.design_system.Gray70
 import com.poptato.design_system.Gray80
 import com.poptato.design_system.Gray90
@@ -305,10 +307,15 @@ fun BacklogContent(
 
         Box {
             TopBar(
-                titleText = com.poptato.design_system.TODO,
+                titleText = if (uiState.categoryList.isNotEmpty()) {
+                    uiState.categoryList[uiState.selectedCategoryIndex].categoryName
+                } else {
+                    ALL
+                },
+                titleTextStyle = PoptatoTypo.lgSemiBold,
                 subText = uiState.backlogList.size.toString(),
-                subTextStyle = PoptatoTypo.xLSemiBold,
-                subTextColor = Primary60,
+                subTextStyle = PoptatoTypo.lgMedium,
+                subTextColor = Gray60,
                 isCategorySettingBtn = (uiState.selectedCategoryIndex != 0 && uiState.selectedCategoryIndex != 1),
                 isCategorySettingBtnSelected = { onDropdownExpandedChange(true) }
             )
