@@ -50,6 +50,7 @@ import com.poptato.domain.model.enums.DialogType
 import com.poptato.domain.model.response.category.CategoryIconTotalListModel
 import com.poptato.domain.model.response.category.CategoryScreenContentModel
 import com.poptato.domain.model.response.dialog.DialogContentModel
+import com.poptato.domain.model.response.history.CalendarMonthModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.feature.component.BottomNavBar
 import com.poptato.navigation.NavRoutes
@@ -65,6 +66,7 @@ import com.poptato.ui.common.CalendarBottomSheet
 import com.poptato.ui.common.CategoryBottomSheet
 import com.poptato.ui.common.CommonSnackBar
 import com.poptato.ui.common.DatePickerBottomSheet
+import com.poptato.ui.common.MonthPickerBottomSheet
 import com.poptato.ui.common.OneBtnTypeDialog
 import com.poptato.ui.common.TodoBottomSheet
 import com.poptato.ui.common.TwoBtnTypeDialog
@@ -95,6 +97,11 @@ fun MainScreen() {
     }
     val showCategoryIconBottomSheet: (CategoryIconTotalListModel) -> Unit = { categoryList: CategoryIconTotalListModel ->
         viewModel.onSelectedCategoryIcon(categoryList)
+        scope.launch { sheetState.show() }
+    }
+    val showMonthPickerBottomSheet: (CalendarMonthModel) -> Unit = {
+        currentMonthModel: CalendarMonthModel ->
+        viewModel.showMonthPicker(currentMonthModel)
         scope.launch { sheetState.show() }
     }
     val backPressHandler: () -> Unit = {
@@ -251,6 +258,23 @@ fun MainScreen() {
                                 }
                             )
                         }
+                        BottomSheetType.MonthPicker -> {
+                            MonthPickerBottomSheet(
+                                initialMonthModel = uiState.selectedMonth,
+                                onYearMonthSelected = { selectedModel ->
+                                    viewModel.onMonthSelected(selectedModel)
+                                    scope.launch {
+                                        viewModel.updateMonthFlow.emit(selectedModel)
+                                    }
+                                    viewModel.updateBottomSheetType(BottomSheetType.Main)
+                                    scope.launch { sheetState.hide() }
+                                },
+                                onDismissRequest = {
+                                    viewModel.updateBottomSheetType(BottomSheetType.Main)
+                                    scope.launch { sheetState.hide() }
+                                }
+                            )
+                        }
                     }
                 }
             },
@@ -380,7 +404,10 @@ fun MainScreen() {
                             showDialog = showDialog,
                             categoryScreenFromBacklog = viewModel.categoryScreenContent
                         )
-                        historyNavGraph(navController = navController)
+                        historyNavGraph(
+                            navController = navController,
+                            showBottomSheet = showMonthPickerBottomSheet,
+                            updateMonthFlow = viewModel.updateMonthFlow)
                     }
                 }
             }
