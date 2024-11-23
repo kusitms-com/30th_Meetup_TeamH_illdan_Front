@@ -8,6 +8,7 @@ import com.poptato.backlog.BacklogScreen
 import com.poptato.category.CategoryScreen
 import com.poptato.domain.model.response.category.CategoryIconItemModel
 import com.poptato.domain.model.response.category.CategoryIconTotalListModel
+import com.poptato.domain.model.response.category.CategoryItemModel
 import com.poptato.domain.model.response.category.CategoryScreenContentModel
 import com.poptato.domain.model.response.dialog.DialogContentModel
 import com.poptato.domain.model.response.history.CalendarMonthModel
@@ -77,11 +78,12 @@ fun NavGraphBuilder.loginNavGraph(
 
 fun NavGraphBuilder.backlogNavGraph(
     navController: NavHostController,
-    showBottomSheet: (TodoItemModel) -> Unit,
+    showBottomSheet: (TodoItemModel, List<CategoryItemModel>) -> Unit,
     updateDeadlineFlow: SharedFlow<String?>,
     deleteTodoFlow: SharedFlow<Long>,
     activateItemFlow: SharedFlow<Long>,
     updateBookmarkFlow: SharedFlow<Long>,
+    updateCategoryFlow: SharedFlow<Long?>,
     showSnackBar: (String) -> Unit,
     showDialog: (DialogContentModel) -> Unit,
     categoryScreenContent: (CategoryScreenContentModel) -> Unit
@@ -101,6 +103,7 @@ fun NavGraphBuilder.backlogNavGraph(
                 deleteTodoFlow = deleteTodoFlow,
                 activateItemFlow = activateItemFlow,
                 updateBookmarkFlow = updateBookmarkFlow,
+                updateCategoryFlow = updateCategoryFlow,
                 showSnackBar = showSnackBar,
                 showDialog = showDialog
             )
@@ -122,6 +125,7 @@ fun NavGraphBuilder.categoryNavGraph(
         composable(NavRoutes.CategoryScreen.route) {
             CategoryScreen(
                 goBackToBacklog = { navController.popBackStack() },
+                goToBacklog = { navController.navigate(NavRoutes.BacklogScreen.route) },
                 showIconBottomSheet = showCategoryIconBottomSheet,
                 selectedIconInBottomSheet = selectedIconInBottomSheet,
                 showDialog = showDialog,
@@ -222,11 +226,12 @@ fun NavGraphBuilder.myPageNavGraph(
 fun NavGraphBuilder.todayNavGraph(
     navController: NavHostController,
     showSnackBar: (String) -> Unit,
-    showBottomSheet: (TodoItemModel) -> Unit,
+    showBottomSheet: (TodoItemModel, List<CategoryItemModel>) -> Unit,
     deleteTodoFlow: SharedFlow<Long>,
     updateDeadlineFlow: SharedFlow<String?>,
     activateItemFlow: SharedFlow<Long>,
-    updateBookmarkFlow: SharedFlow<Long>
+    updateBookmarkFlow: SharedFlow<Long>,
+    updateCategoryFlow: SharedFlow<Long?>,
 ) {
     navigation(startDestination = NavRoutes.TodayScreen.route, route = NavRoutes.TodayGraph.route) {
         composable(NavRoutes.TodayScreen.route) {
@@ -237,7 +242,8 @@ fun NavGraphBuilder.todayNavGraph(
                 updateDeadlineFlow = updateDeadlineFlow,
                 updateBookmarkFlow = updateBookmarkFlow,
                 activateItemFlow = activateItemFlow,
-                deleteTodoFlow = deleteTodoFlow
+                deleteTodoFlow = deleteTodoFlow,
+                updateCategoryFlow = updateCategoryFlow
             )
         }
     }

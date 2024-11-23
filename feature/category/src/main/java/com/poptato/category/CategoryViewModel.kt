@@ -1,44 +1,29 @@
 package com.poptato.category
 
+import androidx.lifecycle.viewModelScope
+import com.poptato.domain.model.enums.CategoryScreenType
+import com.poptato.domain.model.request.category.CategoryRequestModel
+import com.poptato.domain.model.request.category.ModifyCategoryRequestModel
 import com.poptato.domain.model.response.category.CategoryIconItemModel
 import com.poptato.domain.model.response.category.CategoryIconTotalListModel
-import com.poptato.domain.model.response.category.CategoryIconTypeListModel
 import com.poptato.domain.model.response.category.CategoryScreenContentModel
+import com.poptato.domain.usecase.category.CreateCategoryUseCase
+import com.poptato.domain.usecase.category.GetCategoryIconListUseCase
+import com.poptato.domain.usecase.category.ModifyCategoryUseCase
 import com.poptato.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class CategoryViewModel @Inject constructor(
-
+    private val getCategoryIconListUseCase: GetCategoryIconListUseCase,
+    private val createCategoryUseCase: CreateCategoryUseCase,
+    private val modifyCategoryUseCase: ModifyCategoryUseCase
 ): BaseViewModel<CategoryPageState>(
     CategoryPageState()
 ) {
-
-    private val _categoryIconList: CategoryIconTotalListModel = CategoryIconTotalListModel(
-        listOf(
-            CategoryIconTypeListModel(
-                "생산성",
-                listOf(
-                    CategoryIconItemModel(1, "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
-                    CategoryIconItemModel(2, "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
-                    CategoryIconItemModel(3, "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
-                    CategoryIconItemModel(4, "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
-                    CategoryIconItemModel(5, "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
-                    CategoryIconItemModel(6, "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
-                    CategoryIconItemModel(7, "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
-                    CategoryIconItemModel(8, "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
-                )
-            ),
-            CategoryIconTypeListModel(
-                "데일리",
-                listOf(
-                    CategoryIconItemModel(9, "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
-                )
-            )
-        )
-    )
 
     init {
         getCategoryIconList()
@@ -53,10 +38,22 @@ class CategoryViewModel @Inject constructor(
     }
 
     private fun getCategoryIconList() {
-        // TODO 서버통신 연결
+        viewModelScope.launch {
+            getCategoryIconListUseCase(request = Unit).collect {
+                resultResponse(it, { data ->
+                    onSuccessGetCategoryIconList(data)
+                    Timber.d("[카테고리] 아이콘 리스트 서버통신 성공 -> $data")
+                }, { error ->
+                    Timber.d("[카테고리] 아이콘 리스트 서버통신 실패 -> ${error.message}")
+                })
+            }
+        }
+    }
+
+    private fun onSuccessGetCategoryIconList(response: CategoryIconTotalListModel) {
         updateState(
             uiState.value.copy(
-                categoryIconList = _categoryIconList
+                categoryIconList = response
             )
         )
     }
@@ -75,13 +72,42 @@ class CategoryViewModel @Inject constructor(
             uiState.value.copy(
                 screenType = item.screenType,
                 categoryName = item.categoryItem.categoryName,
-                categoryIconImgUrl = item.categoryItem.categoryImgUrl
+                selectedIcon = CategoryIconItemModel(item.categoryItem.iconId, item.categoryItem.categoryImgUrl),
+                categoryIconImgUrl = item.categoryItem.categoryImgUrl,
+                modifyCategoryId = item.categoryItem.categoryId
             )
         )
     }
 
     fun finishSettingCategory() {
-        // TODO 카테고리 설정 서버통신 연결
-        Timber.d("[카테고리] 카테고리명: ${uiState.value.categoryName} && 아이콘: ${uiState.value.selectedIcon?.iconId}")
+        if (uiState.value.screenType == CategoryScreenType.Add) {
+            createCategory()
+        } else {
+            modifyCategory()
+        }
+    }
+
+    private fun createCategory() {
+        viewModelScope.launch {
+            createCategoryUseCase(request = CategoryRequestModel(uiState.value.categoryName, uiState.value.selectedIcon?.iconId ?: -1)).collect {
+                resultResponse(it, {
+                    emitEventFlow(CategoryEvent.GoToBacklog)
+                }, { error ->
+                    Timber.d("[카테고리] 카테고리 생성 서버통신 실패 -> $error")
+                })
+            }
+        }
+    }
+
+    private fun modifyCategory() {
+        viewModelScope.launch {
+            modifyCategoryUseCase(request = ModifyCategoryRequestModel(uiState.value.modifyCategoryId, CategoryRequestModel(uiState.value.categoryName, uiState.value.selectedIcon?.iconId ?: -1))).collect {
+                resultResponse(it, {
+                    emitEventFlow(CategoryEvent.GoToBacklog)
+                }, { error ->
+                    Timber.d("[카테고리] 카테고리 수정 서버통신 실패 -> $error")
+                })
+            }
+        }
     }
 }

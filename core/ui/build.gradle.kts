@@ -13,4 +13,6 @@ dependencies {
     implementation(projects.core)
 
     implementation(libs.threeten)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.svg)
 }
