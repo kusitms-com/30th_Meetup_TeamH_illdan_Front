@@ -8,8 +8,10 @@ import com.poptato.backlog.BacklogScreen
 import com.poptato.category.CategoryScreen
 import com.poptato.domain.model.response.category.CategoryIconItemModel
 import com.poptato.domain.model.response.category.CategoryIconTotalListModel
+import com.poptato.domain.model.response.category.CategoryItemModel
 import com.poptato.domain.model.response.category.CategoryScreenContentModel
 import com.poptato.domain.model.response.dialog.DialogContentModel
+import com.poptato.domain.model.response.history.CalendarMonthModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.login.KaKaoLoginScreen
 import com.poptato.mypage.MyPageScreen
@@ -76,11 +78,12 @@ fun NavGraphBuilder.loginNavGraph(
 
 fun NavGraphBuilder.backlogNavGraph(
     navController: NavHostController,
-    showBottomSheet: (TodoItemModel) -> Unit,
+    showBottomSheet: (TodoItemModel, List<CategoryItemModel>) -> Unit,
     updateDeadlineFlow: SharedFlow<String?>,
     deleteTodoFlow: SharedFlow<Long>,
     activateItemFlow: SharedFlow<Long>,
     updateBookmarkFlow: SharedFlow<Long>,
+    updateCategoryFlow: SharedFlow<Long?>,
     showSnackBar: (String) -> Unit,
     showDialog: (DialogContentModel) -> Unit,
     categoryScreenContent: (CategoryScreenContentModel) -> Unit,
@@ -101,6 +104,7 @@ fun NavGraphBuilder.backlogNavGraph(
                 deleteTodoFlow = deleteTodoFlow,
                 activateItemFlow = activateItemFlow,
                 updateBookmarkFlow = updateBookmarkFlow,
+                updateCategoryFlow = updateCategoryFlow,
                 updateTodoRepeatFlow = updateTodoRepeatFlow,
                 showSnackBar = showSnackBar,
                 showDialog = showDialog
@@ -123,6 +127,7 @@ fun NavGraphBuilder.categoryNavGraph(
         composable(NavRoutes.CategoryScreen.route) {
             CategoryScreen(
                 goBackToBacklog = { navController.popBackStack() },
+                goToBacklog = { navController.navigate(NavRoutes.BacklogScreen.route) },
                 showIconBottomSheet = showCategoryIconBottomSheet,
                 selectedIconInBottomSheet = selectedIconInBottomSheet,
                 showDialog = showDialog,
@@ -223,10 +228,11 @@ fun NavGraphBuilder.myPageNavGraph(
 fun NavGraphBuilder.todayNavGraph(
     navController: NavHostController,
     showSnackBar: (String) -> Unit,
-    showBottomSheet: (TodoItemModel) -> Unit,
+    showBottomSheet: (TodoItemModel, List<CategoryItemModel>) -> Unit,
     deleteTodoFlow: SharedFlow<Long>,
     updateDeadlineFlow: SharedFlow<String?>,
     activateItemFlow: SharedFlow<Long>,
+    updateCategoryFlow: SharedFlow<Long?>,
     updateBookmarkFlow: SharedFlow<Long>,
     updateTodoRepeatFlow: SharedFlow<Long>
 ) {
@@ -240,19 +246,27 @@ fun NavGraphBuilder.todayNavGraph(
                 updateBookmarkFlow = updateBookmarkFlow,
                 activateItemFlow = activateItemFlow,
                 deleteTodoFlow = deleteTodoFlow,
+                updateCategoryFlow = updateCategoryFlow,
                 updateTodoRepeatFlow = updateTodoRepeatFlow
             )
         }
     }
 }
 
-fun NavGraphBuilder.historyNavGraph(navController: NavHostController) {
+fun NavGraphBuilder.historyNavGraph(
+    navController: NavHostController,
+    showBottomSheet: (CalendarMonthModel) -> Unit,
+    updateMonthFlow: SharedFlow<CalendarMonthModel>
+) {
     navigation(
         startDestination = NavRoutes.HistoryScreen.route,
         route = NavRoutes.HistoryGraph.route
     ) {
         composable(NavRoutes.HistoryScreen.route) {
-            HistoryScreen()
+            HistoryScreen(
+                showBottomSheet = showBottomSheet,
+                updateMonthFlow = updateMonthFlow
+            )
         }
     }
 }

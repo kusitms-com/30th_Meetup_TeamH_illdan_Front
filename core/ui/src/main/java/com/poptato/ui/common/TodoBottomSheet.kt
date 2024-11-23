@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,32 +21,46 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.Coil
+import coil.ImageLoader
+import coil.compose.AsyncImage
+import coil.decode.SvgDecoder
+import com.poptato.design_system.Category
 import com.poptato.design_system.DEADLINE_OPTION
+import com.poptato.design_system.DELETE_ACTION
 import com.poptato.design_system.Danger50
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
 import com.poptato.design_system.Gray30
 import com.poptato.design_system.Gray60
+import com.poptato.design_system.Gray90
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.R
 import com.poptato.design_system.REPEAT_TASK_OPTION
 import com.poptato.design_system.DELETE_ACTION
 import com.poptato.design_system.Gray95
+import com.poptato.design_system.Settings
 import com.poptato.design_system.modify
+import com.poptato.domain.model.response.category.CategoryItemModel
 import com.poptato.domain.model.response.today.TodoItemModel
 
 @Composable
 fun TodoBottomSheet(
     item: TodoItemModel = TodoItemModel(),
+    categoryItem: CategoryItemModel? = CategoryItemModel(),
     onClickShowDatePicker: () -> Unit = {},
     onClickBtnDelete: (Long) -> Unit = {},
     onClickBtnModify: (Long) -> Unit = {},
     onClickBtnBookmark: (Long) -> Unit = {},
+    onClickCategoryBottomSheet: () -> Unit = {},
     onClickBtnRepeat: (Long) -> Unit = {}
 ) {
     var deadline by remember { mutableStateOf(item.deadline) }
@@ -58,6 +74,7 @@ fun TodoBottomSheet(
     }
 
     TodoBottomSheetContent(
+        categoryItem = categoryItem,
         item = item.copy(deadline = deadline, isBookmark = isBookmark, isRepeat = isRepeat),
         onClickShowDatePicker = onClickShowDatePicker,
         onClickBtnDelete = onClickBtnDelete,
@@ -66,6 +83,7 @@ fun TodoBottomSheet(
             onClickBtnBookmark(it)
             isBookmark = !isBookmark
         },
+        onClickCategoryBottomSheet = onClickCategoryBottomSheet,
         onClickBtnRepeat = onClickBtnRepeat
     )
 }
@@ -73,10 +91,12 @@ fun TodoBottomSheet(
 @Composable
 fun TodoBottomSheetContent(
     item: TodoItemModel = TodoItemModel(),
+    categoryItem: CategoryItemModel? = CategoryItemModel(),
     onClickShowDatePicker: () -> Unit = {},
     onClickBtnDelete: (Long) -> Unit = {},
     onClickBtnModify: (Long) -> Unit = {},
     onClickBtnBookmark: (Long) -> Unit = {},
+    onClickCategoryBottomSheet: () -> Unit = {},
     onClickBtnRepeat: (Long) -> Unit = {}
 ) {
     Column(
@@ -150,6 +170,15 @@ fun TodoBottomSheetContent(
             },
             deadline = item.deadline
         )
+        BottomSheetBtn(
+            resourceId = R.drawable.ic_add_category_icon,
+            buttonText = Category,
+            textColor = Gray30,
+            category = categoryItem,
+            modifier = Modifier.clickable {
+                onClickCategoryBottomSheet()
+            }
+        )
     }
 }
 
@@ -161,6 +190,7 @@ fun BottomSheetBtn(
     buttonText: String,
     textColor: Color,
     deadline: String = "",
+    category: CategoryItemModel? = CategoryItemModel(),
     modifier: Modifier = Modifier,
     isRepeatBtn: Boolean = false,
     isRepeat: Boolean = false,
@@ -172,7 +202,7 @@ fun BottomSheetBtn(
             .fillMaxWidth()
             .padding(vertical = 12.dp, horizontal = 24.dp)
     ) {
-        Icon(painter = painterResource(id = resourceId), contentDescription = null, tint = resourceColor)
+        Icon(painter = painterResource(id = resourceId), contentDescription = null, tint = resourceColor, modifier = Modifier.size(20.dp))
         Spacer(modifier = Modifier.width(8.dp))
         Text(text = buttonText, style = PoptatoTypo.mdRegular, color = textColor)
         Spacer(modifier = Modifier.weight(1f))
@@ -183,6 +213,62 @@ fun BottomSheetBtn(
                 onClickBtnRepeat()
             }
         )
+        if (buttonText == DEADLINE_OPTION && deadline.isNotEmpty()) {
+            Text(text = deadline, style = PoptatoTypo.mdMedium, color = Gray00)
+        } else if (buttonText == DEADLINE_OPTION) {
+            Text(text = Settings, style = PoptatoTypo.mdRegular, color = Gray60)
+        }
+
+        CategoryTodoItem(buttonText = buttonText, category = category, modifier = modifier)
+    }
+}
+
+@SuppressLint("ModifierParameter")
+@Composable
+fun CategoryTodoItem(
+    buttonText: String,
+    category: CategoryItemModel? = CategoryItemModel(),
+    modifier: Modifier = Modifier
+) {
+
+    val categoryFixedIcon: List<Int> = listOf(R.drawable.ic_category_all, R.drawable.ic_category_star)
+
+    val context = LocalContext.current
+    val imageLoader = ImageLoader.Builder(context)
+        .components {
+            add(SvgDecoder.Factory())
+        }
+        .build()
+    Coil.setImageLoader(imageLoader)
+
+    if (buttonText == Category && category != null) {
+        val categoryId: Int = category.categoryId.toInt()
+        val categoryIndex: Int = if (categoryId == -1 || categoryId == 0) categoryId + 1 else -1
+
+        Row(
+            modifier = modifier
+                .clip(RoundedCornerShape(32.dp))
+                .background(Gray90)
+                .padding(horizontal = 10.dp, vertical = 4.dp),
+        ) {
+            AsyncImage(
+                model = if (categoryIndex == 0 || categoryIndex == 1) categoryFixedIcon[categoryIndex] else category.categoryImgUrl,
+                contentDescription = "category icon",
+                modifier = Modifier
+                    .size(20.dp),
+                contentScale = ContentScale.Crop
+            )
+
+            Spacer(modifier = Modifier.width(4.dp))
+
+            Text(
+                text = category.categoryName,
+                style = PoptatoTypo.mdMedium,
+                color = Gray00
+            )
+        }
+    } else if (buttonText == Category) {
+        Text(text = Settings, style = PoptatoTypo.mdRegular, color = Gray60)
     }
 }
 

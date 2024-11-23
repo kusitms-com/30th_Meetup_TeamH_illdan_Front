@@ -20,7 +20,8 @@ object BacklogListResponseMapper: Mapper<BacklogListResponse, BacklogListModel> 
                         dDay = item.dDay
                     )
                 },
-                totalPageCount = it.totalPageCount
+                totalPageCount = it.totalPageCount,
+                categoryName = it.categoryName
             )
         } ?: BacklogListModel()
     }

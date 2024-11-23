@@ -48,8 +48,10 @@ import com.poptato.design_system.Gray100
 import com.poptato.domain.model.enums.BottomSheetType
 import com.poptato.domain.model.enums.DialogType
 import com.poptato.domain.model.response.category.CategoryIconTotalListModel
+import com.poptato.domain.model.response.category.CategoryItemModel
 import com.poptato.domain.model.response.category.CategoryScreenContentModel
 import com.poptato.domain.model.response.dialog.DialogContentModel
+import com.poptato.domain.model.response.history.CalendarMonthModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.feature.component.BottomNavBar
 import com.poptato.navigation.NavRoutes
@@ -63,8 +65,10 @@ import com.poptato.navigation.todayNavGraph
 import com.poptato.navigation.yesterdayListNavGraph
 import com.poptato.ui.common.CalendarBottomSheet
 import com.poptato.ui.common.CategoryBottomSheet
+import com.poptato.ui.common.CategoryIconBottomSheet
 import com.poptato.ui.common.CommonSnackBar
 import com.poptato.ui.common.DatePickerBottomSheet
+import com.poptato.ui.common.MonthPickerBottomSheet
 import com.poptato.ui.common.OneBtnTypeDialog
 import com.poptato.ui.common.TodoBottomSheet
 import com.poptato.ui.common.TwoBtnTypeDialog
@@ -89,12 +93,19 @@ fun MainScreen() {
         skipHalfExpanded = true
     )
     val isShowDialog = remember { mutableStateOf(false) }
-    val showBottomSheet: (TodoItemModel) -> Unit = { item: TodoItemModel ->
-        viewModel.onSelectedTodoItem(item)
-        scope.launch { sheetState.show() }
-    }
-    val showCategoryIconBottomSheet: (CategoryIconTotalListModel) -> Unit = { categoryList: CategoryIconTotalListModel ->
-        viewModel.onSelectedCategoryIcon(categoryList)
+    val showBottomSheet: (TodoItemModel, List<CategoryItemModel>) -> Unit =
+        { item: TodoItemModel, categoryList: List<CategoryItemModel> ->
+            viewModel.onSelectedTodoItem(item, categoryList)
+            scope.launch { sheetState.show() }
+        }
+    val showCategoryIconBottomSheet: (CategoryIconTotalListModel) -> Unit =
+        { categoryList: CategoryIconTotalListModel ->
+            viewModel.onSelectedCategoryIcon(categoryList)
+            scope.launch { sheetState.show() }
+        }
+    val showMonthPickerBottomSheet: (CalendarMonthModel) -> Unit = {
+            currentMonthModel: CalendarMonthModel ->
+        viewModel.showMonthPicker(currentMonthModel)
         scope.launch { sheetState.show() }
     }
     val backPressHandler: () -> Unit = {
@@ -119,7 +130,8 @@ fun MainScreen() {
         isShowDialog.value = true
     }
     val categoryScreenContent: (CategoryScreenContentModel) -> Unit = {
-        scope.launch { viewModel.categoryScreenContent.emit(it)
+        scope.launch {
+            viewModel.categoryScreenContent.emit(it)
         }
     }
 
@@ -147,14 +159,18 @@ fun MainScreen() {
         snapshotFlow { sheetState.isVisible }
             .distinctUntilChanged()
             .collect { isVisible ->
-                if (!isVisible) { viewModel.updateBottomSheetType(BottomSheetType.Main) }
+                if (!isVisible) {
+                    viewModel.updateBottomSheetType(BottomSheetType.Main)
+                }
             }
     }
 
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collect { event ->
-            when(event) {
-                is MainEvent.ShowTodoBottomSheet -> { sheetState.show() }
+            when (event) {
+                is MainEvent.ShowTodoBottomSheet -> {
+                    sheetState.show()
+                }
             }
         }
     }
@@ -168,6 +184,7 @@ fun MainScreen() {
                         dialogContent = uiState.dialogContent
                     )
                 }
+
                 DialogType.TwoBtn -> {
                     TwoBtnTypeDialog(
                         onDismiss = { isShowDialog.value = false },
@@ -183,12 +200,16 @@ fun MainScreen() {
                 AnimatedContent(
                     targetState = uiState.bottomSheetType,
                     transitionSpec = {
-                        fadeIn(animationSpec = tween(500)) togetherWith fadeOut(animationSpec = tween(500))
+                        fadeIn(animationSpec = tween(500)) togetherWith fadeOut(
+                            animationSpec = tween(
+                                500
+                            )
+                        )
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .then(
-                            if (uiState.bottomSheetType == BottomSheetType.Category) {
+                            if (uiState.bottomSheetType == BottomSheetType.CategoryIcon) {
                                 Modifier.height(610.dp)
                             } else {
                                 Modifier.wrapContentHeight()
@@ -202,7 +223,12 @@ fun MainScreen() {
                         BottomSheetType.Main -> {
                             TodoBottomSheet(
                                 item = uiState.selectedTodoItem,
-                                onClickShowDatePicker = { viewModel.updateBottomSheetType(BottomSheetType.FullDate) },
+                                categoryItem = uiState.selectedTodoCategoryItem,
+                                onClickShowDatePicker = {
+                                    viewModel.updateBottomSheetType(
+                                        BottomSheetType.FullDate
+                                    )
+                                },
                                 onClickBtnDelete = {
                                     scope.launch {
                                         viewModel.deleteTodoFlow.emit(it)
@@ -221,12 +247,16 @@ fun MainScreen() {
                                         viewModel.updateBookmarkFlow.emit(it)
                                     }
                                 },
+                                onClickCategoryBottomSheet = {
+                                    viewModel.updateBottomSheetType(BottomSheetType.CategoryList)
+                                },
                                 onClickBtnRepeat = {
                                     viewModel.onUpdatedTodoRepeat(!uiState.selectedTodoItem.isRepeat)
                                     scope.launch { viewModel.updateTodoRepeatFlow.emit(it) }
                                 }
                             )
                         }
+
                         BottomSheetType.FullDate -> {
                             CalendarBottomSheet(
                                 onDismissRequest = { viewModel.updateBottomSheetType(BottomSheetType.Main) },
@@ -237,6 +267,7 @@ fun MainScreen() {
                                 deadline = uiState.selectedTodoItem.deadline
                             )
                         }
+
                         BottomSheetType.Calendar -> TODO("캘린더 바텀시트 컴포저블을 여기에 추가")
                         BottomSheetType.SubDate -> {
                             DatePickerBottomSheet(
@@ -244,14 +275,46 @@ fun MainScreen() {
                                 bottomSheetType = BottomSheetType.SubDate
                             )
                         }
-                        BottomSheetType.Category -> {
-                            CategoryBottomSheet(
+
+                        BottomSheetType.CategoryIcon -> {
+                            CategoryIconBottomSheet(
                                 categoryIconList = uiState.categoryIconList,
                                 onSelectCategoryIcon = {
                                     scope.launch {
                                         viewModel.selectedIconInBottomSheet.emit(it)
                                         sheetState.hide()
                                     }
+                                }
+                            )
+                        }
+
+                        BottomSheetType.CategoryList -> {
+                            CategoryBottomSheet(
+                                categoryId = uiState.selectedTodoCategoryItem?.categoryId ?: -1,
+                                categoryList = uiState.categoryList,
+                                onDismiss = {
+                                    viewModel.updateBottomSheetType(BottomSheetType.Main)
+                                },
+                                onCategorySelected = {
+                                    viewModel.onUpdatedCategory(it)
+                                    scope.launch { viewModel.updateCategoryFlow.emit(it) }
+                                }
+                            )
+                        }
+                        BottomSheetType.MonthPicker -> {
+                            MonthPickerBottomSheet(
+                                initialMonthModel = uiState.selectedMonth,
+                                onYearMonthSelected = { selectedModel ->
+                                    viewModel.onMonthSelected(selectedModel)
+                                    scope.launch {
+                                        viewModel.updateMonthFlow.emit(selectedModel)
+                                    }
+                                    viewModel.updateBottomSheetType(BottomSheetType.Main)
+                                    scope.launch { sheetState.hide() }
+                                },
+                                onDismissRequest = {
+                                    viewModel.updateBottomSheetType(BottomSheetType.Main)
+                                    scope.launch { sheetState.hide() }
                                 }
                             )
                         }
@@ -356,7 +419,8 @@ fun MainScreen() {
                         yesterdayListNavGraph(navController = navController)
                         myPageNavGraph(
                             navController = navController,
-                            showDialog = showDialog)
+                            showDialog = showDialog
+                        )
                         backlogNavGraph(
                             navController = navController,
                             showBottomSheet = showBottomSheet,
@@ -364,6 +428,7 @@ fun MainScreen() {
                             deleteTodoFlow = viewModel.deleteTodoFlow,
                             activateItemFlow = viewModel.activateItemFlow,
                             updateBookmarkFlow = viewModel.updateBookmarkFlow,
+                            updateCategoryFlow = viewModel.updateCategoryFlow,
                             showSnackBar = showSnackBar,
                             showDialog = showDialog,
                             categoryScreenContent = categoryScreenContent,
@@ -377,6 +442,7 @@ fun MainScreen() {
                             updateBookmarkFlow = viewModel.updateBookmarkFlow,
                             deleteTodoFlow = viewModel.deleteTodoFlow,
                             activateItemFlow = viewModel.activateItemFlow,
+                            updateCategoryFlow = viewModel.updateCategoryFlow,
                             updateTodoRepeatFlow = viewModel.updateTodoRepeatFlow
                         )
                         categoryNavGraph(
@@ -386,7 +452,10 @@ fun MainScreen() {
                             showDialog = showDialog,
                             categoryScreenFromBacklog = viewModel.categoryScreenContent
                         )
-                        historyNavGraph(navController = navController)
+                        historyNavGraph(
+                            navController = navController,
+                            showBottomSheet = showMonthPickerBottomSheet,
+                            updateMonthFlow = viewModel.updateMonthFlow)
                     }
                 }
             }

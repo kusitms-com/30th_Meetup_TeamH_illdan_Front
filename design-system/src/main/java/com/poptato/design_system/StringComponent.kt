@@ -4,12 +4,13 @@ package com.poptato.design_system
 const val Today = "오늘"
 const val List = "목록"
 const val History = "히스토리"
-const val Settings = "설정"
+const val Settings = "설정하기"
 const val Backlog = "백로그"
 const val modify = "수정하기"
 const val DELETE_ACTION = "삭제하기"
 const val DELETE = "삭제"
 const val dueDate = "마감기한"
+const val Category = "카테고리"
 const val Confirm = "확인"
 const val CONFIRM_ACTION = "확인하기"
 const val Cancel = "취소"
@@ -89,7 +90,7 @@ const val BtnGetTodoText = "할 일 가져오기"
 
 //history
 const val HistoryTitle = "기록"
-const val HistoryListEmpty = "아직 완료한 일이 없어요"
+const val HistoryListEmpty = "완료한 일이 없어요"
 
 // BottomSheet
 const val REPEAT_TASK_OPTION = "반복 할 일"

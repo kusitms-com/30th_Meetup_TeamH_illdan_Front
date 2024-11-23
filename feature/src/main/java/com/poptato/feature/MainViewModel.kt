@@ -4,8 +4,10 @@ import com.poptato.core.enums.BottomNavType
 import com.poptato.domain.model.enums.BottomSheetType
 import com.poptato.domain.model.response.category.CategoryIconItemModel
 import com.poptato.domain.model.response.category.CategoryIconTotalListModel
+import com.poptato.domain.model.response.category.CategoryItemModel
 import com.poptato.domain.model.response.category.CategoryScreenContentModel
 import com.poptato.domain.model.response.dialog.DialogContentModel
+import com.poptato.domain.model.response.history.CalendarMonthModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.navigation.NavRoutes
 import com.poptato.ui.base.BaseViewModel
@@ -19,9 +21,11 @@ class MainViewModel @Inject constructor() : BaseViewModel<MainPageState>(MainPag
     val deleteTodoFlow = MutableSharedFlow<Long>()
     val activateItemFlow = MutableSharedFlow<Long>()
     val updateBookmarkFlow = MutableSharedFlow<Long>()
+    val updateCategoryFlow = MutableSharedFlow<Long?>()
     val updateTodoRepeatFlow = MutableSharedFlow<Long>()
     val animationDuration = 300
     val selectedIconInBottomSheet = MutableSharedFlow<CategoryIconItemModel>()
+    val updateMonthFlow = MutableSharedFlow<CalendarMonthModel>()
     val categoryScreenContent = MutableSharedFlow<CategoryScreenContentModel>(replay = 1)
 
     fun setBottomNavType(route: String?) {
@@ -53,13 +57,26 @@ class MainViewModel @Inject constructor() : BaseViewModel<MainPageState>(MainPag
         )
     }
 
-    fun onSelectedTodoItem(item: TodoItemModel) {
+    fun onSelectedTodoItem(item: TodoItemModel, category: List<CategoryItemModel>) {
+        val isAllOrStar: Boolean = item.categoryId.toInt() == -1 || item.categoryId.toInt() == 0
+        val categoryItemModel = if (isAllOrStar) null else category.firstOrNull { it.categoryId == item.categoryId }
+
         updateState(
             uiState.value.copy(
-                selectedTodoItem = item
+                selectedTodoItem = item,
+                categoryList = category,
+                selectedTodoCategoryItem = categoryItemModel
             )
         )
         emitEventFlow(MainEvent.ShowTodoBottomSheet)
+    }
+
+    fun onUpdatedCategory(selectedId: Long?) {
+        updateState(
+            uiState.value.copy(
+                selectedTodoCategoryItem = uiState.value.categoryList.firstOrNull { it.categoryId == selectedId }
+            )
+        )
     }
 
     fun onUpdatedDeadline(date: String?) {
@@ -99,7 +116,7 @@ class MainViewModel @Inject constructor() : BaseViewModel<MainPageState>(MainPag
     fun onSelectedCategoryIcon(categoryList: CategoryIconTotalListModel) {
         updateState(
             uiState.value.copy(
-                bottomSheetType = BottomSheetType.Category,
+                bottomSheetType = BottomSheetType.CategoryIcon,
                 categoryIconList = categoryList
             )
         )
@@ -111,5 +128,23 @@ class MainViewModel @Inject constructor() : BaseViewModel<MainPageState>(MainPag
                 dialogContent = dialogContent
             )
         )
+    }
+
+    fun showMonthPicker(currentMonthModel: CalendarMonthModel) {
+        updateState(
+            uiState.value.copy(
+                selectedMonth = currentMonthModel, // 초기 Month 설정
+                bottomSheetType = BottomSheetType.MonthPicker
+            )
+        )
+    }
+
+    fun onMonthSelected(selectedMonthModel: CalendarMonthModel) {
+            updateState(
+                uiState.value.copy(
+                    selectedMonth = selectedMonthModel,
+                    bottomSheetType = BottomSheetType.Main
+                )
+            )
     }
 }

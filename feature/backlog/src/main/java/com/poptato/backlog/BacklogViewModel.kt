@@ -7,26 +7,33 @@ import com.poptato.core.util.move
 import com.poptato.domain.model.request.ListRequestModel
 import com.poptato.domain.model.request.backlog.CreateBacklogRequestModel
 import com.poptato.domain.model.request.backlog.GetBacklogListRequestModel
-import com.poptato.domain.model.request.todo.TodoIdModel
+import com.poptato.domain.model.request.category.GetCategoryListRequestModel
 import com.poptato.domain.model.request.todo.DeadlineContentModel
 import com.poptato.domain.model.request.todo.DragDropRequestModel
 import com.poptato.domain.model.request.todo.ModifyTodoRequestModel
+import com.poptato.domain.model.request.todo.TodoCategoryIdModel
+import com.poptato.domain.model.request.todo.TodoIdModel
 import com.poptato.domain.model.request.todo.UpdateDeadlineRequestModel
+import com.poptato.domain.model.request.todo.UpdateTodoCategoryModel
 import com.poptato.domain.model.response.backlog.BacklogListModel
-import com.poptato.domain.model.response.category.CategoryIconItemModel
-import com.poptato.domain.model.response.category.CategoryItemModel
+import com.poptato.domain.model.response.category.CategoryListModel
 import com.poptato.domain.model.response.today.TodoItemModel
+import com.poptato.domain.model.response.todo.TodoDetailItemModel
 import com.poptato.domain.model.response.yesterday.YesterdayListModel
 import com.poptato.domain.usecase.backlog.CreateBacklogUseCase
 import com.poptato.domain.usecase.backlog.GetBacklogListUseCase
-import com.poptato.domain.usecase.yesterday.GetYesterdayListUseCase
+import com.poptato.domain.usecase.category.DeleteCategoryUseCase
+import com.poptato.domain.usecase.category.GetCategoryListUseCase
 import com.poptato.domain.usecase.todo.DeleteTodoUseCase
 import com.poptato.domain.usecase.todo.DragDropUseCase
+import com.poptato.domain.usecase.todo.GetTodoDetailUseCase
 import com.poptato.domain.usecase.todo.ModifyTodoUseCase
 import com.poptato.domain.usecase.todo.SwipeTodoUseCase
 import com.poptato.domain.usecase.todo.UpdateBookmarkUseCase
 import com.poptato.domain.usecase.todo.UpdateDeadlineUseCase
 import com.poptato.domain.usecase.todo.UpdateTodoRepeatUseCase
+import com.poptato.domain.usecase.todo.UpdateTodoCategoryUseCase
+import com.poptato.domain.usecase.yesterday.GetYesterdayListUseCase
 import com.poptato.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -37,6 +44,8 @@ import kotlin.random.Random
 
 @HiltViewModel
 class BacklogViewModel @Inject constructor(
+    private val getCategoryListUseCase: GetCategoryListUseCase,
+    private val deleteCategoryUseCase: DeleteCategoryUseCase,
     private val createBacklogUseCase: CreateBacklogUseCase,
     private val getBacklogListUseCase: GetBacklogListUseCase,
     private val getYesterdayListUseCase: GetYesterdayListUseCase,
@@ -45,6 +54,8 @@ class BacklogViewModel @Inject constructor(
     private val dragDropUseCase: DragDropUseCase,
     private val updateDeadlineUseCase: UpdateDeadlineUseCase,
     private val updateBookmarkUseCase: UpdateBookmarkUseCase,
+    private val updateTodoCategoryUseCase: UpdateTodoCategoryUseCase,
+    private val getTodoDetailUseCase: GetTodoDetailUseCase,
     private val swipeTodoUseCase: SwipeTodoUseCase,
     private val updateTodoRepeatUseCase: UpdateTodoRepeatUseCase
 ) : BaseViewModel<BacklogPageState>(
@@ -53,43 +64,56 @@ class BacklogViewModel @Inject constructor(
     private var snapshotList: List<TodoItemModel> = emptyList()
     private var tempTodoId: Long? = null
 
-    private val _categoryList: List<CategoryItemModel> = listOf(
-        CategoryItemModel(11, "전체", "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
-        CategoryItemModel(12, "중요", "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
-        CategoryItemModel(13, "이름1", "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
-        CategoryItemModel(14, "이름2", "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
-        CategoryItemModel(15, "이름3", "https://github.com/user-attachments/assets/dc389ca0-fe85-44e5-9371-d3bc3505b53e"),
-    )
-
     init {
         getCategoryList()
         getYesterdayList(0, 1)
-        getBacklogList(0, 100)
+        getBacklogList(-1, 0, 100)
     }
 
     private fun getCategoryList() {
-        // TODO 카테고리 리스트 서버통신 연결
-        updateState(
-            uiState.value.copy(
-                categoryList = _categoryList
-            )
-        )
-    }
-
-    fun getBacklogListInCategory(categoryId: Long, categoryIndex: Int) {
-        // TODO 선택한 카테고리에 대한 백로그 리스트 가져오는 것으로 수정
-        updateState(
-            uiState.value.copy(
-                selectedCategoryId = categoryId,
-                selectedCategoryIndex = categoryIndex
-            )
-        )
-        Timber.d("[카테고리] 선택 -> $categoryId")
-    }
-
-    private fun getBacklogList(page: Int, size: Int) {
         viewModelScope.launch {
-            getBacklogListUseCase.invoke(request = GetBacklogListRequestModel(categoryId = -1, page = page, size = size)).collect {
+            getCategoryListUseCase(request = GetCategoryListRequestModel(0, 8)).collect {
+                resultResponse(it, { data ->
+                    onSuccessGetCategoryList(data)
+                })
+            }
+        }
+    }
+
+    private fun onSuccessGetCategoryList(response: CategoryListModel) {
+        updateState(
+            uiState.value.copy(
+                categoryList = response.categoryList
+            )
+        )
+    }
+
+    fun deleteCategory() {
+        viewModelScope.launch {
+            deleteCategoryUseCase(request = uiState.value.selectedCategoryId).collect {
+                resultResponse(it, {
+                    getCategoryList()
+                }, { error ->
+                    Timber.d("[카테고리] 삭제 서버통신 실패 -> $error")
+                })
+            }
+        }
+    }
+
+    fun getBacklogListInCategory(categoryIndex: Int) {
+        updateState(
+            uiState.value.copy(
+                selectedCategoryIndex = categoryIndex,
+                selectedCategoryId = uiState.value.categoryList[categoryIndex].categoryId
+            )
+        )
+
+        getBacklogList(uiState.value.selectedCategoryId, 0, 8)
+    }
+
+    private fun getBacklogList(categoryId: Long, page: Int, size: Int) {
+        viewModelScope.launch {
+            getBacklogListUseCase.invoke(request = GetBacklogListRequestModel(categoryId = categoryId, page = page, size = size)).collect {
                 resultResponse(it, ::onSuccessGetBacklogList)
             }
         }
@@ -98,9 +122,11 @@ class BacklogViewModel @Inject constructor(
     private fun onSuccessGetBacklogList(response: BacklogListModel) {
         updateSnapshotList(response.backlogs)
 
+        val backlogs: List<TodoItemModel> = response.backlogs.map { it.apply { categoryId = uiState.value.selectedCategoryId } }
+
         updateState(
             uiState.value.copy(
-                backlogList = response.backlogs,
+                backlogList = backlogs,
                 totalPageCount = response.totalPageCount,
                 totalItemCount = response.totalCount,
                 isFinishedInitialization = true
@@ -141,7 +167,7 @@ class BacklogViewModel @Inject constructor(
         addTemporaryBacklog(content)
 
         viewModelScope.launch(Dispatchers.IO) {
-            createBacklogUseCase.invoke(request = CreateBacklogRequestModel(categoryId = -1, content = content)).collect {
+            createBacklogUseCase.invoke(request = CreateBacklogRequestModel(uiState.value.selectedCategoryId, content)).collect {
                 resultResponse(it, ::onSuccessCreateBacklog, { onFailedUpdateBacklogList() })
             }
         }
@@ -165,7 +191,7 @@ class BacklogViewModel @Inject constructor(
         }
         updateList(updatedList)
 
-        getBacklogList(page = 0, size = uiState.value.backlogList.size)
+        getBacklogList(categoryId = -1, page = 0, size = uiState.value.backlogList.size)
     }
 
     private fun onFailedUpdateBacklogList() {
@@ -215,6 +241,26 @@ class BacklogViewModel @Inject constructor(
         )
     }
 
+    fun updateCategory(todoId: Long, categoryId: Long?) {
+        Timber.d("[수정 테스트] ${uiState.value.backlogList} -> $todoId $categoryId")
+//        val newList = uiState.value.backlogList.filter { it.todoId != todoId }
+//        updateList(newList)
+
+        viewModelScope.launch {
+            updateTodoCategoryUseCase(request = UpdateTodoCategoryModel(
+                todoId = todoId,
+                todoCategoryModel = TodoCategoryIdModel(categoryId)
+            )).collect {
+                resultResponse(it, {
+//                    updateSnapshotList(uiState.value.backlogList)
+                    getBacklogList(categoryId = uiState.value.selectedCategoryId, page = 0, size = uiState.value.backlogList.size)
+                }, { error ->
+                    Timber.d("[카테고리] 수정 서버통신 실패 -> $error")
+                })
+            }
+        }
+    }
+
     fun setDeadline(deadline: String?, id: Long) {
         updateDeadlineInUI(deadline = deadline, id = id)
 
@@ -249,12 +295,30 @@ class BacklogViewModel @Inject constructor(
         )
     }
 
-    fun onSelectedItem(item: TodoItemModel) {
+    fun getSelectedItemDetailContent(item: TodoItemModel, callback: (TodoItemModel) -> Unit) {
+        viewModelScope.launch {
+            getTodoDetailUseCase(item.todoId).collect {
+                resultResponse(it, { data ->
+                    callback(setSelectedItemCategory(item, data))
+                }, { error ->
+                    Timber.d("[todo] 할 일 상세조회 실패 -> $error")
+                })
+            }
+        }
+    }
+
+    private fun setSelectedItemCategory(item: TodoItemModel, response: TodoDetailItemModel): TodoItemModel {
+        val categoryId: Long =
+            uiState.value.categoryList.firstOrNull { it.categoryName == response.categoryName && it.categoryImgUrl == response.emojiImageUrl }?.categoryId ?: -1
+        val todoItem: TodoItemModel = item.copy(categoryId = categoryId)
+
         updateState(
             uiState.value.copy(
-                selectedItem = item
+                selectedItem = todoItem,
             )
         )
+
+        return todoItem
     }
 
     fun deleteBacklog(id: Long) {

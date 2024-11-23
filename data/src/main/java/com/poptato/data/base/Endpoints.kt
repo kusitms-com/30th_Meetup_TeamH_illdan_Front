@@ -20,6 +20,7 @@ object Endpoints {
 
     object History {
         const val HISTORIES = "/histories"
+        const val CALENDAR = "/calendar"
     }
 
     object Todo {
@@ -32,6 +33,7 @@ object Endpoints {
         const val SWIPE = "swipe"
         const val COMPLETION = "$DELETE/achieve"
         const val REPEAT = "$TODO/{todoId}/repeat"
+        const val UPDATECATEGIRY = "$DELETE/category"
     }
 
     object MyPage {
@@ -43,5 +45,12 @@ object Endpoints {
 
     object Today {
         const val TODAYS = "/todays"
+    }
+
+    object Category {
+        const val ICONS = "/emojis"
+        const val CATEGORY = "/category"
+        const val LIST = "$CATEGORY/list"
+        const val MODIFY = "$CATEGORY/{categoryId}"
     }
 }

@@ -2,6 +2,7 @@ package com.poptato.di
 
 import com.poptato.data.service.AuthService
 import com.poptato.data.service.BacklogService
+import com.poptato.data.service.CategoryService
 import com.poptato.data.service.HistoryService
 import com.poptato.data.service.TodoService
 import com.poptato.data.service.MyPageService
@@ -50,5 +51,10 @@ object ServiceModule {
     @Provides
     fun provideTodayService(retrofit: Retrofit): TodayService {
         return retrofit.create(TodayService::class.java)
+    }
+
+    @Provides
+    fun providesCategoryService(retrofit: Retrofit): CategoryService {
+        return retrofit.create(CategoryService::class.java)
     }
 }

@@ -27,10 +27,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
@@ -61,8 +59,8 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -77,7 +75,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.rememberAsyncImagePainter
+import coil.Coil
+import coil.ImageLoader
+import coil.compose.AsyncImage
+import coil.decode.SvgDecoder
 import com.poptato.design_system.BACKLOG_YESTERDAY_TASK_GUIDE
 import com.poptato.design_system.BacklogHint
 import com.poptato.design_system.COMPLETE_DELETE_TODO
@@ -125,11 +126,12 @@ import kotlinx.coroutines.launch
 fun BacklogScreen(
     goToYesterdayList: () -> Unit = {},
     goToCategorySelect: (CategoryScreenContentModel) -> Unit = {},
-    showBottomSheet: (TodoItemModel) -> Unit = {},
+    showBottomSheet: (TodoItemModel, List<CategoryItemModel>) -> Unit = { _, _ -> },
     updateDeadlineFlow: SharedFlow<String?>,
     deleteTodoFlow: SharedFlow<Long>,
     activateItemFlow: SharedFlow<Long>,
     updateBookmarkFlow: SharedFlow<Long>,
+    updateCategoryFlow: SharedFlow<Long?>,
     updateTodoRepeatFlow: SharedFlow<Long>,
     showSnackBar: (String) -> Unit,
     showDialog: (DialogContentModel) -> Unit = {}
@@ -178,6 +180,12 @@ fun BacklogScreen(
         }
     }
 
+    LaunchedEffect(updateCategoryFlow) {
+        updateCategoryFlow.collect {
+            viewModel.updateCategory(uiState.selectedItem.todoId, it)
+        }
+    }
+
     LaunchedEffect(updateTodoRepeatFlow) {
         updateTodoRepeatFlow.collect {
             viewModel.updateTodoRepeat(it)
@@ -197,14 +205,16 @@ fun BacklogScreen(
             createBacklog = { newItem -> viewModel.createBacklog(newItem) },
             onItemSwiped = { itemToRemove -> viewModel.swipeBacklogItem(itemToRemove) },
             onClickYesterdayList = { goToYesterdayList() },
-            onSelectCategory = { categoryId, index ->
-                viewModel.getBacklogListInCategory(categoryId, index)
+            onSelectCategory = { index ->
+                viewModel.getBacklogListInCategory(index)
             },
-            onClickCategoryAdd = { goToCategorySelect(
-                CategoryScreenContentModel(
-                    CategoryScreenType.Add
+            onClickCategoryAdd = {
+                goToCategorySelect(
+                    CategoryScreenContentModel(
+                        CategoryScreenType.Add
+                    )
                 )
-            ) },
+            },
             onClickCategoryDeleteDropdown = {
                 showDialog(
                     DialogContentModel(
@@ -213,7 +223,10 @@ fun BacklogScreen(
                         dialogContentText = CategoryDeleteDropDownContent,
                         positiveBtnText = DELETE,
                         cancelBtnText = Cancel,
-                        positiveBtnAction = {}
+                        positiveBtnAction = {
+                            isDropDownMenuExpanded = false
+                            viewModel.deleteCategory()
+                        }
                     )
                 )
             },
@@ -227,8 +240,9 @@ fun BacklogScreen(
                 )
             },
             onClickBtnTodoSettings = {
-                showBottomSheet(uiState.backlogList[it])
-                viewModel.onSelectedItem(uiState.backlogList[it])
+                viewModel.getSelectedItemDetailContent(uiState.backlogList[it]) { callback ->
+                    showBottomSheet(callback, uiState.categoryList)
+                }
             },
             interactionSource = interactionSource,
             activeItemId = activeItemId,
@@ -260,7 +274,7 @@ fun BacklogContent(
     onValueChange: (String) -> Unit = {},
     createBacklog: (String) -> Unit = {},
     onClickYesterdayList: () -> Unit = {},
-    onSelectCategory: (Long, Int) -> Unit = { _, _ -> },
+    onSelectCategory: (Int) -> Unit = {},
     onClickCategoryAdd: () -> Unit = {},
     onClickCategoryDeleteDropdown: () -> Unit = {},
     onClickCategoryModifyDropdown: () -> Unit = {},
@@ -286,7 +300,7 @@ fun BacklogContent(
             categoryList = uiState.categoryList,
             interactionSource = interactionSource,
             onSelectCategory = onSelectCategory,
-            selectedCategoryId = uiState.selectedCategoryId
+            selectedCategoryIndex = uiState.selectedCategoryIndex
         )
 
         Box {
@@ -295,7 +309,7 @@ fun BacklogContent(
                 subText = uiState.backlogList.size.toString(),
                 subTextStyle = PoptatoTypo.xLSemiBold,
                 subTextColor = Primary60,
-                isCategorySettingBtn = (uiState.selectedCategoryId.toInt() != 0 && uiState.selectedCategoryId.toInt() != 1),    // TODO 서버통신 후 selectedCategoryIndex로 변경
+                isCategorySettingBtn = (uiState.selectedCategoryIndex != 0 && uiState.selectedCategoryIndex != 1),
                 isCategorySettingBtnSelected = { onDropdownExpandedChange(true) }
             )
 
@@ -423,8 +437,8 @@ fun BacklogCategoryList(
     interactionSource: MutableInteractionSource,
     categoryList: List<CategoryItemModel> = emptyList(),
     onClickCategoryAdd: () -> Unit = {},
-    onSelectCategory: (Long, Int) -> Unit = { _, _ -> },
-    selectedCategoryId: Long = 0
+    onSelectCategory: (Int) -> Unit = {},
+    selectedCategoryIndex: Int = 0
 ) {
 
     Row(
@@ -439,28 +453,16 @@ fun BacklogCategoryList(
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            item {
-                // TODO 카테고리 리스트 서버통신 완료 후 LazyRow 아이템으로 플로우 변경 및 삭제
-                CategoryListIcon(
-                    paddingStart = 16,
-                    imgResource = painterResource(id = R.drawable.ic_category_all),
-                    isSelected = selectedCategoryId.toInt() == 0,
-                    onClickCategory = { onSelectCategory(0, -1) }
-                )
-
-                CategoryListIcon(
-                    paddingStart = 12,
-                    imgResource = painterResource(id = R.drawable.ic_category_star),
-                    isSelected = selectedCategoryId.toInt() == 1,
-                    onClickCategory = { onSelectCategory(1, -1) }
-                )
-            }
+            val categoryFixedIcon: List<Int> =
+                listOf(R.drawable.ic_category_all, R.drawable.ic_category_star)
 
             itemsIndexed(categoryList, key = { _, item -> item.categoryId }) { index, item ->
                 CategoryListIcon(
-                    imgResource = rememberAsyncImagePainter(model = item.categoryImgUrl),
-                    isSelected = selectedCategoryId == item.categoryId,
-                    onClickCategory = { onSelectCategory(item.categoryId, index) }
+                    imgResource = if (index == 0 || index == 1) categoryFixedIcon[index] else -1,
+                    paddingStart = if (index == 0) 16 else 0,
+                    imgUrl = item.categoryImgUrl,
+                    isSelected = selectedCategoryIndex == index,
+                    onClickCategory = { onSelectCategory(index) }
                 )
             }
 
@@ -488,10 +490,20 @@ fun BacklogCategoryList(
 fun CategoryListIcon(
     paddingStart: Int = 0,
     paddingHorizontal: Int = 0,
-    imgResource: Painter,
+    imgResource: Int = -1,
+    imgUrl: String = "",
     isSelected: Boolean,
     onClickCategory: () -> Unit = {}
 ) {
+
+    val context = LocalContext.current
+    val imageLoader = ImageLoader.Builder(context)
+        .components {
+            add(SvgDecoder.Factory())
+        }
+        .build()
+    Coil.setImageLoader(imageLoader)
+
     Box(
         modifier = Modifier
             .padding(start = paddingStart.dp)
@@ -500,13 +512,13 @@ fun CategoryListIcon(
             .border(width = 1.dp, color = if (isSelected) Gray00 else Gray95, shape = CircleShape)
             .clickable { onClickCategory() }
     ) {
-        Icon(
-            painter = imgResource,
+        AsyncImage(
+            model = if (imgResource == -1) imgUrl else imgResource,
             contentDescription = "category icon",
-            tint = Color.Unspecified,
             modifier = Modifier
                 .align(Alignment.Center)
-                .size(24.dp)
+                .size(24.dp),
+            contentScale = ContentScale.Crop
         )
     }
 }
