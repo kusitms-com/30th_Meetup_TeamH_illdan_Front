@@ -5,6 +5,7 @@ import com.poptato.domain.model.enums.BottomSheetType
 import com.poptato.domain.model.response.category.CategoryIconTotalListModel
 import com.poptato.domain.model.response.category.CategoryItemModel
 import com.poptato.domain.model.response.dialog.DialogContentModel
+import com.poptato.domain.model.response.history.CalendarMonthModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.ui.base.PageState
 
@@ -16,5 +17,6 @@ data class MainPageState(
     val bottomSheetType: BottomSheetType = BottomSheetType.Main,
     val backPressedOnce: Boolean = false,
     val categoryIconList: CategoryIconTotalListModel = CategoryIconTotalListModel(),
-    val dialogContent: DialogContentModel = DialogContentModel()
+    val dialogContent: DialogContentModel = DialogContentModel(),
+    val selectedMonth: CalendarMonthModel = CalendarMonthModel(),
 ): PageState
