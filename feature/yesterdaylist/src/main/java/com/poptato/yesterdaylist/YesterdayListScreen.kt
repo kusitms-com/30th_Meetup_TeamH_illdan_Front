@@ -91,7 +91,11 @@ fun YesterdayContent(
                 onClickCloseBtn = onClickCloseBtn
             )
 
-            Box {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+            ) {
                 Text(
                     text = YesterdayListTitle,
                     style = PoptatoTypo.xxLSemiBold,
@@ -108,18 +112,17 @@ fun YesterdayContent(
                         .height(118.dp),
                     contentScale = ContentScale.Crop
                 )
-            }
 
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .padding(top = 8.dp)
-            ) {
-                YesterdayTodoList(
-                    list = uiState.yesterdayList,
-                    onCheckedChange = onCheckedChange
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 70.dp)
+                ) {
+                    YesterdayTodoList(
+                        list = uiState.yesterdayList,
+                        onCheckedChange = onCheckedChange
+                    )
+                }
             }
 
             AllCheckBtn(
