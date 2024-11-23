@@ -42,6 +42,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.messaging.FirebaseMessagingService
 import com.poptato.core.enums.BottomNavType
 import com.poptato.design_system.FINISH_APP_GUIDE
 import com.poptato.design_system.Gray100
@@ -77,6 +80,7 @@ import com.poptato.ui.util.DismissKeyboardOnClick
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
@@ -179,6 +183,14 @@ fun MainScreen() {
             }
         }
     }
+
+    FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+        if (task.isSuccessful) {
+            val token = task.result
+            Timber.d("[FCM] MainScreen -> 성공: $token")
+            return@OnCompleteListener
+        }
+    })
 
     DismissKeyboardOnClick {
         if (isShowDialog.value) {
