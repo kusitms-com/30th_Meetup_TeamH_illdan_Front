@@ -11,6 +11,7 @@ import com.poptato.domain.model.response.category.CategoryIconTotalListModel
 import com.poptato.domain.model.response.category.CategoryItemModel
 import com.poptato.domain.model.response.category.CategoryScreenContentModel
 import com.poptato.domain.model.response.dialog.DialogContentModel
+import com.poptato.domain.model.response.history.CalendarMonthModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.login.KaKaoLoginScreen
 import com.poptato.mypage.MyPageScreen
@@ -248,13 +249,20 @@ fun NavGraphBuilder.todayNavGraph(
     }
 }
 
-fun NavGraphBuilder.historyNavGraph(navController: NavHostController) {
+fun NavGraphBuilder.historyNavGraph(
+    navController: NavHostController,
+    showBottomSheet: (CalendarMonthModel) -> Unit,
+    updateMonthFlow: SharedFlow<CalendarMonthModel>
+) {
     navigation(
         startDestination = NavRoutes.HistoryScreen.route,
         route = NavRoutes.HistoryGraph.route
     ) {
         composable(NavRoutes.HistoryScreen.route) {
-            HistoryScreen()
+            HistoryScreen(
+                showBottomSheet = showBottomSheet,
+                updateMonthFlow = updateMonthFlow
+            )
         }
     }
 }
