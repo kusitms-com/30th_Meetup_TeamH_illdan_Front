@@ -71,7 +71,14 @@ fun NavGraphBuilder.loginNavGraph(
                         }
                     }
                 },
-                showSnackBar = showSnackBar
+                showSnackBar = showSnackBar,
+                goToOnboarding = {
+                    navController.navigate(NavRoutes.OnboardingScreen.route) {
+                        popUpTo(NavRoutes.KaKaoLoginScreen.route) {
+                            inclusive = true
+                        }
+                    }
+                }
             )
         }
 
