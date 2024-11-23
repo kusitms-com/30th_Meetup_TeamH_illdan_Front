@@ -5,6 +5,7 @@ plugins {
     id("poptato.android.hilt")
     id("poptato.android.kotlin")
     id("poptato.retrofit")
+    id("com.google.gms.google-services")
 }
 
 val properties = Properties().apply {
@@ -46,4 +47,8 @@ dependencies {
     implementation(libs.threeten)
 
     implementation(libs.hilt.core)
+
+    // FCM
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
 }

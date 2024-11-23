@@ -49,6 +49,7 @@ web-view = "0.24.13-rc"
 pdf-viewer = "master-SNAPSHOT"
 lazy-column-scrollbar = "2.2.0"
 google-service = "4.4.2"
+firebase-bom = "33.6.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -117,6 +118,10 @@ kotlin = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "ko
 kotlin-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "datetime" }
 
 kotlin-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
+
+# FCM
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom"}
+firebase-analytics = { module = "com.google.firebase:firebase-analytics"}
 
 # Compose
 compose-ui = { module = "androidx.compose.ui:ui" }
