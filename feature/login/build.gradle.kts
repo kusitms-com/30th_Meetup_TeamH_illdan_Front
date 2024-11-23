@@ -15,4 +15,6 @@ dependencies {
 
     // 카카오 로그인
     implementation(libs.kakao.auth)
+
+    implementation(libs.firebase.messaging)
 }

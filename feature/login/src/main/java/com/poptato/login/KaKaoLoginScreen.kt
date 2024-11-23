@@ -18,7 +18,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -26,7 +25,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
 import com.kakao.sdk.user.UserApiClient
 import com.poptato.design_system.BtnKaKaoLoginText
 import com.poptato.design_system.Gray100
@@ -54,6 +54,17 @@ fun KaKaoLoginScreen(
             }
         }
     }
+
+    FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+        if (!task. isSuccessful) {
+            Timber.d("[FCM] login -> 실패: ${task.exception}")
+            return@OnCompleteListener
+        }
+
+        // TODO device token 서버통신
+        val token = task.result
+        Timber.d("[FCM] login -> 성공: $token")
+    })
 
     KaKaoLoginContent(
         onSuccessKaKaoLogin = { viewModel.kakaoLogin(it) },
