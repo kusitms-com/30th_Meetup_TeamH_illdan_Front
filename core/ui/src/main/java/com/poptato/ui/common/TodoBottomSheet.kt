@@ -206,7 +206,6 @@ fun BottomSheetBtn(
         Spacer(modifier = Modifier.width(8.dp))
         Text(text = buttonText, style = PoptatoTypo.mdRegular, color = textColor)
         Spacer(modifier = Modifier.weight(1f))
-        if (deadline.isNotEmpty()) Text(text = deadline, style = PoptatoTypo.mdMedium, color = Gray00)
         if (isRepeatBtn) PoptatoSwitchButton(
             check = isRepeat,
             onClick = {
