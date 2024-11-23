@@ -43,7 +43,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.poptato.core.enums.BottomNavType
-import com.poptato.design_system.FINISH_APP_GUIDE
+import com.poptato.design_system.SNACK_BAR_FINISH_APP_GUIDE
 import com.poptato.design_system.Gray100
 import com.poptato.domain.model.enums.BottomSheetType
 import com.poptato.domain.model.enums.DialogType
@@ -115,7 +115,7 @@ fun MainScreen() {
             (context as? Activity)?.finish()
         } else {
             viewModel.toggleBackPressed(true)
-            Toast.makeText(context, FINISH_APP_GUIDE, Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, SNACK_BAR_FINISH_APP_GUIDE, Toast.LENGTH_SHORT).show()
             scope.launch {
                 delay(2000)
                 viewModel.toggleBackPressed(false)

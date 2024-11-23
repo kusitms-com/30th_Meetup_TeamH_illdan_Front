@@ -102,8 +102,12 @@ const val YEAR_MONTH = "%s년 %s월"
 const val ERROR_GENERIC_MESSAGE = "에러가 발생하였습니다"
 
 // Etc
-const val FINISH_APP_GUIDE = "뒤로가기를 한 번 더 누르면 종료돼요."
+
 const val DEADLINE = "D-%s"
 const val DEADLINE_DDAY = "D-day"
 const val DEADLINE_PASSED = "D+%s"
-const val COMPLETE_DELETE_TODO = "할 일이 삭제되었어요."
+
+// SnackBar
+const val SNACK_BAR_TODAY_ALL_CHECKED = "와우! 수고한 나 자신에게 박수!👏"
+const val SNACK_BAR_FINISH_APP_GUIDE = "뒤로가기를 한 번 더 누르면 종료돼요."
+const val SNACK_BAR_COMPLETE_DELETE_TODO = "할 일이 삭제되었어요."

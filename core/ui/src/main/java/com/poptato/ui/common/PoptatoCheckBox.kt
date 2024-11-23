@@ -10,6 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.poptato.design_system.R
@@ -19,10 +21,15 @@ fun PoptatoCheckBox(
     isChecked: Boolean = false,
     onCheckedChange: (Boolean) -> Unit = {}
 ) {
+    val haptic = LocalHapticFeedback.current
+
     Box(
         modifier = Modifier
             .size(20.dp)
-            .clickable { onCheckedChange(!isChecked) }
+            .clickable {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                onCheckedChange(!isChecked)
+            }
             .background(color = Color.Unspecified, shape = RoundedCornerShape(4.dp)),
         contentAlignment = Alignment.Center
     ) {
