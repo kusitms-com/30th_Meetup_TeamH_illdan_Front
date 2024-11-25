@@ -10,7 +10,8 @@ object UserDataResponseMapper : Mapper<UserDataResponse, UserDataModel> {
         return response?.let { data ->
             UserDataModel(
                 name = data.name,
-                email = data.email
+                email = data.email,
+                userImg = data.imageUrl
             )
         } ?: UserDataModel()
     }

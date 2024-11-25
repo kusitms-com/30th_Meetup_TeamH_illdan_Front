@@ -134,6 +134,11 @@ fun MainScreen() {
             viewModel.categoryScreenContent.emit(it)
         }
     }
+    val deleteUserName: (String) -> Unit = {
+        scope.launch {
+            viewModel.userDeleteName.emit(it)
+        }
+    }
 
     if (uiState.bottomNavType != BottomNavType.DEFAULT) {
         BackHandler(onBack = backPressHandler)
@@ -419,7 +424,9 @@ fun MainScreen() {
                         yesterdayListNavGraph(navController = navController)
                         myPageNavGraph(
                             navController = navController,
-                            showDialog = showDialog
+                            showDialog = showDialog,
+                            deleteUserName = deleteUserName,
+                            deleteUserNameFromUserData = viewModel.userDeleteName
                         )
                         backlogNavGraph(
                             navController = navController,

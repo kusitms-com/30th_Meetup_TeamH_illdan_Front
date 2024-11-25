@@ -38,7 +38,7 @@ object Endpoints {
 
     object MyPage {
         private const val USER = "/user"
-        const val USER_DELETE = USER
+        const val USER_DELETE = "$USER/delete"
         const val USER_DATA = "$USER/mypage"
         const val POLICY = "/policy"
     }

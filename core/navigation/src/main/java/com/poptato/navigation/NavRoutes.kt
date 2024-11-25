@@ -30,6 +30,7 @@ sealed class NavRoutes(val route: String) {
     data object MyPageScreen: NavRoutes("my_page")
     data object SettingScreen: NavRoutes("setting")
     data object ServiceDeleteScreen: NavRoutes("service_delete")
+    data object ServiceDeleteFinishScreen: NavRoutes("service_delete_finish")
     data object UserDataScreen: NavRoutes("user_data")
     data object NoticeViewScreen: NavRoutes("notice_viewer")
     data object FAQViewScreen: NavRoutes("faq_viewer")

@@ -34,4 +34,6 @@ dependencies {
 
     // pdf viewer
     implementation(libs.pdf.viewer)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.svg)
 }

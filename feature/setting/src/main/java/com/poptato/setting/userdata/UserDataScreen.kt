@@ -1,6 +1,5 @@
 package com.poptato.setting.userdata
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -13,6 +12,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
@@ -24,11 +24,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.Coil
+import coil.ImageLoader
+import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter
+import coil.decode.SvgDecoder
 import com.poptato.design_system.Danger40
 import com.poptato.design_system.Danger50
 import com.poptato.design_system.Gray00
@@ -47,12 +54,13 @@ import com.poptato.design_system.UserDataName
 import com.poptato.design_system.UserDelete
 import com.poptato.domain.model.enums.DialogType
 import com.poptato.domain.model.response.dialog.DialogContentModel
+import timber.log.Timber
 
 @Composable
 fun UserDataScreen(
     goBackToMyPage: () -> Unit = {},
     goBackToLogIn: () -> Unit = {},
-    goToServiceDelete: () -> Unit = {},
+    goToServiceDelete: (String) -> Unit = {},
     showDialog: (DialogContentModel) -> Unit = {}
 ) {
 
@@ -84,7 +92,7 @@ fun UserDataScreen(
                 )
             )
         },
-        onClickServiceDeleteBtn = { goToServiceDelete() },
+        onClickServiceDeleteBtn = { goToServiceDelete(uiState.userDataModel.name) },
         interactionSource = interactionSource
     )
 }
@@ -177,11 +185,41 @@ fun MyData(
             .padding(start = 16.dp, top = 16.dp)
     ) {
         Row {
-            Image(
-                painter = painterResource(id = R.drawable.ic_person),
-                contentDescription = "img_temp_person",
-                modifier = Modifier.size(64.dp)
-            )
+
+            val context = LocalContext.current
+            val imageLoader = ImageLoader.Builder(context)
+                .components {
+                    add(SvgDecoder.Factory())
+                }
+                .build()
+            Coil.setImageLoader(imageLoader)
+
+            Timber.d("[테스트] 이미지 -> ${uiState.userDataModel.userImg}")
+
+            Box(
+                modifier = Modifier
+                    .size(64.dp)
+                    .clip(CircleShape)
+            ) {
+                AsyncImage(
+                    model = uiState.userDataModel.userImg,
+                    contentDescription = "img_temp_person",
+                    modifier = Modifier.size(64.dp),
+                    contentScale = ContentScale.Crop,
+                    onState = { state ->
+                        when (state){
+                            is AsyncImagePainter.State.Error -> {
+                                Timber.d("[이미지] 에러 ${state.result.throwable}")
+                            }
+                            is AsyncImagePainter.State.Success -> {
+                                //
+                            }
+                            else -> {}
+                        }
+                    }
+                )
+
+            }
 
             Column {
                 Text(
