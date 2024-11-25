@@ -119,7 +119,7 @@ fun HistoryContent(
         modifier = Modifier
             .fillMaxSize()
             .background(Gray100)
-            .padding(start = 24.dp, end = 24.dp)
+            .padding(start = 14.dp, end = 14.dp)
     ) {
 
         CalendarContent(
