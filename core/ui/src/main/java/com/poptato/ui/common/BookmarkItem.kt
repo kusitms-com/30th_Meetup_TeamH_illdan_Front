@@ -1,6 +1,7 @@
 package com.poptato.ui.common
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -24,31 +25,30 @@ import com.poptato.design_system.R
 
 @Composable
 fun BookmarkItem() {
-    Row(
+    Box(
         modifier = Modifier
-            .wrapContentSize()
             .clip(RoundedCornerShape(4.dp))
-            .background(Gray90),
-        verticalAlignment = Alignment.CenterVertically,
+            .background(color = Gray90, shape = RoundedCornerShape(4.dp))
+            .padding(horizontal = 4.dp, vertical = 2.dp),
+        contentAlignment = Alignment.Center
     ) {
-        Icon(
-            painter = painterResource(id = R.drawable.ic_star_filled),
-            contentDescription = "",
-            modifier = Modifier
-                .padding(start = 4.dp)
-                .padding(vertical = 4.dp)
-                .size(12.dp),
-            tint = Primary60
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_star_filled),
+                contentDescription = "",
+                modifier = Modifier.size(12.dp),
+                tint = Primary60
+            )
 
-        Spacer(modifier = Modifier.width(2.dp))
+            Spacer(modifier = Modifier.width(2.dp))
 
-        Text(
-            text = BOOKMARK,
-            style = PoptatoTypo.xsSemiBold,
-            color = Primary60,
-            modifier = Modifier
-                .padding(end = 4.dp),
-        )
+            Text(
+                text = BOOKMARK,
+                style = PoptatoTypo.xsSemiBold,
+                color = Primary60
+            )
+        }
     }
 }

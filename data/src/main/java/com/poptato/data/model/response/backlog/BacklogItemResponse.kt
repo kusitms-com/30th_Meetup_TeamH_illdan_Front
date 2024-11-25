@@ -7,10 +7,10 @@ data class BacklogItemResponse(
     val todoId: Long = -1,
     @SerializedName("content")
     val content: String = "",
-    @SerializedName("bookmark")
+    @SerializedName("isBookmark")
     val isBookmark: Boolean = false,
-    @SerializedName("repeat")
-    val repeat: Boolean = false,
+    @SerializedName("isRepeat")
+    val isRepeat: Boolean = false,
     @SerializedName("deadline")
     val deadline: String? = null,
     @SerializedName("dday")

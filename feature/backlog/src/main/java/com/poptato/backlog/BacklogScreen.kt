@@ -59,17 +59,19 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -79,16 +81,14 @@ import coil.Coil
 import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.decode.SvgDecoder
+import com.poptato.design_system.ALL
 import com.poptato.design_system.BACKLOG_YESTERDAY_TASK_GUIDE
 import com.poptato.design_system.BacklogHint
-import com.poptato.design_system.COMPLETE_DELETE_TODO
+import com.poptato.design_system.SNACK_BAR_COMPLETE_DELETE_TODO
 import com.poptato.design_system.CONFIRM_ACTION
 import com.poptato.design_system.Cancel
 import com.poptato.design_system.CategoryDeleteDropDownContent
 import com.poptato.design_system.CategoryDeleteDropDownTitle
-import com.poptato.design_system.DEADLINE
-import com.poptato.design_system.DEADLINE_DDAY
-import com.poptato.design_system.DEADLINE_PASSED
 import com.poptato.design_system.DELETE
 import com.poptato.design_system.DELETE_ACTION
 import com.poptato.design_system.Danger50
@@ -97,6 +97,7 @@ import com.poptato.design_system.EmptyBacklogTitle
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
 import com.poptato.design_system.Gray30
+import com.poptato.design_system.Gray60
 import com.poptato.design_system.Gray70
 import com.poptato.design_system.Gray80
 import com.poptato.design_system.Gray90
@@ -114,7 +115,9 @@ import com.poptato.domain.model.response.category.CategoryScreenContentModel
 import com.poptato.domain.model.response.dialog.DialogContentModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.ui.common.BookmarkItem
+import com.poptato.ui.common.RepeatItem
 import com.poptato.ui.common.TopBar
+import com.poptato.ui.common.formatDeadline
 import com.poptato.ui.util.LoadingManager
 import com.poptato.ui.util.rememberDragDropListState
 import kotlinx.coroutines.flow.SharedFlow
@@ -130,15 +133,16 @@ fun BacklogScreen(
     activateItemFlow: SharedFlow<Long>,
     updateBookmarkFlow: SharedFlow<Long>,
     updateCategoryFlow: SharedFlow<Long?>,
+    updateTodoRepeatFlow: SharedFlow<Long>,
     showSnackBar: (String) -> Unit,
     showDialog: (DialogContentModel) -> Unit = {}
 ) {
     val viewModel: BacklogViewModel = hiltViewModel()
-    val context = LocalContext.current
     val interactionSource = remember { MutableInteractionSource() }
     val uiState: BacklogPageState by viewModel.uiState.collectAsStateWithLifecycle()
     var activeItemId by remember { mutableStateOf<Long?>(null) }
     var isDropDownMenuExpanded by remember { mutableStateOf(false) }
+    val haptic = LocalHapticFeedback.current
 
     LaunchedEffect(activateItemFlow) {
         activateItemFlow.collect { id ->
@@ -160,7 +164,7 @@ fun BacklogScreen(
                 }
 
                 is BacklogEvent.OnSuccessDeleteBacklog -> {
-                    showSnackBar(COMPLETE_DELETE_TODO)
+                    showSnackBar(SNACK_BAR_COMPLETE_DELETE_TODO)
                 }
             }
         }
@@ -181,6 +185,12 @@ fun BacklogScreen(
     LaunchedEffect(updateCategoryFlow) {
         updateCategoryFlow.collect {
             viewModel.updateCategory(uiState.selectedItem.todoId, it)
+        }
+    }
+
+    LaunchedEffect(updateTodoRepeatFlow) {
+        updateTodoRepeatFlow.collect {
+            viewModel.updateTodoRepeat(it)
         }
     }
 
@@ -253,7 +263,8 @@ fun BacklogScreen(
             onDragEnd = { viewModel.onDragEnd() },
             onMove = { from, to -> viewModel.onMove(from, to) },
             isDropDownMenuExpanded = isDropDownMenuExpanded,
-            onDropdownExpandedChange = { isDropDownMenuExpanded = it }
+            onDropdownExpandedChange = { isDropDownMenuExpanded = it },
+            haptic = haptic
         )
     } else {
         LoadingManager.startLoading()
@@ -280,7 +291,8 @@ fun BacklogContent(
     onDragEnd: (List<TodoItemModel>) -> Unit = { },
     onMove: (Int, Int) -> Unit,
     isDropDownMenuExpanded: Boolean = false,
-    onDropdownExpandedChange: (Boolean) -> Unit = {}
+    onDropdownExpandedChange: (Boolean) -> Unit = {},
+    haptic: HapticFeedback = LocalHapticFeedback.current
 ) {
     Column(
         modifier = Modifier
@@ -297,10 +309,15 @@ fun BacklogContent(
 
         Box {
             TopBar(
-                titleText = com.poptato.design_system.TODO,
+                titleText = if (uiState.categoryList.isNotEmpty()) {
+                    uiState.categoryList[uiState.selectedCategoryIndex].categoryName
+                } else {
+                    ALL
+                },
+                titleTextStyle = PoptatoTypo.lgSemiBold,
                 subText = uiState.backlogList.size.toString(),
-                subTextStyle = PoptatoTypo.xLSemiBold,
-                subTextColor = Primary60,
+                subTextStyle = PoptatoTypo.lgMedium,
+                subTextColor = Gray60,
                 isCategorySettingBtn = (uiState.selectedCategoryIndex != 0 && uiState.selectedCategoryIndex != 1),
                 isCategorySettingBtnSelected = { onDropdownExpandedChange(true) }
             )
@@ -376,7 +393,8 @@ fun BacklogContent(
                         isNewItemCreated = uiState.isNewItemCreated,
                         resetNewItemFlag = resetNewItemFlag,
                         onDragEnd = onDragEnd,
-                        onMove = onMove
+                        onMove = onMove,
+                        haptic = haptic
                     )
                 }
             }
@@ -528,6 +546,7 @@ fun BacklogTaskList(
     resetNewItemFlag: () -> Unit = {},
     onDragEnd: (List<TodoItemModel>) -> Unit = { },
     onMove: (Int, Int) -> Unit,
+    haptic: HapticFeedback = LocalHapticFeedback.current
 ) {
     var draggedItem by remember { mutableStateOf<TodoItemModel?>(null) }
     var isDragging by remember { mutableStateOf(false) }
@@ -545,6 +564,7 @@ fun BacklogTaskList(
             .pointerInput(Unit) {
                 detectDragGesturesAfterLongPress(
                     onDragStart = { offset ->
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                         dragDropState.onDragStart(offset)
                         draggedItem = backlogList[dragDropState.currentIndexOfDraggedItem
                             ?: return@detectDragGesturesAfterLongPress]
@@ -695,11 +715,25 @@ fun BacklogItem(
                     BookmarkItem()
                     Spacer(modifier = Modifier.width(6.dp))
                 }
-                if (item.dDay != null) Text(
-                    text = formatDeadline(item.dDay),
-                    style = PoptatoTypo.xsSemiBold,
-                    color = Gray70
-                )
+                if (item.isRepeat) {
+                    RepeatItem()
+                    Spacer(modifier = Modifier.width(6.dp))
+                }
+                if (item.dDay != null) {
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(color = Gray90, shape = RoundedCornerShape(4.dp))
+                            .padding(horizontal = 4.dp, vertical = 2.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = formatDeadline(item.dDay),
+                            style = PoptatoTypo.xsSemiBold,
+                            color = Gray70
+                        )
+                    }
+                }
             }
 
             if (!item.isBookmark && item.dDay == null) Spacer(modifier = Modifier.height(16.dp)) else Spacer(
@@ -920,11 +954,3 @@ fun BacklogGuideItem(
     }
 }
 
-fun formatDeadline(dDay: Int?): String {
-    return when {
-        dDay == null -> ""
-        dDay > 0 -> String.format(DEADLINE, dDay)
-        dDay < 0 -> String.format(DEADLINE_PASSED, -dDay)
-        else -> DEADLINE_DDAY
-    }
-}

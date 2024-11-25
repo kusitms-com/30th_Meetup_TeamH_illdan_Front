@@ -18,4 +18,5 @@ interface TodoRepository {
     suspend fun updateTodoCompletion(todoId: Long): Flow<Result<Unit>>
     suspend fun updateTodoCategory(request: UpdateTodoCategoryModel): Flow<Result<Unit>>
     suspend fun getTodoDetail(todoId: Long): Flow<Result<TodoDetailItemModel>>
+    suspend fun updateTodoRepeat(todoId: Long): Flow<Result<Unit>>
 }

@@ -20,6 +20,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -30,19 +32,27 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.kakao.sdk.user.UserApiClient
 import com.poptato.design_system.BtnKaKaoLoginText
 import com.poptato.design_system.Gray100
+import com.poptato.design_system.KaKaoLogin
 import com.poptato.design_system.KaKaoMain
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.R
 import com.poptato.design_system.SUCCESS_LOGIN
+import com.poptato.design_system.Splash
+import com.poptato.ui.util.LoadingManager
 import timber.log.Timber
 
 @Composable
 fun KaKaoLoginScreen(
     goToBacklog: () -> Unit = {},
-    showSnackBar: (String) -> Unit
+    showSnackBar: (String) -> Unit,
+    goToOnboarding: () -> Unit = {}
 ) {
     val viewModel: KaKaoLoginViewModel = hiltViewModel()
     val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        LoadingManager.endLoading()
+    }
 
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collect { event ->
@@ -50,6 +60,9 @@ fun KaKaoLoginScreen(
                 is KaKaoLoginEvent.OnSuccessLogin -> {
                     goToBacklog()
                     showSnackBar(SUCCESS_LOGIN)
+                }
+                is KaKaoLoginEvent.NewUserLogin -> {
+                    goToOnboarding()
                 }
             }
         }
@@ -82,12 +95,42 @@ fun KaKaoLoginContent(
         modifier = Modifier
             .fillMaxSize()
             .background(Gray100),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.TopCenter
     ) {
+
+        Icon(
+            painter = painterResource(id = R.drawable.ic_stairs),
+            contentDescription = null,
+            tint = Color.Unspecified,
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        )  {
+            Image(
+                painter = painterResource(id = R.drawable.splash_dotted_texture),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop,
+                alpha = 0.3f
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(KaKaoLogin)
+        )
+
         Image(
-            painter = painterResource(id = R.drawable.ic_splash),
-            contentDescription = "ic_temp",
-            modifier = Modifier.padding(bottom = 100.dp)
+            painter = painterResource(id = R.drawable.ic_login),
+            contentDescription = "ic_splash",
+            modifier = Modifier
+                .padding(top = 80.dp)
         )
 
         Column(

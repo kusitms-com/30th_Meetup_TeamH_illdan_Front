@@ -22,12 +22,12 @@ class MainViewModel @Inject constructor() : BaseViewModel<MainPageState>(MainPag
     val activateItemFlow = MutableSharedFlow<Long>()
     val updateBookmarkFlow = MutableSharedFlow<Long>()
     val updateCategoryFlow = MutableSharedFlow<Long?>()
+    val updateTodoRepeatFlow = MutableSharedFlow<Long>()
     val animationDuration = 300
     val selectedIconInBottomSheet = MutableSharedFlow<CategoryIconItemModel>()
     val updateMonthFlow = MutableSharedFlow<CalendarMonthModel>()
     val categoryScreenContent = MutableSharedFlow<CategoryScreenContentModel>(replay = 1)
     val userDeleteName = MutableSharedFlow<String>(replay = 1)
-
 
     fun setBottomNavType(route: String?) {
         val type = when (route) {
@@ -92,6 +92,16 @@ class MainViewModel @Inject constructor() : BaseViewModel<MainPageState>(MainPag
 
     fun onUpdatedBookmark(value: Boolean) {
         val updatedItem = uiState.value.selectedTodoItem.copy(isBookmark = value)
+
+        updateState(
+            uiState.value.copy(
+                selectedTodoItem = updatedItem
+            )
+        )
+    }
+
+    fun onUpdatedTodoRepeat(value: Boolean) {
+        val updatedItem = uiState.value.selectedTodoItem.copy(isRepeat = value)
 
         updateState(
             uiState.value.copy(
