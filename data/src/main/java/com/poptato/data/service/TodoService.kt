@@ -63,4 +63,9 @@ interface TodoService {
     suspend fun getTodoDetail(
         @Path("todoId") todoId: Long
     ): Response<ApiResponse<TodoDetailItemResponse>>
+
+    @PATCH(Endpoints.Todo.REPEAT)
+    suspend fun updateTodoRepeat(
+        @Path("todoId") todoId: Long
+    ): Response<ApiResponse<Unit>>
 }

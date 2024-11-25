@@ -9,6 +9,9 @@ sealed class NavRoutes(val route: String) {
     data object KaKaoLoginGraph: NavRoutes("kakao_login_graph")
     data object KaKaoLoginScreen: NavRoutes("kakao_login")
 
+    // Onboarding
+    data object OnboardingScreen: NavRoutes("onboarding")
+
     // Backlog Graph
     data object BacklogGraph: NavRoutes("backlog_graph")
     data object BacklogScreen: NavRoutes("backlog")

@@ -6,7 +6,6 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -52,7 +51,10 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextRange
@@ -66,20 +68,20 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.poptato.core.util.TimeFormatter
 import com.poptato.design_system.BtnGetTodoText
-import com.poptato.design_system.COMPLETE_DELETE_TODO
-import com.poptato.design_system.DEADLINE
-import com.poptato.design_system.DEADLINE_DDAY
+import com.poptato.design_system.SNACK_BAR_COMPLETE_DELETE_TODO
 import com.poptato.design_system.ERROR_GENERIC_MESSAGE
 import com.poptato.design_system.EmptyTodoTitle
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
 import com.poptato.design_system.Gray40
 import com.poptato.design_system.Gray70
+import com.poptato.design_system.Gray90
 import com.poptato.design_system.Gray95
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.Primary100
 import com.poptato.design_system.Primary60
 import com.poptato.design_system.R
+import com.poptato.design_system.SNACK_BAR_TODAY_ALL_CHECKED
 import com.poptato.design_system.TodayTopBarSub
 import com.poptato.domain.model.enums.TodoStatus
 import com.poptato.domain.model.request.todo.ModifyTodoRequestModel
@@ -88,10 +90,13 @@ import com.poptato.domain.model.response.category.CategoryItemModel
 import com.poptato.domain.model.response.today.TodoItemModel
 import com.poptato.ui.common.BookmarkItem
 import com.poptato.ui.common.PoptatoCheckBox
+import com.poptato.ui.common.RepeatItem
 import com.poptato.ui.common.TopBar
+import com.poptato.ui.common.formatDeadline
 import com.poptato.ui.util.LoadingManager
 import com.poptato.ui.util.rememberDragDropListState
 import com.poptato.ui.util.toPx
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
@@ -104,13 +109,16 @@ fun TodayScreen(
     updateDeadlineFlow: SharedFlow<String?>,
     deleteTodoFlow: SharedFlow<Long>,
     activateItemFlow: SharedFlow<Long>,
+    updateTodoRepeatFlow: SharedFlow<Long>,
     updateBookmarkFlow: SharedFlow<Long>,
     updateCategoryFlow: SharedFlow<Long?>,
 ) {
     val viewModel: TodayViewModel = hiltViewModel()
+    val scope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val date = TimeFormatter.getTodayMonthDay()
     var activeItemId by remember { mutableStateOf<Long?>(null) }
+    val haptic = LocalHapticFeedback.current
 
     LaunchedEffect(activateItemFlow) {
         activateItemFlow.collect { id ->
@@ -142,6 +150,12 @@ fun TodayScreen(
         }
     }
 
+    LaunchedEffect(updateTodoRepeatFlow) {
+        updateTodoRepeatFlow.collect {
+            viewModel.updateTodoRepeat(it)
+        }
+    }
+
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collect { event ->
             when(event) {
@@ -149,7 +163,15 @@ fun TodayScreen(
                     showSnackBar(ERROR_GENERIC_MESSAGE)
                 }
                 is TodayEvent.OnSuccessDeleteTodo -> {
-                    showSnackBar(COMPLETE_DELETE_TODO)
+                    showSnackBar(SNACK_BAR_COMPLETE_DELETE_TODO)
+                }
+                is TodayEvent.TodayAllChecked -> {
+                    scope.launch {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        delay(300)
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        showSnackBar(SNACK_BAR_TODAY_ALL_CHECKED)
+                    }
                 }
             }
         }
@@ -189,6 +211,7 @@ fun TodayScreen(
                     )
                 )
             },
+            haptic = haptic
         )
     } else {
         LoadingManager.startLoading()
@@ -208,6 +231,7 @@ fun TodayContent(
     activeItemId: Long?,
     onClearActiveItem: () -> Unit = {},
     onTodoItemModified: (Long, String) -> Unit = {_,_ ->},
+    haptic: HapticFeedback = LocalHapticFeedback.current
 ) {
     Column(
         modifier = Modifier
@@ -244,6 +268,7 @@ fun TodayContent(
                 activeItemId = activeItemId,
                 onClearActiveItem = onClearActiveItem,
                 onTodoItemModified = onTodoItemModified,
+                haptic = haptic
             )
         }
     }
@@ -260,7 +285,8 @@ fun TodayTodoList(
     showBottomSheet: (TodoItemModel) -> Unit = {},
     activeItemId: Long?,
     onClearActiveItem: () -> Unit = {},
-    onTodoItemModified: (Long, String) -> Unit = {_,_ ->}
+    onTodoItemModified: (Long, String) -> Unit = {_,_ ->},
+    haptic: HapticFeedback = LocalHapticFeedback.current
 ) {
     var draggedItem by remember { mutableStateOf<TodoItemModel?>(null) }
     var isDragging by remember { mutableStateOf(false) }
@@ -276,6 +302,7 @@ fun TodayTodoList(
             .pointerInput(Unit) {
                 detectDragGesturesAfterLongPress(
                     onDragStart = { offset ->
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                         dragDropState.onDragStart(offset)
                         draggedItem = list[dragDropState.currentIndexOfDraggedItem
                             ?: return@detectDragGesturesAfterLongPress]
@@ -456,11 +483,25 @@ fun TodayTodoItem(
                     BookmarkItem()
                     Spacer(modifier = Modifier.width(6.dp))
                 }
-                if (item.dDay != null) Text(
-                    text = if(item.dDay != 0) String.format(DEADLINE, item.dDay) else DEADLINE_DDAY,
-                    style = PoptatoTypo.xsSemiBold,
-                    color = Gray70
-                )
+                if (item.isRepeat) {
+                    RepeatItem()
+                    Spacer(modifier = Modifier.width(6.dp))
+                }
+                if (item.dDay != null) {
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(color = Gray90, shape = RoundedCornerShape(4.dp))
+                            .padding(horizontal = 4.dp, vertical = 2.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = formatDeadline(item.dDay),
+                            style = PoptatoTypo.xsSemiBold,
+                            color = Gray70
+                        )
+                    }
+                }
             }
 
             Row(

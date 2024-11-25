@@ -19,6 +19,7 @@ import com.poptato.mypage.policy.PolicyViewerScreen
 import com.poptato.mypage.viewer.FAQViewerScreen
 import com.poptato.mypage.viewer.NoticeViewerScreen
 import com.poptato.setting.servicedelete.finish.ServiceDeleteFinishScreen
+import com.poptato.onboarding.OnboardingScreen
 import com.poptato.setting.servicedelete.ServiceDeleteScreen
 import com.poptato.setting.userdata.UserDataScreen
 import com.poptato.splash.SplashScreen
@@ -71,8 +72,19 @@ fun NavGraphBuilder.loginNavGraph(
                         }
                     }
                 },
-                showSnackBar = showSnackBar
+                showSnackBar = showSnackBar,
+                goToOnboarding = {
+                    navController.navigate(NavRoutes.OnboardingScreen.route) {
+                        popUpTo(NavRoutes.KaKaoLoginScreen.route) {
+                            inclusive = true
+                        }
+                    }
+                }
             )
+        }
+
+        composable(NavRoutes.OnboardingScreen.route) {
+            OnboardingScreen(goToBacklog = { navController.navigate(NavRoutes.BacklogGraph.route) })
         }
     }
 }
@@ -87,7 +99,8 @@ fun NavGraphBuilder.backlogNavGraph(
     updateCategoryFlow: SharedFlow<Long?>,
     showSnackBar: (String) -> Unit,
     showDialog: (DialogContentModel) -> Unit,
-    categoryScreenContent: (CategoryScreenContentModel) -> Unit
+    categoryScreenContent: (CategoryScreenContentModel) -> Unit,
+    updateTodoRepeatFlow: SharedFlow<Long>,
 ) {
     navigation(
         startDestination = NavRoutes.BacklogScreen.route,
@@ -105,6 +118,7 @@ fun NavGraphBuilder.backlogNavGraph(
                 activateItemFlow = activateItemFlow,
                 updateBookmarkFlow = updateBookmarkFlow,
                 updateCategoryFlow = updateCategoryFlow,
+                updateTodoRepeatFlow = updateTodoRepeatFlow,
                 showSnackBar = showSnackBar,
                 showDialog = showDialog
             )
@@ -246,8 +260,9 @@ fun NavGraphBuilder.todayNavGraph(
     deleteTodoFlow: SharedFlow<Long>,
     updateDeadlineFlow: SharedFlow<String?>,
     activateItemFlow: SharedFlow<Long>,
-    updateBookmarkFlow: SharedFlow<Long>,
     updateCategoryFlow: SharedFlow<Long?>,
+    updateBookmarkFlow: SharedFlow<Long>,
+    updateTodoRepeatFlow: SharedFlow<Long>
 ) {
     navigation(startDestination = NavRoutes.TodayScreen.route, route = NavRoutes.TodayGraph.route) {
         composable(NavRoutes.TodayScreen.route) {
@@ -259,7 +274,8 @@ fun NavGraphBuilder.todayNavGraph(
                 updateBookmarkFlow = updateBookmarkFlow,
                 activateItemFlow = activateItemFlow,
                 deleteTodoFlow = deleteTodoFlow,
-                updateCategoryFlow = updateCategoryFlow
+                updateCategoryFlow = updateCategoryFlow,
+                updateTodoRepeatFlow = updateTodoRepeatFlow
             )
         }
     }

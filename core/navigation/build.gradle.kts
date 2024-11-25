@@ -19,4 +19,5 @@ dependencies {
     implementation(projects.feature.today)
     implementation(projects.feature.history)
     implementation(projects.feature.category)
+    implementation(projects.feature.onboarding)
 }
