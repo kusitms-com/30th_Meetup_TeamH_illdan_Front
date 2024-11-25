@@ -1,6 +1,9 @@
 package com.poptato.backlog
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -81,10 +84,12 @@ import coil.Coil
 import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.decode.SvgDecoder
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import com.poptato.design_system.ALL
 import com.poptato.design_system.BACKLOG_YESTERDAY_TASK_GUIDE
 import com.poptato.design_system.BacklogHint
-import com.poptato.design_system.SNACK_BAR_COMPLETE_DELETE_TODO
 import com.poptato.design_system.CONFIRM_ACTION
 import com.poptato.design_system.Cancel
 import com.poptato.design_system.CategoryDeleteDropDownContent
@@ -105,6 +110,7 @@ import com.poptato.design_system.Gray95
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.Primary60
 import com.poptato.design_system.R
+import com.poptato.design_system.SNACK_BAR_COMPLETE_DELETE_TODO
 import com.poptato.design_system.modify
 import com.poptato.domain.model.enums.CategoryScreenType
 import com.poptato.domain.model.enums.DialogType
@@ -123,6 +129,8 @@ import com.poptato.ui.util.rememberDragDropListState
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun BacklogScreen(
     goToYesterdayList: () -> Unit = {},
@@ -143,6 +151,14 @@ fun BacklogScreen(
     var activeItemId by remember { mutableStateOf<Long?>(null) }
     var isDropDownMenuExpanded by remember { mutableStateOf(false) }
     val haptic = LocalHapticFeedback.current
+
+    val permissionState = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
+
+    LaunchedEffect(Unit) {
+        if (!permissionState.status.isGranted) {
+            permissionState.launchPermissionRequest()
+        }
+    }
 
     LaunchedEffect(activateItemFlow) {
         activateItemFlow.collect { id ->

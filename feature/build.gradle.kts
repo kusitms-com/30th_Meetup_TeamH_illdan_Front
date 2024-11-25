@@ -17,4 +17,5 @@ dependencies {
     implementation(projects.core.navigation)
 
     implementation(libs.firebase.messaging)
+    implementation(libs.permissions)
 }

@@ -51,6 +51,7 @@ lazy-column-scrollbar = "2.2.0"
 google-service = "4.4.2"
 firebase-bom = "33.6.0"
 firebase-messaging = "21.1.0"
+permissions = "0.33.1-alpha"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -124,6 +125,7 @@ kotlin-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-s
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom"}
 firebase-analytics = { module = "com.google.firebase:firebase-analytics"}
 firebase-messaging = { module = "com.google.firebase:firebase-messaging", version.ref = "firebase-messaging"}
+permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "permissions" }
 
 # Compose
 compose-ui = { module = "androidx.compose.ui:ui" }
