@@ -2,13 +2,10 @@ package com.poptato.login
 
 import androidx.lifecycle.viewModelScope
 import com.poptato.domain.model.request.KaKaoLoginRequest
-import com.poptato.domain.model.request.today.GetTodayListRequestModel
 import com.poptato.domain.model.response.auth.TokenModel
 import com.poptato.domain.model.response.login.AuthModel
-import com.poptato.domain.model.response.today.TodayListModel
 import com.poptato.domain.usecase.PostKaKaoLoginUseCase
 import com.poptato.domain.usecase.auth.SaveTokenUseCase
-import com.poptato.domain.usecase.today.GetTodayListUseCase
 import com.poptato.ui.base.BaseViewModel
 import com.poptato.ui.base.PageState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,7 +20,7 @@ class KaKaoLoginViewModel @Inject constructor(
 
     fun kakaoLogin(token: String) {
         viewModelScope.launch {
-            postKaKaoLoginUseCase.invoke(request = KaKaoLoginRequest(token)).collect {
+            postKaKaoLoginUseCase(request = KaKaoLoginRequest(accessToken = token, clientId = "12345")).collect {
                 resultResponse(it, ::onSuccessKaKaoLogin)
             }
         }
