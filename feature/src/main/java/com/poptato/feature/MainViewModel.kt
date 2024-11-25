@@ -27,6 +27,7 @@ class MainViewModel @Inject constructor() : BaseViewModel<MainPageState>(MainPag
     val selectedIconInBottomSheet = MutableSharedFlow<CategoryIconItemModel>()
     val updateMonthFlow = MutableSharedFlow<CalendarMonthModel>()
     val categoryScreenContent = MutableSharedFlow<CategoryScreenContentModel>(replay = 1)
+    val userDeleteName = MutableSharedFlow<String>(replay = 1)
 
     fun setBottomNavType(route: String?) {
         val type = when (route) {
