@@ -707,7 +707,7 @@ fun BacklogItem(
         ) {
             Row(
                 modifier = Modifier
-                    .padding(top = if (item.isBookmark || item.dDay != null) 12.dp else 0.dp),
+                    .padding(top = if (item.isBookmark || item.dDay != null || item.isRepeat) 12.dp else 0.dp),
                 horizontalArrangement = Arrangement.Start
             ) {
                 if (item.isBookmark) {
@@ -735,7 +735,7 @@ fun BacklogItem(
                 }
             }
 
-            if (!item.isBookmark && item.dDay == null) Spacer(modifier = Modifier.height(16.dp)) else Spacer(
+            if (!item.isBookmark && item.dDay == null && !item.isRepeat) Spacer(modifier = Modifier.height(16.dp)) else Spacer(
                 modifier = Modifier.height(8.dp)
             )
 
