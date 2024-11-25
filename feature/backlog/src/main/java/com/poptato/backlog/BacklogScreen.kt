@@ -359,7 +359,6 @@ fun BacklogContent(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-                Spacer(modifier = Modifier.height(16.dp))
 
                 CreateBacklogTextFiled(
                     onValueChange = onValueChange,
