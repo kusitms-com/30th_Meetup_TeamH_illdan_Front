@@ -21,17 +21,15 @@ class FcmService: FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
 
+        Timber.d("[FCM] FcmService -> data: ${message.data}")
+
         val title = message.data["title"] ?: message.notification?.title
         val body = message.data["todolist"] ?: message.notification?.body
 
         if (message.data.isNotEmpty()) {
-            Timber.d("[FCM] FcmService -> title: ${message.data["title"].toString()} & message: ${message.data["todolist"].toString()}")
-
-
-
             sendNotification(title, body)
         } else {
-            Timber.d("[FCM] FcmService -> 수신에러: data가 비어있습니다. 메시지를 수신하지 못했습니다.")
+            Timber.d("[FCM] FcmService -> empty data")
         }
 
     }
@@ -40,37 +38,42 @@ class FcmService: FirebaseMessagingService() {
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        val channel = NotificationChannel(
-            ID,
-            CHANNEL_NAME,
-            NotificationManager.IMPORTANCE_HIGH
-        )
-        notificationManager.createNotificationChannel(channel)
-
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle(title)
-            .setContentText(body)
+            .setContentTitle(body)
             .setSmallIcon(R.drawable.ic_app)
             .setAutoCancel(true)
+            .setGroup(GROUP_KEY)
             .build()
 
+        val summaryNotification = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle("일단")
+            .setSmallIcon(R.drawable.ic_app)
+            .setStyle(
+                NotificationCompat.InboxStyle()
+                    .addLine(body)
+                    .setSummaryText("오늘 마감 할 일: ${notificationManager.activeNotifications.size}")
+            )
+            .setGroup(GROUP_KEY)
+            .setGroupSummary(true)
+            .build()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                CHANNEL_TITLE,
+                CHANNEL_NAME,
                 NotificationManager.IMPORTANCE_DEFAULT
             )
             notificationManager.createNotificationChannel(channel)
         }
-        notificationManager.notify(NOTIFICATION_ID, notification)
+
+        notificationManager.notify(System.currentTimeMillis().toInt(), notification)
+        notificationManager.notify(SUMMARY_ID, summaryNotification)
     }
 
     companion object {
-        private const val CHANNEL_ID = "CHANNEL_ID"
-        private const val NOTIFICATION_ID = 1
-        private const val ID = "ID"
-        private const val CHANNEL_NAME = "CHANNEL_NAME"
-        private const val CHANNEL_TITLE = "CHANNEL_TITLE"
+        private const val GROUP_KEY = "TODO_GROUP"
+        private const val CHANNEL_ID = "TODO_CHANNEL"
+        private const val CHANNEL_NAME = "TODO"
+        private const val SUMMARY_ID = 0
     }
 }
