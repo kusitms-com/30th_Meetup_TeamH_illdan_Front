@@ -32,6 +32,7 @@ object Endpoints {
         const val BOOKMARK = "$DELETE/bookmark"
         const val SWIPE = "swipe"
         const val COMPLETION = "$DELETE/achieve"
+        const val REPEAT = "$TODO/{todoId}/repeat"
         const val UPDATECATEGIRY = "$DELETE/category"
     }
 

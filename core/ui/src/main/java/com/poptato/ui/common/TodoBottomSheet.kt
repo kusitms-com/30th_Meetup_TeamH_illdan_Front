@@ -45,6 +45,8 @@ import com.poptato.design_system.Gray90
 import com.poptato.design_system.PoptatoTypo
 import com.poptato.design_system.R
 import com.poptato.design_system.REPEAT_TASK_OPTION
+import com.poptato.design_system.DELETE_ACTION
+import com.poptato.design_system.Gray95
 import com.poptato.design_system.Settings
 import com.poptato.design_system.modify
 import com.poptato.domain.model.response.category.CategoryItemModel
@@ -58,19 +60,22 @@ fun TodoBottomSheet(
     onClickBtnDelete: (Long) -> Unit = {},
     onClickBtnModify: (Long) -> Unit = {},
     onClickBtnBookmark: (Long) -> Unit = {},
-    onClickCategoryBottomSheet: () -> Unit = {}
+    onClickCategoryBottomSheet: () -> Unit = {},
+    onClickBtnRepeat: (Long) -> Unit = {}
 ) {
     var deadline by remember { mutableStateOf(item.deadline) }
     var isBookmark by remember { mutableStateOf(item.isBookmark) }
+    var isRepeat by remember { mutableStateOf(item.isRepeat) }
 
     LaunchedEffect(item) {
         deadline = item.deadline
         isBookmark = item.isBookmark
+        isRepeat = item.isRepeat
     }
 
     TodoBottomSheetContent(
-        item = item.copy(deadline = deadline, isBookmark = isBookmark),
         categoryItem = categoryItem,
+        item = item.copy(deadline = deadline, isBookmark = isBookmark, isRepeat = isRepeat),
         onClickShowDatePicker = onClickShowDatePicker,
         onClickBtnDelete = onClickBtnDelete,
         onClickBtnModify = onClickBtnModify,
@@ -78,7 +83,8 @@ fun TodoBottomSheet(
             onClickBtnBookmark(it)
             isBookmark = !isBookmark
         },
-        onClickCategoryBottomSheet = onClickCategoryBottomSheet
+        onClickCategoryBottomSheet = onClickCategoryBottomSheet,
+        onClickBtnRepeat = onClickBtnRepeat
     )
 }
 
@@ -90,18 +96,19 @@ fun TodoBottomSheetContent(
     onClickBtnDelete: (Long) -> Unit = {},
     onClickBtnModify: (Long) -> Unit = {},
     onClickBtnBookmark: (Long) -> Unit = {},
-    onClickCategoryBottomSheet: () -> Unit = {}
+    onClickCategoryBottomSheet: () -> Unit = {},
+    onClickBtnRepeat: (Long) -> Unit = {}
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .height(324.dp)
-            .background(Gray100)
+            .background(Gray95)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Gray100)
+                .background(Gray95)
                 .padding(top = 24.dp)
                 .padding(horizontal = 24.dp)
         ) {
@@ -143,7 +150,17 @@ fun TodoBottomSheetContent(
         BottomSheetBtn(resourceId = R.drawable.ic_trash, buttonText = DELETE_ACTION, textColor = Danger50, modifier = Modifier.clickable {
             onClickBtnDelete(item.todoId)
         })
-        BottomSheetBtn(resourceId = R.drawable.ic_refresh, buttonText = REPEAT_TASK_OPTION, textColor = Gray30)
+        BottomSheetBtn(
+            resourceId = R.drawable.ic_refresh,
+            buttonText = REPEAT_TASK_OPTION,
+            textColor = Gray30,
+            modifier = Modifier.clickable {
+                onClickBtnRepeat(item.todoId)
+            },
+            isRepeatBtn = true,
+            isRepeat = item.isRepeat,
+            onClickBtnRepeat = { onClickBtnRepeat(item.todoId) }
+        )
         BottomSheetBtn(
             resourceId = R.drawable.ic_calendar,
             buttonText = DEADLINE_OPTION,
@@ -158,7 +175,7 @@ fun TodoBottomSheetContent(
             buttonText = Category,
             textColor = Gray30,
             category = categoryItem,
-            modifier = Modifier.clickable { 
+            modifier = Modifier.clickable {
                 onClickCategoryBottomSheet()
             }
         )
@@ -174,8 +191,12 @@ fun BottomSheetBtn(
     textColor: Color,
     deadline: String = "",
     category: CategoryItemModel? = CategoryItemModel(),
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isRepeatBtn: Boolean = false,
+    isRepeat: Boolean = false,
+    onClickBtnRepeat: () -> Unit = {}
 ) {
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -183,8 +204,14 @@ fun BottomSheetBtn(
     ) {
         Icon(painter = painterResource(id = resourceId), contentDescription = null, tint = resourceColor, modifier = Modifier.size(20.dp))
         Spacer(modifier = Modifier.width(8.dp))
-        Text(text = buttonText, style = PoptatoTypo.mdMedium, color = textColor)
+        Text(text = buttonText, style = PoptatoTypo.mdRegular, color = textColor)
         Spacer(modifier = Modifier.weight(1f))
+        if (isRepeatBtn) PoptatoSwitchButton(
+            check = isRepeat,
+            onClick = {
+                onClickBtnRepeat()
+            }
+        )
         if (buttonText == DEADLINE_OPTION && deadline.isNotEmpty()) {
             Text(text = deadline, style = PoptatoTypo.mdMedium, color = Gray00)
         } else if (buttonText == DEADLINE_OPTION) {

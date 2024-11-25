@@ -31,6 +31,7 @@ import com.poptato.domain.usecase.todo.ModifyTodoUseCase
 import com.poptato.domain.usecase.todo.SwipeTodoUseCase
 import com.poptato.domain.usecase.todo.UpdateBookmarkUseCase
 import com.poptato.domain.usecase.todo.UpdateDeadlineUseCase
+import com.poptato.domain.usecase.todo.UpdateTodoRepeatUseCase
 import com.poptato.domain.usecase.todo.UpdateTodoCategoryUseCase
 import com.poptato.domain.usecase.yesterday.GetYesterdayListUseCase
 import com.poptato.ui.base.BaseViewModel
@@ -53,9 +54,10 @@ class BacklogViewModel @Inject constructor(
     private val dragDropUseCase: DragDropUseCase,
     private val updateDeadlineUseCase: UpdateDeadlineUseCase,
     private val updateBookmarkUseCase: UpdateBookmarkUseCase,
-    private val swipeTodoUseCase: SwipeTodoUseCase,
     private val updateTodoCategoryUseCase: UpdateTodoCategoryUseCase,
-    private val getTodoDetailUseCase: GetTodoDetailUseCase
+    private val getTodoDetailUseCase: GetTodoDetailUseCase,
+    private val swipeTodoUseCase: SwipeTodoUseCase,
+    private val updateTodoRepeatUseCase: UpdateTodoRepeatUseCase
 ) : BaseViewModel<BacklogPageState>(
     BacklogPageState()
 ) {
@@ -388,6 +390,34 @@ class BacklogViewModel @Inject constructor(
             }
         }
         val updatedItem = uiState.value.selectedItem.copy(isBookmark = !uiState.value.selectedItem.isBookmark)
+
+        updateState(
+            uiState.value.copy(
+                backlogList = newList,
+                selectedItem = updatedItem
+            )
+        )
+    }
+
+    fun updateTodoRepeat(id: Long) {
+        updateTodoRepeatInUI(id)
+
+        viewModelScope.launch {
+            updateTodoRepeatUseCase(id).collect {
+                resultResponse(it, { updateSnapshotList(uiState.value.backlogList) }, { onFailedUpdateBacklogList() })
+            }
+        }
+    }
+
+    private fun updateTodoRepeatInUI(id: Long) {
+        val newList = uiState.value.backlogList.map {
+            if (it.todoId == id) {
+                it.copy(isRepeat = !it.isRepeat)
+            } else {
+                it
+            }
+        }
+        val updatedItem = uiState.value.selectedItem.copy(isRepeat = !uiState.value.selectedItem.isRepeat)
 
         updateState(
             uiState.value.copy(

@@ -249,6 +249,10 @@ fun MainScreen() {
                                 },
                                 onClickCategoryBottomSheet = {
                                     viewModel.updateBottomSheetType(BottomSheetType.CategoryList)
+                                },
+                                onClickBtnRepeat = {
+                                    viewModel.onUpdatedTodoRepeat(!uiState.selectedTodoItem.isRepeat)
+                                    scope.launch { viewModel.updateTodoRepeatFlow.emit(it) }
                                 }
                             )
                         }
@@ -427,7 +431,8 @@ fun MainScreen() {
                             updateCategoryFlow = viewModel.updateCategoryFlow,
                             showSnackBar = showSnackBar,
                             showDialog = showDialog,
-                            categoryScreenContent = categoryScreenContent
+                            categoryScreenContent = categoryScreenContent,
+                            updateTodoRepeatFlow = viewModel.updateTodoRepeatFlow
                         )
                         todayNavGraph(
                             navController = navController,
@@ -438,6 +443,7 @@ fun MainScreen() {
                             deleteTodoFlow = viewModel.deleteTodoFlow,
                             activateItemFlow = viewModel.activateItemFlow,
                             updateCategoryFlow = viewModel.updateCategoryFlow,
+                            updateTodoRepeatFlow = viewModel.updateTodoRepeatFlow
                         )
                         categoryNavGraph(
                             navController = navController,

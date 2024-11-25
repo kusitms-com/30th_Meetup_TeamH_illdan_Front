@@ -86,7 +86,8 @@ fun NavGraphBuilder.backlogNavGraph(
     updateCategoryFlow: SharedFlow<Long?>,
     showSnackBar: (String) -> Unit,
     showDialog: (DialogContentModel) -> Unit,
-    categoryScreenContent: (CategoryScreenContentModel) -> Unit
+    categoryScreenContent: (CategoryScreenContentModel) -> Unit,
+    updateTodoRepeatFlow: SharedFlow<Long>,
 ) {
     navigation(
         startDestination = NavRoutes.BacklogScreen.route,
@@ -104,6 +105,7 @@ fun NavGraphBuilder.backlogNavGraph(
                 activateItemFlow = activateItemFlow,
                 updateBookmarkFlow = updateBookmarkFlow,
                 updateCategoryFlow = updateCategoryFlow,
+                updateTodoRepeatFlow = updateTodoRepeatFlow,
                 showSnackBar = showSnackBar,
                 showDialog = showDialog
             )
@@ -230,8 +232,9 @@ fun NavGraphBuilder.todayNavGraph(
     deleteTodoFlow: SharedFlow<Long>,
     updateDeadlineFlow: SharedFlow<String?>,
     activateItemFlow: SharedFlow<Long>,
-    updateBookmarkFlow: SharedFlow<Long>,
     updateCategoryFlow: SharedFlow<Long?>,
+    updateBookmarkFlow: SharedFlow<Long>,
+    updateTodoRepeatFlow: SharedFlow<Long>
 ) {
     navigation(startDestination = NavRoutes.TodayScreen.route, route = NavRoutes.TodayGraph.route) {
         composable(NavRoutes.TodayScreen.route) {
@@ -243,7 +246,8 @@ fun NavGraphBuilder.todayNavGraph(
                 updateBookmarkFlow = updateBookmarkFlow,
                 activateItemFlow = activateItemFlow,
                 deleteTodoFlow = deleteTodoFlow,
-                updateCategoryFlow = updateCategoryFlow
+                updateCategoryFlow = updateCategoryFlow,
+                updateTodoRepeatFlow = updateTodoRepeatFlow
             )
         }
     }

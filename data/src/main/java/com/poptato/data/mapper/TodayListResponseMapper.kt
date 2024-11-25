@@ -17,6 +17,7 @@ object TodayListResponseMapper: Mapper<TodayListResponse, TodayListModel> {
                         content = item.content,
                         todoStatus = if (item.todoStatus == "COMPLETED") TodoStatus.COMPLETED else TodoStatus.INCOMPLETE,
                         isBookmark = item.isBookmark,
+                        isRepeat = item.isRepeat,
                         deadline = item.deadline ?: "",
                         dDay = item.dDay
                     )

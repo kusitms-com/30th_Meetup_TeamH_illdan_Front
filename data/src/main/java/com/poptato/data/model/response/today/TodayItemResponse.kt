@@ -10,8 +10,10 @@ data class TodayItemResponse(
     val content: String = "",
     @SerializedName("todayStatus")
     val todoStatus: String = "",
-    @SerializedName("bookmark")
+    @SerializedName("isBookmark")
     val isBookmark: Boolean = false,
+    @SerializedName("isRepeat")
+    val isRepeat: Boolean = false,
     @SerializedName("deadline")
     val deadline: String? = null,
     @SerializedName("dday")
