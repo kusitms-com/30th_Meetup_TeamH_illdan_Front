@@ -91,10 +91,30 @@ fun YesterdayContent(
                 onClickCloseBtn = onClickCloseBtn
             )
 
+            Box {
+                Text(
+                    text = YesterdayListTitle,
+                    style = PoptatoTypo.xxLSemiBold,
+                    color = Gray00,
+                    modifier = Modifier
+                        .padding(start = 16.dp)
+                )
+
+                Image(
+                    painter = painterResource(id = R.drawable.ic_yesterday_bg),
+                    contentDescription = "",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(118.dp),
+                    contentScale = ContentScale.Crop
+                )
+            }
+
             Box(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
+                    .padding(top = 8.dp)
             ) {
                 Text(
                     text = YesterdayListTitle,
