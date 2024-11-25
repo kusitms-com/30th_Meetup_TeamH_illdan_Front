@@ -30,3 +30,15 @@ fun LazyListState.getVisibleItemInfoFor(absolute: Int): LazyListItemInfo? {
 
 val LazyListItemInfo.offsetEnd: Int
     get() = this.offset + this.size
+
+@Composable
+fun Int.toDp(): Dp {
+    val density = LocalDensity.current
+    return with(density) { this@toDp.toDp() }
+}
+
+@Composable
+fun Float.toDp(): Dp {
+    val density = LocalDensity.current
+    return with(density) { this@toDp.toDp() }
+}
