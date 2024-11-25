@@ -32,6 +32,8 @@ const val SUN = "일"
 // KaKaoLogin
 const val BtnKaKaoLoginText = "카카오 로그인"
 const val SUCCESS_LOGIN = "로그인 성공하였습니다."
+const val SOCIAL_TYPE = "KAKAO"
+const val MOBILE_TYPE = "ANDROID"
 
 // Backlog
 const val BacklogTitle = "오늘 할 일은 무엇인가요?\n일단 추가해 보세요!"

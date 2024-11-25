@@ -61,9 +61,10 @@ fun KaKaoLoginScreen(
             return@OnCompleteListener
         }
 
-        // TODO device token 서버통신
         val token = task.result
-        Timber.d("[FCM] login -> 성공: $token")
+        if (token != null) {
+            viewModel.getClientId(token)
+        }
     })
 
     KaKaoLoginContent(
