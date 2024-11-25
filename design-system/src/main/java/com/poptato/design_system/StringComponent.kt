@@ -6,6 +6,7 @@ const val List = "목록"
 const val History = "히스토리"
 const val Settings = "설정하기"
 const val Backlog = "백로그"
+const val START = "시작하기"
 const val modify = "수정하기"
 const val DELETE_ACTION = "삭제하기"
 const val DELETE = "삭제"
@@ -33,6 +34,12 @@ const val SUN = "일"
 // KaKaoLogin
 const val BtnKaKaoLoginText = "카카오 로그인"
 const val SUCCESS_LOGIN = "로그인 성공하였습니다."
+
+// Onboarding
+const val ONBOARDING1 = "일단 할 일을\n생각나는 대로 추가해요"
+const val ONBOARDING2 = "강력한 기능으로\n효율적인 할 일 관리!"
+const val ONBOARDING3 = "쌓인 할 일 중에\n‘오늘’ 할 일만 스와이프!"
+const val ONBOARDING4 = "오늘 할 일을 해낸 당신!\n어제보다 한 걸음 성장하셨어요"
 
 // Backlog
 const val BacklogTitle = "오늘 할 일은 무엇인가요?\n일단 추가해 보세요!"
@@ -102,8 +109,12 @@ const val YEAR_MONTH = "%s년 %s월"
 const val ERROR_GENERIC_MESSAGE = "에러가 발생하였습니다"
 
 // Etc
-const val FINISH_APP_GUIDE = "뒤로가기를 한 번 더 누르면 종료돼요."
+
 const val DEADLINE = "D-%s"
 const val DEADLINE_DDAY = "D-day"
 const val DEADLINE_PASSED = "D+%s"
-const val COMPLETE_DELETE_TODO = "할 일이 삭제되었어요."
+
+// SnackBar
+const val SNACK_BAR_TODAY_ALL_CHECKED = "와우! 수고한 나 자신에게 박수!👏"
+const val SNACK_BAR_FINISH_APP_GUIDE = "뒤로가기를 한 번 더 누르면 종료돼요."
+const val SNACK_BAR_COMPLETE_DELETE_TODO = "할 일이 삭제되었어요."

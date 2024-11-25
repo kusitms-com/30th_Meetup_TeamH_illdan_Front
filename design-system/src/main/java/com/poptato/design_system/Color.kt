@@ -1,5 +1,7 @@
 package com.poptato.design_system
 
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
 // Gray Scale
@@ -52,6 +54,18 @@ val KaKaoMain = Color(0xFFFEE500)
 
 // ETC
 val Bookmark = Color(0xFF294746)
+val KaKaoLogin = Brush.linearGradient(
+    colors = listOf(
+        Color(0xFF1E1E20).copy(alpha = 0.5f),
+        Color(0xFF1E1E20)
+    )
+)
+val Splash = Brush.linearGradient(
+    colors = listOf(
+        Color(0xFF1E1E20).copy(alpha = 0.1f),
+        Color(0xFF1CB59C)
+    )
+)
 
 // Background
 val BgSnackBar = Color(0xFF121214)

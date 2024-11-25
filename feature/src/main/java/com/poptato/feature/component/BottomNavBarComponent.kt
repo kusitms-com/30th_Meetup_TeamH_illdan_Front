@@ -17,6 +17,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.poptato.core.enums.BottomNavType
@@ -82,6 +84,8 @@ fun BottomNavItem(
     onClick: (String) -> Unit = {},
     interactionSource: MutableInteractionSource
 ) {
+    val haptic = LocalHapticFeedback.current
+
     Column(
         modifier = Modifier
             .size(width = 42.dp, height = 46.dp)
@@ -89,6 +93,7 @@ fun BottomNavItem(
                 interactionSource = interactionSource,
                 indication = null,
                 onClick = {
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                     when (type) {
                         BottomNavType.TODAY -> {
                             onClick(NavRoutes.TodayScreen.route)

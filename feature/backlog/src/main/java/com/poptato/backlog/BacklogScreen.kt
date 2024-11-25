@@ -59,17 +59,19 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -82,14 +84,11 @@ import coil.decode.SvgDecoder
 import com.poptato.design_system.ALL
 import com.poptato.design_system.BACKLOG_YESTERDAY_TASK_GUIDE
 import com.poptato.design_system.BacklogHint
-import com.poptato.design_system.COMPLETE_DELETE_TODO
+import com.poptato.design_system.SNACK_BAR_COMPLETE_DELETE_TODO
 import com.poptato.design_system.CONFIRM_ACTION
 import com.poptato.design_system.Cancel
 import com.poptato.design_system.CategoryDeleteDropDownContent
 import com.poptato.design_system.CategoryDeleteDropDownTitle
-import com.poptato.design_system.DEADLINE
-import com.poptato.design_system.DEADLINE_DDAY
-import com.poptato.design_system.DEADLINE_PASSED
 import com.poptato.design_system.DELETE
 import com.poptato.design_system.DELETE_ACTION
 import com.poptato.design_system.Danger50
@@ -143,6 +142,7 @@ fun BacklogScreen(
     val uiState: BacklogPageState by viewModel.uiState.collectAsStateWithLifecycle()
     var activeItemId by remember { mutableStateOf<Long?>(null) }
     var isDropDownMenuExpanded by remember { mutableStateOf(false) }
+    val haptic = LocalHapticFeedback.current
 
     LaunchedEffect(activateItemFlow) {
         activateItemFlow.collect { id ->
@@ -164,7 +164,7 @@ fun BacklogScreen(
                 }
 
                 is BacklogEvent.OnSuccessDeleteBacklog -> {
-                    showSnackBar(COMPLETE_DELETE_TODO)
+                    showSnackBar(SNACK_BAR_COMPLETE_DELETE_TODO)
                 }
             }
         }
@@ -263,7 +263,8 @@ fun BacklogScreen(
             onDragEnd = { viewModel.onDragEnd() },
             onMove = { from, to -> viewModel.onMove(from, to) },
             isDropDownMenuExpanded = isDropDownMenuExpanded,
-            onDropdownExpandedChange = { isDropDownMenuExpanded = it }
+            onDropdownExpandedChange = { isDropDownMenuExpanded = it },
+            haptic = haptic
         )
     } else {
         LoadingManager.startLoading()
@@ -290,7 +291,8 @@ fun BacklogContent(
     onDragEnd: (List<TodoItemModel>) -> Unit = { },
     onMove: (Int, Int) -> Unit,
     isDropDownMenuExpanded: Boolean = false,
-    onDropdownExpandedChange: (Boolean) -> Unit = {}
+    onDropdownExpandedChange: (Boolean) -> Unit = {},
+    haptic: HapticFeedback = LocalHapticFeedback.current
 ) {
     Column(
         modifier = Modifier
@@ -391,7 +393,8 @@ fun BacklogContent(
                         isNewItemCreated = uiState.isNewItemCreated,
                         resetNewItemFlag = resetNewItemFlag,
                         onDragEnd = onDragEnd,
-                        onMove = onMove
+                        onMove = onMove,
+                        haptic = haptic
                     )
                 }
             }
@@ -543,6 +546,7 @@ fun BacklogTaskList(
     resetNewItemFlag: () -> Unit = {},
     onDragEnd: (List<TodoItemModel>) -> Unit = { },
     onMove: (Int, Int) -> Unit,
+    haptic: HapticFeedback = LocalHapticFeedback.current
 ) {
     var draggedItem by remember { mutableStateOf<TodoItemModel?>(null) }
     var isDragging by remember { mutableStateOf(false) }
@@ -560,6 +564,7 @@ fun BacklogTaskList(
             .pointerInput(Unit) {
                 detectDragGesturesAfterLongPress(
                     onDragStart = { offset ->
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                         dragDropState.onDragStart(offset)
                         draggedItem = backlogList[dragDropState.currentIndexOfDraggedItem
                             ?: return@detectDragGesturesAfterLongPress]

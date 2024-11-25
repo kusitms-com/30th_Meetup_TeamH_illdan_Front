@@ -108,6 +108,20 @@ class TodayViewModel @Inject constructor(
         }
 
         updateList(newTodays)
+        checkForAllDone(newTodays)
+    }
+
+    private fun checkForAllDone(list: List<TodoItemModel>) {
+        var isAllChecked = true
+
+        for (item in list) {
+            if (item.todoStatus == TodoStatus.INCOMPLETE) {
+                isAllChecked = false
+                break
+            }
+        }
+
+        if (isAllChecked) { emitEventFlow(TodayEvent.TodayAllChecked) }
     }
 
     private fun getTodayList(page: Int, size: Int) {

@@ -18,6 +18,7 @@ import com.poptato.mypage.MyPageScreen
 import com.poptato.mypage.policy.PolicyViewerScreen
 import com.poptato.mypage.viewer.FAQViewerScreen
 import com.poptato.mypage.viewer.NoticeViewerScreen
+import com.poptato.onboarding.OnboardingScreen
 import com.poptato.setting.servicedelete.ServiceDeleteScreen
 import com.poptato.setting.userdata.UserDataScreen
 import com.poptato.splash.SplashScreen
@@ -70,8 +71,19 @@ fun NavGraphBuilder.loginNavGraph(
                         }
                     }
                 },
-                showSnackBar = showSnackBar
+                showSnackBar = showSnackBar,
+                goToOnboarding = {
+                    navController.navigate(NavRoutes.OnboardingScreen.route) {
+                        popUpTo(NavRoutes.KaKaoLoginScreen.route) {
+                            inclusive = true
+                        }
+                    }
+                }
             )
+        }
+
+        composable(NavRoutes.OnboardingScreen.route) {
+            OnboardingScreen(goToBacklog = { navController.navigate(NavRoutes.BacklogGraph.route) })
         }
     }
 }
