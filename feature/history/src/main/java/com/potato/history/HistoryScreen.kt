@@ -119,6 +119,7 @@ fun HistoryContent(
         modifier = Modifier
             .fillMaxSize()
             .background(Gray100)
+            .padding(start = 14.dp, end = 14.dp)
     ) {
 
         CalendarContent(
@@ -185,7 +186,6 @@ fun CalendarContent(
         modifier = Modifier
             .fillMaxWidth()
             .background(Gray100)
-            .padding(start = 20.dp, end = 20.dp)
     ) {
         Spacer(modifier = Modifier.height(10.dp))
 
@@ -196,7 +196,7 @@ fun CalendarContent(
             onHeaderClick = { onClickCalendarHeader() }
         )
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         DayOfWeekHeader()
 
@@ -379,7 +379,7 @@ fun HistoryListItem(item: HistoryItemModel) {
             text = item.content,
             color = Gray00,
             style = PoptatoTypo.smMedium,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }
@@ -400,7 +400,7 @@ private fun LazyListState.onLoadMoreWhenLastItemVisible(action: () -> Unit) {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun InfinityLazyColumn(
-    modifier: Modifier = Modifier.padding(start = 24.dp, end = 24.dp),
+    modifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
     reverseLayout: Boolean = false,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
@@ -413,7 +413,7 @@ fun InfinityLazyColumn(
     state.onLoadMoreWhenLastItemVisible(action = loadMore)
     CompositionLocalProvider(LocalOverscrollConfiguration provides null) {
         LazyColumn(
-            modifier = modifier,
+            modifier = modifier.padding(start = 10.dp, end = 10.dp),
             state = state,
             reverseLayout = reverseLayout,
             verticalArrangement = verticalArrangement,
