@@ -1,8 +1,8 @@
 package com.poptato.domain.model.request
 
 data class KaKaoLoginRequest(
-    val socialType: String = "KAKAO",
+    val socialType: String = "",
     val accessToken: String = "",
-    val mobileType: String = "ANDROID",
+    val mobileType: String = "",
     val clientId: String = ""
 )

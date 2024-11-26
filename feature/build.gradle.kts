@@ -15,4 +15,7 @@ dependencies {
     implementation(projects.core.ui)
     implementation(projects.designSystem)
     implementation(projects.core.navigation)
+
+    implementation(libs.firebase.messaging)
+    implementation(libs.permissions)
 }

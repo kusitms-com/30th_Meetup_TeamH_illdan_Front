@@ -16,4 +16,7 @@ dependencies {
     implementation(libs.lazycolumn.scrollbar)
     implementation(libs.coil.compose)
     implementation(libs.coil.svg)
+
+    implementation(libs.firebase.messaging)
+    implementation(libs.permissions)
 }
