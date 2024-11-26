@@ -240,7 +240,8 @@ fun NavGraphBuilder.myPageNavGraph(
                     deleteUserName(it)
                     navController.navigate(NavRoutes.ServiceDeleteScreen.route)
                                     },
-                showDialog = showDialog
+                showDialog = showDialog,
+                navController = navController
             )
         }
 

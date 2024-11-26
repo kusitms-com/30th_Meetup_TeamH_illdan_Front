@@ -1,5 +1,6 @@
 package com.poptato.setting.userdata
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -31,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import coil.Coil
 import coil.ImageLoader
 import coil.compose.AsyncImage
@@ -61,12 +63,17 @@ fun UserDataScreen(
     goBackToMyPage: () -> Unit = {},
     goBackToLogIn: () -> Unit = {},
     goToServiceDelete: (String) -> Unit = {},
-    showDialog: (DialogContentModel) -> Unit = {}
+    showDialog: (DialogContentModel) -> Unit = {},
+    navController: NavController
 ) {
 
     val viewModel: UserDataViewModel = hiltViewModel()
     val uiState: UserDataPageState by viewModel.uiState.collectAsStateWithLifecycle()
     val interactionSource = remember { MutableInteractionSource() }
+
+    BackHandler {
+        navController.popBackStack()
+    }
 
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collect { event ->
