@@ -62,8 +62,8 @@ class HistoryViewModel @Inject constructor(
 
     fun getImageResourceForDate(date: LocalDate, hasEvent: Boolean): Int {
         return when {
-            hasEvent && date.isBefore(LocalDate.now()) -> com.poptato.design_system.R.drawable.ic_history_star
-            date.isAfter(LocalDate.now()) || date.isEqual(LocalDate.now()) -> com.poptato.design_system.R.drawable.ic_history_circle
+            hasEvent -> com.poptato.design_system.R.drawable.ic_history_star
+            date.isAfter(LocalDate.now()) -> com.poptato.design_system.R.drawable.ic_history_circle
             else -> com.poptato.design_system.R.drawable.ic_history_moon
         }
     }
