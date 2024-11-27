@@ -32,7 +32,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import coil.Coil
 import coil.ImageLoader
 import coil.compose.AsyncImage
@@ -64,7 +63,6 @@ fun UserDataScreen(
     goBackToLogIn: () -> Unit = {},
     goToServiceDelete: (String) -> Unit = {},
     showDialog: (DialogContentModel) -> Unit = {},
-    navController: NavController
 ) {
 
     val viewModel: UserDataViewModel = hiltViewModel()
@@ -72,7 +70,7 @@ fun UserDataScreen(
     val interactionSource = remember { MutableInteractionSource() }
 
     BackHandler {
-        navController.popBackStack()
+        goBackToMyPage()
     }
 
     LaunchedEffect(Unit) {
