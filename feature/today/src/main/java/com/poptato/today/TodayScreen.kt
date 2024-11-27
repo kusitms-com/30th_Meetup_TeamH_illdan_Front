@@ -476,7 +476,7 @@ fun TodayTodoItem(
             Row(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
-                    .padding(top = if (item.isBookmark || item.dDay != null) 12.dp else 0.dp),
+                    .padding(top = if (item.isBookmark || item.dDay != null || item.isRepeat) 12.dp else 0.dp),
                 horizontalArrangement = Arrangement.Start
             ) {
                 if (item.isBookmark) {
@@ -509,7 +509,7 @@ fun TodayTodoItem(
                     .fillMaxWidth()
                     .padding(
                         bottom = 16.dp,
-                        top = if (item.isBookmark || item.dDay != null) 8.dp else 16.dp
+                        top = if (item.isBookmark || item.dDay != null || item.isRepeat) 8.dp else 16.dp
                     )
                     .padding(start = 16.dp, end = 18.dp),
                 verticalAlignment = Alignment.CenterVertically

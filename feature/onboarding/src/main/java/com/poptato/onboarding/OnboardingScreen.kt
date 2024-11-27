@@ -108,7 +108,10 @@ fun OnboardingContent(
                 if (it == currentPage) {
                     LottieAnimation(
                         composition = composition,
-                        progress = { progress }
+                        progress = { progress },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.CenterHorizontally)
                     )
                 } else {
                     Box(
