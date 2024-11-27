@@ -57,6 +57,7 @@ const val CategoryNameDialogTitle = "카테고리 이름을 작성해 주세요"
 const val CategoryIconDialogTitle = "카테고리 아이콘을 설정해주세요"
 const val CategoryDeleteDropDownTitle  = "카테고리를 삭제하시겠어요?"
 const val CategoryDeleteDropDownContent = "카테고리에 저장된 할 일도 함께 삭제돼요"
+const val CategoryEmptyBottomSheet = "생성된\n카테고리가 없어요."
 
 // YesterdayList
 const val YesterdayListTitle = "어제 한 일을\n모두 체크하세요!"

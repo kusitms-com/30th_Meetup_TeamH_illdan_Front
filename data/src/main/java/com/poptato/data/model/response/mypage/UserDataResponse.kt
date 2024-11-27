@@ -4,9 +4,9 @@ import com.google.gson.annotations.SerializedName
 
 data class UserDataResponse (
     @SerializedName("name")
-    val name: String = "",
+    val name: String? = "",
     @SerializedName("email")
-    val email: String = "",
+    val email: String? = "",
     @SerializedName("imageUrl")
-    val imageUrl: String = ""
+    val imageUrl: String? = ""
 )

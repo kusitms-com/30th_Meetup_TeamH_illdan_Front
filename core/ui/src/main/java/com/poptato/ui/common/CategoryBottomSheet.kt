@@ -30,13 +30,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.poptato.design_system.CategoryEmptyBottomSheet
 import com.poptato.design_system.Complete
 import com.poptato.design_system.DELETE
 import com.poptato.design_system.Gray00
 import com.poptato.design_system.Gray100
+import com.poptato.design_system.Gray80
 import com.poptato.design_system.Gray90
 import com.poptato.design_system.Gray95
 import com.poptato.design_system.PoptatoTypo
@@ -79,25 +82,39 @@ fun CategoryListBottomSheetContent(
             .fillMaxWidth()
             .background(Gray95)
     ) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 24.dp, bottom = 16.dp)
-                .height(264.dp),
-        ) {
-            itemsIndexed(categoryList, key = { _, item -> item.categoryId }) { index, item ->
-                if (index != 0 && index != 1) {
-                    CategoryBottomSheetItem(
-                        iconImg = item.categoryImgUrl,
-                        categoryName = item.categoryName,
-                        isSelected = item.categoryId == selectedCategory,
-                        onClick = { onClickCategory(item.categoryId) }
-                    )
+
+        if (categoryList.size == 2) {
+            Text(
+                text = CategoryEmptyBottomSheet,
+                color = Gray80,
+                style = PoptatoTypo.lgMedium,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(top = 129.dp, bottom = 105.dp)
+            )
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 24.dp, bottom = 16.dp)
+                    .height(264.dp),
+            ) {
+                itemsIndexed(categoryList, key = { _, item -> item.categoryId }) { index, item ->
+                    if (index != 0 && index != 1) {
+                        CategoryBottomSheetItem(
+                            iconImg = item.categoryImgUrl,
+                            categoryName = item.categoryName,
+                            isSelected = item.categoryId == selectedCategory,
+                            onClick = { onClickCategory(item.categoryId) }
+                        )
+                    }
                 }
             }
         }
 
         CategoryModifyBtnContent(
+            isCategoryListEmpty = categoryList.size == 2,
             onClickDeleteBtn = onClickDeleteBtn,
             onClickFinishBtn = onClickFinishBtn,
             onDismiss = onDismiss
@@ -154,6 +171,7 @@ fun CategoryBottomSheetItem(
 
 @Composable
 fun CategoryModifyBtnContent(
+    isCategoryListEmpty: Boolean = false,
     onClickDeleteBtn: () -> Unit = {},
     onClickFinishBtn: () -> Unit = {},
     onDismiss: () -> Unit = {},
@@ -166,19 +184,21 @@ fun CategoryModifyBtnContent(
             .height(48.dp)
             .padding(horizontal = 16.dp)
     ) {
-        CategoryBottomSheetBtn(
-            btnText = DELETE,
-            btnColor = Gray90,
-            textColor = Gray00,
-            textStyle = PoptatoTypo.mdMedium,
-            modifier = Modifier.weight(1f),
-            onClickBtn = {
-                onClickDeleteBtn()
-                onDismiss()
-            }
-        )
+        if (!isCategoryListEmpty) {
+            CategoryBottomSheetBtn(
+                btnText = DELETE,
+                btnColor = Gray90,
+                textColor = Gray00,
+                textStyle = PoptatoTypo.mdMedium,
+                modifier = Modifier.weight(1f),
+                onClickBtn = {
+                    onClickDeleteBtn()
+                    onDismiss()
+                }
+            )
 
-        Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(8.dp))
+        }
 
         CategoryBottomSheetBtn(
             btnText = Complete,

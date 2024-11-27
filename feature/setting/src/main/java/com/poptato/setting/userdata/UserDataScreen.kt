@@ -1,5 +1,6 @@
 package com.poptato.setting.userdata
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -61,12 +62,16 @@ fun UserDataScreen(
     goBackToMyPage: () -> Unit = {},
     goBackToLogIn: () -> Unit = {},
     goToServiceDelete: (String) -> Unit = {},
-    showDialog: (DialogContentModel) -> Unit = {}
+    showDialog: (DialogContentModel) -> Unit = {},
 ) {
 
     val viewModel: UserDataViewModel = hiltViewModel()
     val uiState: UserDataPageState by viewModel.uiState.collectAsStateWithLifecycle()
     val interactionSource = remember { MutableInteractionSource() }
+
+    BackHandler {
+        goBackToMyPage()
+    }
 
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collect { event ->
@@ -202,7 +207,7 @@ fun MyData(
                     .clip(CircleShape)
             ) {
                 AsyncImage(
-                    model = uiState.userDataModel.userImg,
+                    model = if (uiState.userDataModel.userImg.isEmpty()) R.drawable.ic_person else uiState.userDataModel.userImg,
                     contentDescription = "img_temp_person",
                     modifier = Modifier.size(64.dp),
                     contentScale = ContentScale.Crop,
