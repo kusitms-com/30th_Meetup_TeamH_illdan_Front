@@ -162,7 +162,7 @@ fun MyData(
                     .clip(CircleShape)
             ) {
                 AsyncImage(
-                    model = uiState.userDataModel.userImg,
+                    model = if (uiState.userDataModel.userImg.isEmpty()) R.drawable.ic_person else uiState.userDataModel.userImg,
                     contentDescription = "img_temp_person",
                     modifier = Modifier.size(64.dp),
                     contentScale = ContentScale.Crop,

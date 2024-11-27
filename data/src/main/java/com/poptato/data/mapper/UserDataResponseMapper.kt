@@ -9,9 +9,9 @@ object UserDataResponseMapper : Mapper<UserDataResponse, UserDataModel> {
     override fun responseToModel(response: UserDataResponse?): UserDataModel {
         return response?.let { data ->
             UserDataModel(
-                name = data.name,
-                email = data.email,
-                userImg = data.imageUrl
+                name = data.name ?: "",
+                email = data.email ?: "",
+                userImg = data.imageUrl ?: ""
             )
         } ?: UserDataModel()
     }
