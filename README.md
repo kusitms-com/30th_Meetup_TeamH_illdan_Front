@@ -53,9 +53,11 @@
 │
 └── feature
     ├── backlog
+    ├── category
     ├── history
     ├── login
     ├── mypage
+    ├── onboarding
     ├── setting
     ├── splash
     ├── today
